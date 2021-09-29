@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { stare } from "./attachments";
+import { stare } from "../attachments";
 import { krystal, sadie } from "../clients";
 import { say } from "../common/functions";
 
