@@ -1,2 +1,2 @@
-import "./krystal"
-import "./sadie"
+import "./krystal/index"
+import "./sadie/index"
