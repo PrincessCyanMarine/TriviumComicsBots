@@ -1,6 +1,6 @@
 import { Message, MessageAttachment, User } from "discord.js";
 import * as sharp from "sharp";
-import { kill } from "../attachments";
+import { kill } from "./attachments";
 import { krystal } from "../clients";
 import { getArgs, getImageFromURL, say, testWord } from "../common/functions";
 import { greetings } from "./greetings";
