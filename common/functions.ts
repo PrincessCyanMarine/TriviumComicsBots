@@ -39,7 +39,7 @@ export async function getImageFromURL(avatarURL: string): Promise<Buffer> {
     });
 }
 
-export function createEncoder(width: number, height: number, delay: number = 1, repeat: number = 0, transparent: number = 0, quality: number = 10): { encoder: GIFEncoder, stream: Readable } {
+export function createEncoder(width: number, height: number, { delay = 1, repeat = 0, transparent = 0, quality = 10 }): { encoder: GIFEncoder, stream: Readable } {
     let encoder = new GIFEncoder(width, height);
     encoder.start();
     encoder.setRepeat(repeat);   // 0 for repeat, -1 for no-repeat
