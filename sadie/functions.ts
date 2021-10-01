@@ -47,7 +47,7 @@ export function punching(msg: Message, target?: User) {
         let width = 486;
         let height = 352;
 
-        let { encoder, stream } = createEncoder(width, height, { quality: 100 });
+        let { encoder, stream } = createEncoder(width, height);
         let canvas = createCanvas(width, height);
         let ctx = canvas.getContext('2d');
         let i: number;
