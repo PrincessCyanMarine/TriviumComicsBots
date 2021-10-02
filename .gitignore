@@ -3,6 +3,7 @@
 /node_modules
 package-lock.json
 **.js
+!writeServiceFile.js
 dist/
 **.sql
 serviceaccount.json
