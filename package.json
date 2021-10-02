@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "preinstall": "node writeServiceFile",
     "start": "node index.js",
     "postinstall": "tsc"
   },
