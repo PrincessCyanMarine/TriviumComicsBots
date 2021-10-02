@@ -4,9 +4,9 @@ import { writeFileSync } from "fs"
 import admin from 'firebase-admin'
 config();
 
-if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+if (process.env.FIREBASE_TOKEN) {
     admin.initializeApp({
-        credential: admin.credential.cert(process.env.GOOGLE_APPLICATION_CREDENTIALS),
+        credential: admin.credential.refreshToken(process.env.FIREBASE_TOKEN),
         databaseURL: 'https://tcbotsrewrite.firebaseio.com'
     });
 }
