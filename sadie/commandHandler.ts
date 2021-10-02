@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { testAllWords, testWord } from "../common/functions";
 import { killWords } from "../common/variables";
-import { bestwaifu, dm, greet, kick, padoru, punching, tsundere, weeb } from "./functions";
+import { bestwaifu, dm, greet, kicking, padoru, punching, tsundere, weeb } from "./functions";
 
 export function testCommands(msg: Message) {
     let args = msg.content;
@@ -10,7 +10,7 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "weeb")) weeb(msg);
         else if (testWord(args, ...killWords)) punching(msg);
         else if (testWord(args, 'dm')) dm(msg);
-        else if (testWord(args, 'kick')) kick(msg);
+        else if (testWord(args, 'kick')) kicking(msg);
         else if (testWord(args, 'like', 'love', 'loves')) tsundere(msg);
         else if (testWord(args, 'padoru')) padoru(msg);
         else greet(msg);

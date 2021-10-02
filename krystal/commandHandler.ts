@@ -11,7 +11,7 @@ export function testCommands(msg: Message) {
     else if (args == '18?') eighteen(msg);
     else if (testWord(args, "krystal", "crystal")) {
         if (willRebel()) rebel(msg, false);
-        if (testWord(args, ...killWords)) killing(msg);
+        else if (testWord(args, ...killWords)) killing(msg);
         else if (testWord(args, "run", "gun", "book it", "escape")) gunning(msg);
         else if (testWord(args, "sleep", "bed", "clothes", "(I|I'm|I am).+(will|going to|gonna|shall).+(bed|sleep)", "bedtime")) sleeping(msg);
         else if (testWord(args, "padoru")) padoru(msg);
