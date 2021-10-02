@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "preinstall": "node writeServiceFile",
     "start": "node index.js",
-    "postinstall": "node writeServiceFile & tsc"
+    "postinstall": "tsc"
   },
   "engines": {
     "node": ">=16.6.2"
