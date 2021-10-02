@@ -4,11 +4,6 @@ import { writeFileSync } from "fs"
 import admin from 'firebase-admin'
 config();
 
-export function writeServiceAccountJSON() {
-    if (process.env.GOOGLE_APPLICATION_CREDENTIALS && process.env.SERVICEACCOUNT)
-        writeFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, process.env.SERVICEACCOUNT.replace(/\$\(INSETNEWLINEHERE\)/g, '\n'));
-}
-
 admin.initializeApp({
     credential: admin.credential.applicationDefault(),
     databaseURL: 'https://tcbotsrewrite.firebaseio.com'
