@@ -1,15 +1,15 @@
 import { Client, Intents } from "discord.js";
 import { config } from "dotenv";
 import { writeFileSync } from "fs"
-import admin from 'firebase-admin'
+// import admin from 'firebase-admin'
 config();
 
-admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
-    databaseURL: 'https://tcbotsrewrite.firebaseio.com'
-});
+// admin.initializeApp({
+//     credential: admin.credential.applicationDefault(),
+//     databaseURL: 'https://tcbotsrewrite.firebaseio.com'
+// });
 
-export const database = admin.database().ref();
+// export const database = admin.database().ref();
 
 
 export const krystal = new Client({
