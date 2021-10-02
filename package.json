@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "postinstall": "tsc"
+    "postinstall": "node writeServiceFile & tsc"
   },
   "engines": {
     "node": ">=16.6.2"
