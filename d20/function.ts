@@ -1,6 +1,5 @@
 import { Message } from "discord.js";
-import { d20, database } from "../clients";
-import { say } from "../common/functions";
+import { database } from "..";
 import { not_count_in_channel_ids } from "../common/variables";
 
 export async function countMessages(msg: Message) {
