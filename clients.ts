@@ -4,13 +4,8 @@ import { writeFileSync } from "fs"
 import admin from 'firebase-admin'
 config();
 
-if (process.env.FIREBASE_TOKEN) {
-    admin.initializeApp({
-        credential: admin.credential.refreshToken(process.env.FIREBASE_TOKEN),
-        databaseURL: 'https://tcbotsrewrite.firebaseio.com'
-    });
-}
-export const database = admin.database().ref();
+export const firebase_app = admin.initializeApp({ databaseURL: process.env.DATABASE_URL });
+export const database = firebase_app.database().ref();
 
 
 export const krystal = new Client({
