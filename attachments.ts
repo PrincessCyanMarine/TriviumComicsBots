@@ -25,3 +25,6 @@ export const box = new MessageAttachment("./assets/krystal/box/box.png", "Box.pn
 export const sleep = new MessageAttachment("./assets/krystal/sleep/sleep.png", "Sleep.png");
 export const lamp = new MessageAttachment("./assets/krystal/greetings/lamp.png", "Lamp.png");
 export const popcorn = new MessageAttachment("./assets/krystal/popcorn/popcorn.png", "Popcorn.png");
+
+export const kick = new MessageAttachment("./assets/sadie/kick/kick.png", "Kick.png");
+export const punch = new MessageAttachment("./assets/sadie/punch/punch.gif", "Punch.gif");

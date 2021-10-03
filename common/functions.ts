@@ -68,7 +68,7 @@ export function detectEmoji(content: string): string {
         changed.push(emoji);
         let regexp = new RegExp(emoji, 'gi');
         emoji = emoji.split(':')[1];
-        content = content.replace(regexp, emojis[emoji]);
+        if (emojis[emoji]) content = content.replace(regexp, emojis[emoji]);
     }
     return content;
 }
