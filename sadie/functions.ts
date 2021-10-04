@@ -53,7 +53,7 @@ export function bestwaifu(msg: Message) {
 
 export function weeb(msg: Message) {
     let target: User | undefined = msg.mentions.users.first();
-    if (!target) return;
+    if (!target) return say(sadie, msg.channel, `Everyone here, except for me, is a Weeb, Weeb!`);
     if (sadie.user && target.id == sadie.user.id) {
         say(sadie, msg.channel, 'I\'m no weeb, you weeb').then(() => {
             punching(msg, msg.author);
