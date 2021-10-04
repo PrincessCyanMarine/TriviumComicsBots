@@ -5,7 +5,8 @@ import { bestwaifu, dm, greet, kicking, padoru, punching, tsundere, weeb } from 
 
 export function testCommands(msg: Message) {
     let args = msg.content;
-    if (testWord(args, "sadie"))
+    if (testWord(args, "sadie")) {
+        msg.channel.sendTyping();
         if (testWord(args, "waifu") || testAllWords(args, "best", "girl") || testAllWords(args, "worst", "girl")) bestwaifu(msg);
         else if (testWord(args, "weeb")) weeb(msg);
         else if (testWord(args, ...killWords)) punching(msg);
@@ -14,4 +15,5 @@ export function testCommands(msg: Message) {
         else if (testWord(args, 'like', 'love', 'loves')) tsundere(msg);
         else if (testWord(args, 'padoru')) padoru(msg);
         else greet(msg);
+    }
 }

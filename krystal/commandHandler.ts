@@ -10,6 +10,7 @@ export function testCommands(msg: Message) {
     else if (!!msg.content.match(/pf{2,}t/gi)) rebel(msg, true);
     else if (args == '18?') eighteen(msg);
     else if (testWord(args, "krystal", "crystal")) {
+        msg.channel.sendTyping();
         if (willRebel()) rebel(msg, false);
         else if (testWord(args, ...killWords)) killing(msg);
         else if (testWord(args, "run", "gun", "book it", "escape")) gunning(msg);

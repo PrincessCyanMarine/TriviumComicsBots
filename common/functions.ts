@@ -20,8 +20,9 @@ function createRegex(test: string[]): RegExp {
 
 export function say(bot: Client, channel: TextBasedChannels, content: string | MessageOptions, delay = 1000): Promise<Message> {
     return new Promise((resolve, reject) => {
-        console.log(delay);
+        console.log(`Pre min ${delay}`);
         delay = Math.min(1, delay);
+        console.log(`Post min ${delay}`);
         if (typeof content == 'string') content = detectEmoji(content);
         else if (content.content) content.content = detectEmoji(content.content);
         bot.channels.fetch(channel.id).then(c => {

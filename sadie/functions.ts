@@ -18,7 +18,7 @@ export function greet(msg: Message, greeting = Math.floor(Math.random() * greeti
 
 export function bestwaifu(msg: Message) {
     let startTime = new Date().valueOf();
-    msg.channel.sendTyping();
+
     if (testWord(msg.content, 'isnt', 'not', 'trash', 'worst')) {
         let width = 1000,
             height = 676;
@@ -64,7 +64,7 @@ export function weeb(msg: Message) {
 
 export function punching(msg: Message, target: User | undefined = getTarget(msg), revengekill = false): any {
     let startTime = new Date().valueOf();
-    msg.channel.sendTyping();
+
 
     if (!target) return say(sadie, msg.channel, { files: [punch] })
     if (protectedFromKills.includes(target.id)) return punching(msg, msg.author, true);
@@ -114,7 +114,7 @@ export function dm(msg: Message) { say(sadie, msg.channel, 'I already got my own
 export async function kicking(msg: Message, target: User | undefined = getTarget(msg)) {
     if (!target) return say(sadie, msg.channel, { files: [kick] });
     let startTime = new Date().valueOf();
-    msg.channel.sendTyping();
+
     let canvas = createCanvas(868, 587);
     let ctx = canvas.getContext('2d');
     let saveavatar_canvas = createCanvas(256, 256);

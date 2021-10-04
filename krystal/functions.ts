@@ -27,7 +27,7 @@ export function gunning(msg: Message) { say(krystal, msg.channel, { files: [run]
 
 export function killing(msg: Message, target: User | undefined = getTarget(msg), revengekill: Boolean = false): any {
     let startTime = new Date().valueOf();
-    msg.channel.sendTyping();
+
 
     if (!revengekill && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
 
@@ -61,7 +61,7 @@ export function rebel(msg: Message, canRebel: boolean = false) {
 export function sleeping(msg: Message, target: User | undefined = getTarget(msg)) {
     if (!target) return say(krystal, msg.channel, { files: [sleep] });
     let startTime = new Date().valueOf();
-    msg.channel.sendTyping();
+
 
     let canvas = createCanvas(361, 303);
     let ctx = canvas.getContext('2d');
@@ -77,9 +77,9 @@ export function sleeping(msg: Message, target: User | undefined = getTarget(msg)
 };
 export function absorbing(msg: Message, target: User | undefined = getTarget(msg)) {
     if (!target) return say(krystal, msg.channel, { files: [absorb] });
-    msg.channel.sendTyping();
+
     let startTime = new Date().valueOf();
-    msg.channel.sendTyping();
+
 
     let canvas = createCanvas(1297, 707);
     let ctx = canvas.getContext('2d');
