@@ -1,9 +1,10 @@
 import { Image, createCanvas, loadImage } from "canvas";
 import { Message, MessageAttachment, User } from "discord.js";
+import assets from "../assetsIndexes";
 // import * as sharp from "sharp";
-import { kill, pfft, run, yeet } from "../attachments";
+import { absorb, kill, pfft, run, sleep, yeet } from "../attachments";
 import { krystal } from "../clients";
-import { say, testWord } from "../common/functions";
+import { getTarget, say, testWord } from "../common/functions";
 import { protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
@@ -24,12 +25,9 @@ export function eighteen(msg: Message) { say(krystal, msg.channel, '18!'); };
 
 export function gunning(msg: Message) { say(krystal, msg.channel, { files: [run] }); };
 
-export function killing(msg: Message, target?: User, revengekill: Boolean = false): any {
+export function killing(msg: Message, target: User | undefined = getTarget(msg), revengekill: Boolean = false): any {
     let startTime = new Date().valueOf();
-    if (!target) {
-        if (msg.mentions.users.first()) target = msg.mentions.users.first();
-        else if (testWord(msg.content, "me")) target = msg.author;
-    }
+    msg.channel.sendTyping();
 
     if (!revengekill && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
 
@@ -45,11 +43,11 @@ export function killing(msg: Message, target?: User, revengekill: Boolean = fals
     let ctx = canvas.getContext('2d');
 
     let base = Math.floor(Math.random() * 2);
-    loadImage(`./assets/krystal/kill/base${base}.png`).then(bg => {
-        if (target) loadImage(target.displayAvatarURL({ size: 512, format: 'png' })).then(avatar => {
+    loadImage(assets.krystal.kill[base]).then(bg => {
+        if (target) loadImage(avatarURL).then(avatar => {
             ctx.drawImage(bg, 0, 0);
             ctx.drawImage(avatar, 150, 200, 500, 500);
-            say(krystal, msg.channel, { content: text, files: [new MessageAttachment(canvas.toBuffer(), 'Kill.png')] }, new Date().valueOf() - startTime)
+            say(krystal, msg.channel, { content: text, files: [new MessageAttachment(canvas.toBuffer(), 'Kill.png')] }, 1000 - (new Date().valueOf() - startTime))
         })
     })
 };
@@ -60,9 +58,41 @@ export function rebel(msg: Message, canRebel: boolean = false) {
     say(krystal, msg.channel, { content: 'Pfft', files: [pfft] });
 };
 
-export function sleeping(msg: Message) { };
-export function padoru(msg: Message) { };
-export function absorbing(msg: Message) { };
+export function sleeping(msg: Message, target: User | undefined = getTarget(msg)) {
+    if (!target) return say(krystal, msg.channel, { files: [sleep] });
+    let startTime = new Date().valueOf();
+    msg.channel.sendTyping();
+
+    let canvas = createCanvas(361, 303);
+    let ctx = canvas.getContext('2d');
+
+    let avatarURL = target.displayAvatarURL({ format: 'jpeg', size: 1024 });
+    loadImage(assets.krystal.sleep).then(top => {
+        loadImage(avatarURL).then(avatar => {
+            ctx.drawImage(avatar, 95, 38, 121, 121);
+            ctx.drawImage(top, 0, 0);
+            say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
+        })
+    })
+};
+export function absorbing(msg: Message, target: User | undefined = getTarget(msg)) {
+    if (!target) return say(krystal, msg.channel, { files: [absorb] });
+    msg.channel.sendTyping();
+    let startTime = new Date().valueOf();
+    msg.channel.sendTyping();
+
+    let canvas = createCanvas(1297, 707);
+    let ctx = canvas.getContext('2d');
+
+    let avatarURL = target.displayAvatarURL({ format: 'png', size: 1024 });
+    loadImage(assets.krystal.absorb).then(bg => {
+        loadImage(avatarURL).then(avatar => {
+            ctx.drawImage(bg, 0, 0);
+            ctx.drawImage(avatar, 82, 98, 512, 512);
+            say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
+        })
+    })
+};
 export function loving(msg: Message) { };
 export function eating(msg: Message) { };
 export function swimming(msg: Message) { };
@@ -72,13 +102,14 @@ export function spinning(msg: Message) { };
 export function prideful(msg: Message) { };
 export function flying(msg: Message) { };
 export function silencing(msg: Message) { };
-export function boxxing(msg: Message) { };
+export function boxxing(msg: Message, target: User | undefined = getTarget(msg)) { };
 export function creeping(msg: Message) { };
 export function talking(msg: Message) { };
-export function drowning(msg: Message) { };
+export function drowning(msg: Message, target: User | undefined = getTarget(msg)) { };
 export function despacito(msg: Message) { };
 export function sparing(msg: Message) { };
 export function dead(msg: Message) { };
 export function pattron(msg: Message) { };
 export function pong(msg: Message) { };
 export function bullshit(msg: Message) { };
+export function padoru(msg: Message) { };

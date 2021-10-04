@@ -1,7 +1,7 @@
 import { createCanvas, Image, loadImage } from "canvas";
 import { Message, MessageAttachment, User } from "discord.js";
 import { sadie } from "../clients";
-import { createEncoder, say, testWord } from "../common/functions";
+import { createEncoder, getTarget, say, testWord } from "../common/functions";
 import { greetings } from "./greetings";
 import { protectedFromKills } from "../common/variables";
 import assets from "../assetsIndexes";
@@ -18,15 +18,16 @@ export function greet(msg: Message, greeting = Math.floor(Math.random() * greeti
 
 export function bestwaifu(msg: Message) {
     let startTime = new Date().valueOf();
+    msg.channel.sendTyping();
     if (testWord(msg.content, 'isnt', 'not', 'trash', 'worst')) {
         let width = 1000,
             height = 676;
 
         let { encoder, canvas, ctx } = createEncoder(width, height, (buffer) => {
-            say(sadie, msg.channel, { content: 'Oh, dumb are we?\nI\'m top bitch, you Weeb!', files: [new MessageAttachment(buffer, 'Door.gif')] }, new Date().valueOf() - startTime);
+            say(sadie, msg.channel, { content: 'Oh, dumb are we?\nI\'m top bitch, you Weeb!', files: [new MessageAttachment(buffer, 'Door.gif')] }, 1000 - new Date().valueOf() - startTime);
         }, { delay: 4500, repeat: -1 });
 
-        let avatarURL = msg.author.displayAvatarURL({ format: 'png', size: 128 });
+        let avatarURL = msg.author.displayAvatarURL({ format: 'png', size: 1024 });
         loadImage(avatarURL).then((avatar) => {
             loadImage(assets.sadie.door.open).then((openDoor) => {
                 loadImage(assets.sadie.door.closed).then((closedDoor) => {
@@ -61,11 +62,9 @@ export function weeb(msg: Message) {
         say(sadie, msg.channel, `Of course <@${target.id}> is a Weeb!\nEveryone here, except for me, is a Weeb, Weeb!`);
 }
 
-export function punching(msg: Message, target?: User, revengekill = false): any {
+export function punching(msg: Message, target: User | undefined = getTarget(msg), revengekill = false): any {
     let startTime = new Date().valueOf();
-    if (!target)
-        if (msg.mentions.users.first()) target = msg.mentions.users.first();
-        else if (testWord(msg.content, 'me')) target = msg.author;
+    msg.channel.sendTyping();
 
     if (!target) return say(sadie, msg.channel, { files: [punch] })
     if (protectedFromKills.includes(target.id)) return punching(msg, msg.author, true);
@@ -73,10 +72,10 @@ export function punching(msg: Message, target?: User, revengekill = false): any 
     let height = 352;
 
     let { encoder, canvas, ctx } = createEncoder(width, height, (buffer) => {
-        say(sadie, msg.channel, { content: revengekill ? 'I would much rather punch you!' : 'My pleasure!', files: [new MessageAttachment(buffer, 'Punch.gif')] }, new Date().valueOf() - startTime)
+        say(sadie, msg.channel, { content: revengekill ? 'I would much rather punch you!' : 'My pleasure!', files: [new MessageAttachment(buffer, 'Punch.gif')] }, 1000 - new Date().valueOf() - startTime)
     });
 
-    loadImage(target.displayAvatarURL({ format: 'png', size: 256 })).then(avatar => {
+    loadImage(target.displayAvatarURL({ format: 'png', size: 1024 })).then(avatar => {
         loadImage(assets.sadie.punch[0]).then(img0 => {
             loadImage(assets.sadie.punch[1]).then(img1 => {
                 loadImage(assets.sadie.punch[2]).then(img2 => {
@@ -112,12 +111,10 @@ export function punching(msg: Message, target?: User, revengekill = false): any 
 
 export function dm(msg: Message) { say(sadie, msg.channel, 'I already got my own group of idiots to DM.\nGo ask someone else.'); }
 
-export async function kicking(msg: Message, target?: User) {
-    if (!target)
-        if (msg.mentions.users.first()) target = msg.mentions.users.first();
-        else if (testWord(msg.content, 'me')) target = msg.author;
-
+export async function kicking(msg: Message, target: User | undefined = getTarget(msg)) {
     if (!target) return say(sadie, msg.channel, { files: [kick] });
+    let startTime = new Date().valueOf();
+    msg.channel.sendTyping();
     let canvas = createCanvas(868, 587);
     let ctx = canvas.getContext('2d');
     let saveavatar_canvas = createCanvas(256, 256);
@@ -125,7 +122,7 @@ export async function kicking(msg: Message, target?: User) {
 
     let ki1 = await (await database.child('canvas_ki1').once('value')).val();
     let ki2 = await (await database.child('canvas_ki2').once('value')).val();
-    let avatarURL = target.displayAvatarURL({ format: 'png', size: 256 });
+    let avatarURL = target.displayAvatarURL({ format: 'png', size: 1024 });
     loadImage('./assets/sadie/kick/kick.png').then(bg => {
         loadImage(avatarURL).then(avatar => {
             loadImage(ki1).then(avatar1 => {
@@ -135,7 +132,7 @@ export async function kicking(msg: Message, target?: User) {
                     ctx.drawImage(avatar1, 78, 79, 72, 72);
                     ctx.drawImage(avatar, 341, 57, 191, 191);
                     ctx.drawImage(avatar2, 706, 37, 71, 71);
-                    say(sadie, msg.channel, { files: [new MessageAttachment(canvas.toBuffer(), 'Kick.png')] });
+                    say(sadie, msg.channel, { files: [new MessageAttachment(canvas.toBuffer(), 'Kick.png')] }, 1000 - (new Date().valueOf() - startTime));
                     database.child('canvas_ki1').set(saveavatar_canvas.toDataURL());
                     database.child('canvas_ki2').set(ki1);
                 })

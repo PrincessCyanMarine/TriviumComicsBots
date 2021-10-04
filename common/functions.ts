@@ -1,5 +1,5 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { Client, Message, MessageOptions, TextBasedChannels, TextChannel } from "discord.js";
+import { Client, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import emojis from "./emojis";
@@ -20,6 +20,8 @@ function createRegex(test: string[]): RegExp {
 
 export function say(bot: Client, channel: TextBasedChannels, content: string | MessageOptions, delay = 1000): Promise<Message> {
     return new Promise((resolve, reject) => {
+        console.log(delay);
+        delay = Math.min(1, delay);
         if (typeof content == 'string') content = detectEmoji(content);
         else if (content.content) content.content = detectEmoji(content.content);
         bot.channels.fetch(channel.id).then(c => {
@@ -71,4 +73,10 @@ export function detectEmoji(content: string): string {
         if (emojis[emoji]) content = content.replace(regexp, emojis[emoji]);
     }
     return content;
+}
+
+export function getTarget(msg: Message): User | undefined {
+    if (msg.mentions.users.first()) return msg.mentions.users.first();
+    if (testWord(msg.content, "me")) return msg.author;
+    return undefined;
 }
