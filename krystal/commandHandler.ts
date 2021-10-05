@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { testWord } from "../common/functions";
 import { killWords } from "../common/variables";
-import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despacito, drowning, eating, eighteen, flying, greet, gunning, killing, loving, padoru, pattron, pong, prideful, rebel, silencing, sleeping, sparing, spinning, swimming, talking, willRebel, yeeting } from "./functions";
+import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despacito, drowning, eating, eighteen, flying, greet, gunning, killing, loving, pattron, pong, prideful, rebel, silencing, sleeping, sparing, spinning, swimming, talking, willRebel, yeeting } from "./functions";
 
 export function testCommands(msg: Message) {
     let args = msg.content;
@@ -9,19 +9,20 @@ export function testCommands(msg: Message) {
     if (!!msg.content.match(/ye{2,}t/gi)) yeeting(msg);
     else if (!!msg.content.match(/pf{2,}t/gi)) rebel(msg, true);
     else if (args == '18?') eighteen(msg);
-    else if (testWord(args, "krystal", "crystal")) {
+    else if (testWord(args, "(I|Im|I am)\\s(will|going to|gonna|shall)\\s(bed|sleep)")) sleeping(msg, msg.author);
+    else if (testWord(args, "(I|Im|I am|(I (will|((am|m)\\s(going\\sto|gonna))|shall)))\\s(hungry|eat)")) eating(msg, msg.author);
+    else if (testWord(args, "krystal")) {
         msg.channel.sendTyping();
         if (willRebel()) rebel(msg, false);
         else if (testWord(args, ...killWords)) killing(msg);
         else if (testWord(args, "run", "gun", "book it", "escape")) gunning(msg);
-        else if (testWord(args, "sleep", "bed", "clothes", "(I|I'm|I am).+(will|going to|gonna|shall).+(bed|sleep)", "bedtime")) sleeping(msg);
-        else if (testWord(args, "padoru")) padoru(msg);
+        else if (testWord(args, "sleep", "bed", "clothes", "bedtime")) sleeping(msg);
         else if (testWord(args, "absorb")) absorbing(msg);
         else if (testWord(args, "girlfriend", "marry", "date", "love", "gf", "boyfriend", "waifu", "wife")) loving(msg);
-        else if (testWord(args, "popcorn", "feed", "hungry")) eating(msg);
+        else if (testWord(args, "popcorn", "feed", "hungry", "eat")) eating(msg);
         else if (testWord(args, "swim")) swimming(msg);
         else if (testWord(args, "fire", "burn", "this is fine")) burning(msg);
-        else if (testWord(args, "(divide by |\/)(0|zero)", "crash", "meaning of life")) crashing(msg);
+        else if (testWord(args, "(divide by |\/ ?)(0|zero)", "crash", "meaning of life")) crashing(msg);
         else if (testWord(args, "spin", "beyblade")) spinning(msg);
         else if (testWord(args, "pride", "gay", "gae", "gæ", "rainbow", "lgbt")) prideful(msg);
         else if (testWord(args, "fly")) flying(msg);

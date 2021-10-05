@@ -1,30 +1,31 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { Client, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
+import { Client, GuildMember, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import emojis from "./emojis";
 
-export function testWord(args: string, ...test: string[]): boolean {
-    return !!(args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '').match(createRegex(test)));
-}
+const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '');
+const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join('(?![A-Z0-9])|(?<![A-Z0-9])')}(?![A-Z0-9]))`, 'gi');
+
+const argMatch = (args: string, test: string[]): RegExpMatchArray | null => argClean(args).match(createRegex(test));
+
+export const testWord = (args: string, ...test: string[]): boolean => !!(argMatch(args, test));
 
 export function testAllWords(args: string, ...test: string[]): boolean {
-    args = args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '');
-    let res = args.match(createRegex(test));
+    let res = argMatch(args, test);
     return ((!!(res)) && (res.length == test.length));
 }
 
-function createRegex(test: string[]): RegExp {
-    return new RegExp(`(${test.join('(?![A-Z0-9])|')}(?![A-Z0-9]))`, 'gi');
-}
 
 export function say(bot: Client, channel: TextBasedChannels, content: string | MessageOptions, delay = 1000): Promise<Message> {
     return new Promise((resolve, reject) => {
-        console.log(`Pre min ${delay}`);
-        delay = Math.min(1, delay);
-        console.log(`Post min ${delay}`);
-        if (typeof content == 'string') content = detectEmoji(content);
-        else if (content.content) content.content = detectEmoji(content.content);
+        // console.log(`Pre max ${delay}`);
+        delay = Math.max(1, delay);
+        // console.log(`Post max ${delay}`);
+        if (typeof content == 'string')
+            content = detectEmoji(content);
+        else if (content.content)
+            content.content = detectEmoji(content.content);
         bot.channels.fetch(channel.id).then(c => {
             if (c instanceof TextChannel) {
                 c.sendTyping().then(() => {
@@ -36,6 +37,19 @@ export function say(bot: Client, channel: TextBasedChannels, content: string | M
         }).catch(reject);
     })
 };
+
+export function edit(msg: Message, content: string | MessageOptions, delay = 1000) {
+    return new Promise((resolve, reject) => {
+        delay = Math.max(1, delay);
+
+        if (typeof content == 'string')
+            content = detectEmoji(content);
+        else if (content.content)
+            content.content = detectEmoji(content.content);
+
+        setTimeout(() => { msg.edit(content).then(resolve).catch(reject); }, delay);
+    })
+}
 
 export function createEncoder(width: number, height: number, callback?: (buffer: Buffer) => void, options?: { delay?: number, repeat?: number, transparent?: number, quality?: number }): { encoder: GIFEncoder, stream: Readable, canvas: Canvas, ctx: CanvasRenderingContext2D } {
     let encoder = new GIFEncoder(width, height);
@@ -78,6 +92,12 @@ export function detectEmoji(content: string): string {
 
 export function getTarget(msg: Message): User | undefined {
     if (msg.mentions.users.first()) return msg.mentions.users.first();
-    if (testWord(msg.content, "me")) return msg.author;
+    if (testWord(msg.content, "me", "I", "Im")) return msg.author;
+    return undefined;
+}
+
+export function getMember(msg: Message): GuildMember | undefined {
+    if (msg.mentions.members?.first()) return msg.mentions.members.first();
+    if (msg.member && testWord(msg.content, "me", "I", "Im")) return msg.member;
     return undefined;
 }

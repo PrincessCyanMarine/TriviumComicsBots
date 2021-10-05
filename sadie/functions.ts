@@ -62,17 +62,17 @@ export function weeb(msg: Message) {
         say(sadie, msg.channel, `Of course <@${target.id}> is a Weeb!\nEveryone here, except for me, is a Weeb, Weeb!`);
 }
 
-export function punching(msg: Message, target: User | undefined = getTarget(msg), revengekill = false): any {
+export function punching(msg: Message, target: User | undefined = getTarget(msg), type = 'normal'): any {
     let startTime = new Date().valueOf();
 
 
     if (!target) return say(sadie, msg.channel, { files: [punch] })
-    if (protectedFromKills.includes(target.id)) return punching(msg, msg.author, true);
+    if (protectedFromKills.includes(target.id)) return punching(msg, msg.author, 'revenge');
     let width = 486;
     let height = 352;
 
     let { encoder, canvas, ctx } = createEncoder(width, height, (buffer) => {
-        say(sadie, msg.channel, { content: revengekill ? 'I would much rather punch you!' : 'My pleasure!', files: [new MessageAttachment(buffer, 'Punch.gif')] }, 1000 - new Date().valueOf() - startTime)
+        say(sadie, msg.channel, { content: type == 'revenge' ? 'I would much rather punch you!' : type == 'tsundere' ? 'I SHOULD KICK YOUR DUMB ASS FOR THIS!!' : 'My pleasure!', files: [new MessageAttachment(buffer, 'Punch.gif')] }, 1000 - new Date().valueOf() - startTime)
     });
 
     loadImage(target.displayAvatarURL({ format: 'png', size: 1024 })).then(avatar => {
@@ -141,6 +141,4 @@ export async function kicking(msg: Message, target: User | undefined = getTarget
     })
 }
 
-export function tsundere(msg: Message) { }
-
-export function padoru(msg: Message) { }
+export function tsundere(msg: Message) { return punching(msg, msg.author, 'tsundere'); }

@@ -9,3 +9,4 @@ export const CerbyId: string = '711241945149734914';
 export const killWords: string[] = ["kill", "beat", "punch", "heal", "shoot", "attack", "unalive", "protect", "exterminate", "end.+suffering"];
 export const protectedFromKills: string[] = [sadieId, krystalId, EliId, CerbyId];
 export const not_count_in_channel_ids: string[] = [""];
+export const patron_role_id = '611539466670309386';

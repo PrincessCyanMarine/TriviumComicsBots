@@ -1,40 +1,44 @@
 import { Image, createCanvas, loadImage } from "canvas";
-import { Message, MessageAttachment, User } from "discord.js";
+import { GuildMember, Message, MessageAttachment, User } from "discord.js";
+import { database } from "..";
 import assets from "../assetsIndexes";
 // import * as sharp from "sharp";
-import { absorb, kill, pfft, run, sleep, yeet } from "../attachments";
+import { absorb, box, drown, fire, fly, glitch, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
 import { krystal } from "../clients";
-import { getTarget, say, testWord } from "../common/functions";
-import { protectedFromKills } from "../common/variables";
+import { edit, getMember, getTarget, say, testWord } from "../common/functions";
+import { patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
-var images: {
-    kill: Image[];
-} = {
-    kill: []
-}
-
+var spared_player_id: string;
+(async () => { spared_player_id = await (await database.child('dontattack').once('value')).val(); })();
+database.child('dontattack').on('value', (s) => { spared_player_id = s.val(); });
 
 export function greet(msg: Message, greeting = Math.floor(Math.random() * greetings.length)) { greetings[greeting](msg); };
-
 export function yeeting(msg: Message, target?: User) { if (!target) say(krystal, msg.channel, { files: [yeet] }) };
-
 export function willRebel(): boolean { return Math.floor(Math.random() * 20) == 0; };
-
 export function eighteen(msg: Message) { say(krystal, msg.channel, '18!'); };
-
 export function gunning(msg: Message) { say(krystal, msg.channel, { files: [run] }); };
+export function creeping(msg: Message) { say(krystal, msg.channel, { files: [moe] }) };
+export function loving(msg: Message) { say(krystal, msg.channel, `I'm sorry, ${msg.member?.displayName} Your Princess is in another castle.`) };
+export function spinning(msg: Message) { say(krystal, msg.channel, { files: [spin] }) };
+export function prideful(msg: Message) { say(krystal, msg.channel, { files: [pride] }) };
+export function pong(msg: Message) { msg.channel.send('Pong!'); };
+export function bullshit(msg: Message) { say(krystal, msg.channel, 'Cow poopy'); };
 
-export function killing(msg: Message, target: User | undefined = getTarget(msg), revengekill: Boolean = false): any {
+export function killing(msg: Message, target: User | undefined = getTarget(msg), type: 'normal' | 'revenge' = 'normal'): any {
     let startTime = new Date().valueOf();
 
+    if (type != 'revenge' && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
 
-    if (!revengekill && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
-
-    let text = revengekill ? `Sorry, <@${msg.author}>, Sadie asked me to spare that player` : target ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***` : `***I will unalive now :GMKrystalDevious:***`
+    let text =
+        type == 'revenge' ? `Sorry, <@${msg.author}>, Sadie asked me to spare that player` :
+            target ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***` :
+                `***I will unalive now :GMKrystalDevious:***`
 
     if (!target) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
-    if (protectedFromKills.includes(target.id)) return killing(msg, msg.author, true);
+    if (protectedFromKills.includes(target.id)) return killing(msg, msg.author, 'revenge');
+
+    if (target.id == spared_player_id) return say(krystal, msg.channel, `Sorry, <@${msg.author}>, I was asked to spare that unattractive weeb`);
 
     let avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });
     if (avatarURL == null) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
@@ -51,13 +55,13 @@ export function killing(msg: Message, target: User | undefined = getTarget(msg),
         })
     })
 };
-
+/**
+ * TODO add rebel commands
+*/
 export function rebel(msg: Message, canRebel: boolean = false) {
-    //TODO add rebel commands
     if (canRebel) { }
     say(krystal, msg.channel, { content: 'Pfft', files: [pfft] });
 };
-
 export function sleeping(msg: Message, target: User | undefined = getTarget(msg)) {
     if (!target) return say(krystal, msg.channel, { files: [sleep] });
     let startTime = new Date().valueOf();
@@ -93,23 +97,116 @@ export function absorbing(msg: Message, target: User | undefined = getTarget(msg
         })
     })
 };
-export function loving(msg: Message) { };
-export function eating(msg: Message) { };
-export function swimming(msg: Message) { };
-export function burning(msg: Message) { };
-export function crashing(msg: Message) { };
-export function spinning(msg: Message) { };
-export function prideful(msg: Message) { };
-export function flying(msg: Message) { };
-export function silencing(msg: Message) { };
-export function boxxing(msg: Message, target: User | undefined = getTarget(msg)) { };
-export function creeping(msg: Message) { };
-export function talking(msg: Message) { };
-export function drowning(msg: Message, target: User | undefined = getTarget(msg)) { };
-export function despacito(msg: Message) { };
-export function sparing(msg: Message) { };
-export function dead(msg: Message) { };
-export function pattron(msg: Message) { };
-export function pong(msg: Message) { };
-export function bullshit(msg: Message) { };
-export function padoru(msg: Message) { };
+export function eating(msg: Message, target: User | undefined = getTarget(msg)) {
+    if (!target) return say(krystal, msg.channel, { files: [popcorn] });
+    let startTime = new Date().valueOf();
+    let canvas = createCanvas(1200, 713);
+    let ctx = canvas.getContext('2d');
+    let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
+    loadImage(assets.krystal.popcorn.base).then(bg => {
+        loadImage(assets.krystal.popcorn.top).then(top => {
+            loadImage(avatarURL).then(avatar => {
+                ctx.drawImage(bg, 0, 0);
+                ctx.drawImage(avatar, 125, 200, 500, 500);
+                ctx.drawImage(top, 0, 0);
+                say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
+            });
+        });
+    });
+};
+export function drowning(msg: Message, target: User | undefined = getTarget(msg)) {
+    if (!target) return say(krystal, msg.channel, { files: [drown] });
+    let canvas = createCanvas(833, 762);
+    let ctx = canvas.getContext('2d');
+    let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
+    loadImage(avatarURL).then(avatar => {
+        loadImage(assets.krystal.drown.base).then(bg => {
+            loadImage(assets.krystal.drown.top).then(top => {
+                ctx.drawImage(bg, 0, 0)
+                ctx.rotate(36 * Math.PI / 180);
+                ctx.drawImage(avatar, 442, -306, 200, 200);
+                ctx.rotate(-36 * Math.PI / 180);
+                ctx.drawImage(top, 0, 0);
+                say(krystal, msg.channel, { files: [canvas.toBuffer()] });
+            });
+        });
+    });
+};
+export function swimming(msg: Message) {
+    if (msg.member?.displayName.toLowerCase() == 'sadie')
+        say(krystal, msg.channel, { files: [swimsadie] });
+    else
+        say(krystal, msg.channel, { files: [swim] });
+
+};
+/**
+ * TODO DND Fireball
+ * */
+export function burning(msg: Message) { say(krystal, msg.channel, { files: [fire] }) };
+export function crashing(msg: Message) {
+    say(krystal, msg.channel, 'Invalid result...', 1500).then(message => {
+        edit(message, 'Krystal.exe stopped responding!', 1000).then(() => {
+            edit(message, 'Restarting Krystal.exe', 2000).then(() => {
+                edit(message, { content: 'Failed to restart: krystal.exe corrupted', files: [glitch] }, 1500);
+            });
+        });
+    });
+};
+export function flying(msg: Message) {
+    if (testWord(msg.content, 'vanquish'))
+        say(krystal, msg.channel, { files: [vanquishFly] });
+    else
+        say(krystal, msg.channel, { files: [fly] });
+};
+/**
+ * TODO silence
+ */
+export function silencing(msg: Message, target: User | undefined = getTarget(msg)) {
+    if (!target) return say(krystal, msg.channel, { files: [lamp] });
+    let canvas = createCanvas(273, 369);
+    let ctx = canvas.getContext('2d');
+    let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
+    loadImage(avatarURL).then(avatar => {
+        loadImage(assets.krystal.lamp).then(top => {
+            ctx.drawImage(avatar, 17, 129, 240, 240);
+            ctx.clearRect(17, 129, 240, 102);
+            ctx.drawImage(top, 0, 0);
+            say(krystal, msg.channel, { files: [canvas.toBuffer()] });
+        });
+    });
+};
+export function boxxing(msg: Message, target: User | undefined = getTarget(msg)) {
+    if (!target) return say(krystal, msg.channel, { files: [box] });
+    let canvas = createCanvas(1754, 1240);
+    let ctx = canvas.getContext('2d');
+    let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
+    loadImage(avatarURL).then(avatar => {
+        loadImage(assets.krystal.box).then(top => {
+            ctx.drawImage(avatar, 621, 161, 465, 465);
+            ctx.drawImage(top, 0, 0);
+            say(krystal, msg.channel, { files: [canvas.toBuffer()] });
+        })
+    })
+};
+/**
+ * TODO silence
+ */
+export function talking(msg: Message) { say(krystal, msg.channel, { files: [speak] }); };
+export function despacito(msg: Message) {
+    let messages = ['What\'s a despacito...?', 'Alexa, play despacito!'];
+    say(krystal, msg.channel, messages[Math.floor(Math.random() * messages.length)]);
+};
+export function dead(msg: Message, target: GuildMember | undefined = getMember(msg)) {
+    if (!target) return say(krystal, msg.channel, `It has expired!`);
+    say(krystal, msg.channel, `${target.displayName} has expired!`);
+};
+export function pattron(msg: Message, target: GuildMember | undefined = getMember(msg)) {
+    if (!target || !target.roles.cache.has(patron_role_id)) return say(krystal, msg.channel, { content: 'Support!\nSupport!\nSupport!\nSupport!', files: [patreon] });
+    say(krystal, msg.channel, `Thanks for being a supporter, <@${target.id}>`);
+};
+
+export function sparing(msg: Message, target: User | undefined = getTarget(msg)) {
+    if (!target) return say(krystal, msg.channel, 'Which unattractive weeb should I spare?');
+    say(krystal, msg.channel, 'Understood, I will spare the unattractive weeb');
+    database.child('dontattack').set(target.id);
+};
