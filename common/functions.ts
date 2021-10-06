@@ -2,6 +2,7 @@ import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
 import { Client, GuildMember, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
+import { eli, krystal, ray, sadie } from "../clients";
 import emojis from "./emojis";
 
 const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '');
@@ -101,4 +102,8 @@ export function getMember(msg: Message): GuildMember | undefined {
     if (msg.mentions.members?.first()) return msg.mentions.members.first();
     if (msg.member && testWord(msg.content, "me", "I", "Im")) return msg.member;
     return undefined;
+}
+
+export function notificationCult(channel_id: string) {
+    [krystal, sadie, ray, eli].forEach(bot => { say(bot, channel_id, ':GMBelleNotificationNew:').catch(console.error); });
 }

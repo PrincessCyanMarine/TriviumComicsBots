@@ -1,5 +1,4 @@
 import { krystal } from "../clients";
-import { detectEmoji, say } from "../common/functions";
 import { testChannelId } from "../common/variables";
 import { testCommands } from "./commandHandler";
 import { testWebtoonEpisode } from "./functions";

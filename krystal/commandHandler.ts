@@ -6,8 +6,8 @@ import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despac
 export function testCommands(msg: Message) {
     let args = msg.content;
 
-    if (!!msg.content.match(/ye{2,}t/gi)) yeeting(msg);
-    else if (!!msg.content.match(/pf{2,}t/gi)) rebel(msg, true);
+    if (!!args.match(/ye{2,}t/gi)) yeeting(msg);
+    else if (!!args.match(/pf{2,}t/gi)) rebel(msg, true);
     else if (args == '18?') eighteen(msg);
     else if (testWord(args, "(I|Im|I am)\\s(will|going to|gonna|shall)\\s(bed|sleep)")) sleeping(msg, msg.author);
     else if (testWord(args, "(I|Im|I am|(I (will|((am|m)\\s(going\\sto|gonna))|shall)))\\s(hungry|eat)")) eating(msg, msg.author);

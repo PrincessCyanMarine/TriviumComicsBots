@@ -5,7 +5,7 @@ import { database } from "..";
 import assets from "../assetsIndexes";
 import { absorb, box, drown, fire, fly, glitch, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
 import { krystal } from "../clients";
-import { edit, getMember, getTarget, say, testWord } from "../common/functions";
+import { edit, getMember, getTarget, notificationCult, say, testWord } from "../common/functions";
 import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
@@ -215,7 +215,6 @@ export function sparing(msg: Message, target: User | undefined = getTarget(msg))
 
 export async function testWebtoonEpisode() {
     let mostRecentEpisode = await (await database.child('mostRecentEpisode').once('value')).val();
-    // console.log(mostRecentEpisode);
     let response = await got('https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252')
     let webtoonEpisode: RegExpMatchArray | null | string = response.body.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
     if (!webtoonEpisode) return;
@@ -231,9 +230,10 @@ export async function testWebtoonEpisode() {
     let episode_title = webtoonEpisode.split('<span class="subj"><span>')[1].split('<\/span><\/span>')[0];
     let episode_url = webtoonEpisode.split('<a href="')[1].split('" class="')[0];
 
-    // console.log(episode_number);
-    // console.log(episode_title);
-    // console.log(episode_url);
+    console.log(episode_number);
+    console.log(episode_title);
+    console.log(episode_url);
 
-    say(krystal, announcementChannelId, `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]} asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`, 1);
+    say(krystal, announcementChannelId, `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]} asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`, 1).catch(console.error);
+    notificationCult('562429294090125330');
 }
