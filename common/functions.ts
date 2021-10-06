@@ -17,7 +17,7 @@ export function testAllWords(args: string, ...test: string[]): boolean {
 }
 
 
-export function say(bot: Client, channel: TextBasedChannels, content: string | MessageOptions, delay = 1000): Promise<Message> {
+export function say(bot: Client, channel: TextBasedChannels | string, content: string | MessageOptions, delay = 1000): Promise<Message> {
     return new Promise((resolve, reject) => {
         // console.log(`Pre max ${delay}`);
         delay = Math.max(1, delay);
@@ -26,7 +26,8 @@ export function say(bot: Client, channel: TextBasedChannels, content: string | M
             content = detectEmoji(content);
         else if (content.content)
             content.content = detectEmoji(content.content);
-        bot.channels.fetch(channel.id).then(c => {
+        let id = typeof channel == 'string' ? channel : channel.id;
+        bot.channels.fetch(id).then(c => {
             if (c instanceof TextChannel) {
                 c.sendTyping().then(() => {
                     setTimeout(() => {
