@@ -29,7 +29,7 @@ export async function countMessages(msg: Message) {
     database.child('guild/' + msg.member.id + '/1').set(guild);
 }
 
-function createXpBar(style: string, color_a: string, color_b: string = '#000000'): Promise<Canvas> {
+export function createXpBar(style: string, color_a: string, color_b: string = '#000000'): Promise<Canvas> {
     return new Promise(async (resolve, reject) => {
         let [width, height] = [664, 29];
         let paint = (bar: Image, color: string) => {

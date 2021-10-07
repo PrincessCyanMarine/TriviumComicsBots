@@ -1,3 +1,5 @@
+import "./express"
+
 import admin from 'firebase-admin'
 import { exit } from "process";
 import { config } from "dotenv"
