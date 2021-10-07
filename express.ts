@@ -98,6 +98,9 @@ express_app.get('/result', async (req, res) => {
     if (typeof color != 'string') color = '#FFFFFF';
     if (typeof color2 != 'string') color2 = '#000000';
 
+    if (!color.startsWith('#')) color = '#' + color;
+    if (!color2.startsWith('#')) color2 = '#' + color2;
+
     let canvas = await createXpBar(type, color, color2);
     res.send(canvas.toDataURL());;
 })
