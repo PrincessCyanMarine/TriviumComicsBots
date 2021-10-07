@@ -8,6 +8,6 @@ testWebtoonEpisode();
 
 krystal.on('messageCreate', (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
-    if (msg.channelId != testChannelId) return;
+    // if (msg.channelId != testChannelId) return;
     testCommands(msg);
 });

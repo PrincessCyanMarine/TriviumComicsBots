@@ -1,8 +1,6 @@
 import { database } from "..";
 import { d20 } from "../clients";
 import { accountForPrestige, createCard, getLevel, getLevelCost, getposition } from "../d20/function";
-import { getMember, getTarget, say } from "./functions";
-import { testChannelId } from "./variables";
 const defaultstyle = {
     type: 'normal',
     color: '#00FFFF',
@@ -28,27 +26,33 @@ d20.on('messageCreate', async (msg) => {
     if (args.startsWith('!')) {
         args = args.replace(/!/, '');
         switch (args.split(' ')[0]) {
-            case 'card_tsc':
+            case 'card':
                 msg.channel.sendTyping();
                 let target = msg.mentions.members?.first();
                 if (!target) target = msg.member;
 
-                let messages = await (await database.child('lvl/' + target.id).once('value')).val();
+                let messages = await (await database.child('lvl/' + msg.guildId + '/' + target.id).once('value')).val();
 
-                let prestige = await (await database.child('prestige/' + target.id).once('value')).val();
-                let style = await (await database.child(`card/${target.id}`).once('value')).val();
+                let prestige = await (await database.child('prestige/' + msg.guildId + '/' + target.id).once('value')).val();
+                let style = await (await database.child(`card/` + target.id).once('value')).val();
                 let stats = await (await database.child('stats/' + target.id).once('value')).val();
                 let warnings_aux = await (await database.child('warnings/' + msg.guildId + '/' + target.id).once('value')).val();
                 let guild = await (await database.child('guild/' + target.id).once('value')).val();
                 if (guild) guild = guild[0];
 
+                let messages_accounted_for_prestige = accountForPrestige(messages, prestige);
                 let level = getLevel(messages, prestige);
+                let level_cost = getLevelCost(level);
+                let level_cost_next = getLevelCost(level + 1);
                 let position = await getposition(target.id);
 
-                if (!style) style = defaultstyle;
-                if (!style['type']) style['type'] = defaultstyle['type'];
-                if (!style['color']) style['color'] = defaultstyle['color'];
-                if (!style['colorb']) style['colorb'] = defaultstyle['colorb'];
+                if (!style)
+                    style = defaultstyle;
+                else {
+                    if (!style['type']) style['type'] = defaultstyle['type'];
+                    if (!style['color']) style['color'] = defaultstyle['color'];
+                    if (!style['colorb']) style['colorb'] = defaultstyle['colorb'];
+                }
 
                 if (!stats) stats = defaultstats;
 
@@ -58,11 +62,11 @@ d20.on('messageCreate', async (msg) => {
                 let months = (((now.getUTCFullYear() - date.getUTCFullYear()) * 12) + (now.getUTCMonth() - date.getUTCMonth()));
 
 
-                let nextlevel_min_messages = getLevelCost(level + 1);
-                let message_to_levelup = getLevelCost(level + 1) - accountForPrestige(messages, prestige);
+                let nextlevel_min_messages = level_cost_next;
+                let message_to_levelup = level_cost_next - messages_accounted_for_prestige;
 
 
-                let percentage = (accountForPrestige(messages, prestige) - getLevelCost(level)) / (getLevelCost(level + 1) - getLevelCost(level));
+                let percentage = (messages_accounted_for_prestige - level_cost) / (level_cost_next - level_cost);
                 let warnings = 0;
                 if (warnings_aux && typeof warnings_aux == 'object' && warnings_aux.length) warnings = warnings_aux.length;
 

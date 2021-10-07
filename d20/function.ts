@@ -8,12 +8,22 @@ import { not_count_in_channel_ids, testGuildId, triviumGuildId } from "../common
 registerFont(assets.d20.card.font, { family: 'LETTERER' });
 
 export async function countMessages(msg: Message) {
-    if (!msg.guildId || ![triviumGuildId, testGuildId].includes(msg.guildId)) return;
-    if (not_count_in_channel_ids.includes(msg.channel.id)) return;
-    let database_lvl_path = msg.guildId == triviumGuildId ? `lvl/${msg.author.id}` : `test_lvl/${msg.author.id}`;
-    let messages = await (await database.child(database_lvl_path).once('value')).val();
+    if (!msg.guildId || !msg.member) return;
+    if (not_count_in_channel_ids.includes(msg.channelId)) return;
+    let database_path = `/${msg.guildId}/${msg.author.id}`;
+    let messages = await (await database.child('lvl' + database_path).once('value')).val();
     messages++;
-    database.child(database_lvl_path).set(messages);
+    database.child('lvl' + database_path).set(messages);
+
+    let level_saved = await (await database.child('prestige' + database_path).once('value')).val();
+    let current_level = getLevel(messages);
+    if (current_level > level_saved) msg.channel.send(`${msg.member.displayName} went from level ${level_saved} to level ${current_level}`);
+    database.child('prestige' + database_path).set(current_level);
+
+    let guild = await (await database.child('guild/' + msg.member.id + '/1').once('value')).val();
+    if (!guild || typeof guild != 'number') return;
+    guild++;
+    database.child('guild/' + msg.member.id + '/1').set(guild);
 }
 
 function createXpBar(style: string, color_a: string, color_b: string = '#000000'): Promise<Canvas> {
@@ -102,7 +112,7 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
     return new Promise(async (resolve, reject) => {
         let canvas = createCanvas(1000, 750);
         let ctx = canvas.getContext('2d');
-        ctx.font = '32px "LETTERER"';
+        ctx.font = '32px "LETTERER", cursive, sans-serif, serif, Verdana, Arial, Helvetica';
         // ctx.fillStyle = '#212121';
         // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
