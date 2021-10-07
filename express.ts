@@ -95,7 +95,7 @@ express_app.get('/result', async (req, res) => {
     let color2 = req.query.color2;
 
     if (typeof type != 'string') type = 'normal';
-    if (typeof color != 'string') color = '#FFFFFF';
+    if (typeof color != 'string') color = '#000000';
     if (typeof color2 != 'string') color2 = '#000000';
 
     if (!color.startsWith('#')) color = '#' + color;

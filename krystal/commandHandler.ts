@@ -36,7 +36,7 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "expired", "dead", "died")) dead(msg);
         else if (testWord(args, "support", "patr(e?)on")) pattron(msg);
         else if (testWord(args, "ping")) pong(msg);
-        else if (testWord(args, "cow poop", "ox excrement", "bullshit")) bullshit(msg);
+        else if (testWord(args, "cow poop(y?)", "ox excrement", "bullshit")) bullshit(msg);
         else greet(msg);
     }
 }
