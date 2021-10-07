@@ -83,16 +83,13 @@ express_app.post('/card/:tokentype/:token', async (req, res) => {
         title: req.body.title
     }
 
-    let {
-        statusCode,
-        user
-    } = await getUser(tokenType, accessToken);
+    let { statusCode, user } = await getUser(tokenType, accessToken);
     database.child('card').child(user.id).set(card).then(() => {
         res.send(card);
     });
 })
 
-express_app.get('/result', (req, res) => {
+express_app.get('/result', async (req, res) => {
     let type = req.query.type;
     let color = req.query.color;
     let color2 = req.query.color2;
@@ -101,7 +98,13 @@ express_app.get('/result', (req, res) => {
     if (typeof color != 'string') color = '#FFFFFF';
     if (typeof color2 != 'string') color2 = '#000000';
 
-    createXpBar(type, color, color2).then(canvas => { res.send(canvas.toDataURL()); });
+    let canvas = await createXpBar(type, color, color2);
+    res.send(canvas.toDataURL());;
 })
+
+express_app.get('/user/:tokentype/:token', async (req, res) => {
+    let { user } = await getUser(req.params.tokentype, req.params.token);
+    res.send(user);
+});
 
 server.listen(port);
