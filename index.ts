@@ -18,3 +18,4 @@ export const database = admin.database().ref();
 import "./krystal/index"
 import "./sadie/index"
 import "./d20/index"
+import "./common/index"
