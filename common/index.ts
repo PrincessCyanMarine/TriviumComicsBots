@@ -27,6 +27,7 @@ d20.on('messageCreate', async (msg) => {
         args = args.replace(/!/, '');
         switch (args.split(' ')[0]) {
             case 'card':
+                if (!msg.guildId) return;
                 msg.channel.sendTyping();
                 let target = msg.mentions.members?.first();
                 if (!target) target = msg.member;
@@ -40,11 +41,14 @@ d20.on('messageCreate', async (msg) => {
                 let guild = await (await database.child('guild/' + target.id).once('value')).val();
                 if (guild) guild = guild[0];
 
+                if (!messages) messages = 0;
+                if (!prestige) prestige = 0;
+
                 let messages_accounted_for_prestige = accountForPrestige(messages, prestige);
                 let level = getLevel(messages, prestige);
                 let level_cost = getLevelCost(level);
                 let level_cost_next = getLevelCost(level + 1);
-                let position = await getposition(target.id);
+                let position = await getposition(msg.guildId, target.id);
 
                 if (!style)
                     style = defaultstyle;
@@ -61,10 +65,8 @@ d20.on('messageCreate', async (msg) => {
                 if (!date) date = now;
                 let months = (((now.getUTCFullYear() - date.getUTCFullYear()) * 12) + (now.getUTCMonth() - date.getUTCMonth()));
 
-
                 let nextlevel_min_messages = level_cost_next;
                 let message_to_levelup = level_cost_next - messages_accounted_for_prestige;
-
 
                 let percentage = (messages_accounted_for_prestige - level_cost) / (level_cost_next - level_cost);
                 let warnings = 0;

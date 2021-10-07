@@ -9,16 +9,19 @@ registerFont(assets.d20.card.font, { family: 'LETTERER' });
 
 export async function countMessages(msg: Message) {
     if (!msg.guildId || !msg.member) return;
+    if (msg.content.startsWith('!') || msg.attachments.first()) return;
     if (not_count_in_channel_ids.includes(msg.channelId)) return;
     let database_path = `/${msg.guildId}/${msg.author.id}`;
     let messages = await (await database.child('lvl' + database_path).once('value')).val();
     messages++;
     database.child('lvl' + database_path).set(messages);
 
-    let level_saved = await (await database.child('prestige' + database_path).once('value')).val();
-    let current_level = getLevel(messages);
+    let level_saved = await (await database.child('level' + database_path).once('value')).val();
+    if (!level_saved || typeof level_saved != 'number') return database.child('level' + database_path).set(1);
+    let prestige = await (await database.child('prestige' + database_path).once('value')).val();
+    let current_level = getLevel(messages, prestige);
     if (current_level > level_saved) msg.channel.send(`${msg.member.displayName} went from level ${level_saved} to level ${current_level}`);
-    database.child('prestige' + database_path).set(current_level);
+    database.child('level' + database_path).set(current_level);
 
     let guild = await (await database.child('guild/' + msg.member.id + '/1').once('value')).val();
     if (!guild || typeof guild != 'number') return;
@@ -195,10 +198,10 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
     });
 }
 
-export function getposition(id: string): Promise<number> {
+export function getposition(guildid: string, memberid: string): Promise<number> {
     return new Promise((resolve, reject) => {
-        database.child('lvl').once('value').then(a => {
-            let messages = a.val()[id];
+        database.child('lvl/' + guildid).once('value').then(a => {
+            let messages = a.val()[memberid];
             let ranking: number[] = Object.values(a.val());
             ranking.sort((a, b) => b - a);
             for (let i = 0; i < ranking.length; i++)
@@ -215,6 +218,6 @@ export const getLevelCost = (level: number): number => (level - 1) * (lvl_base +
 export const accountForPrestige = (messages = 0, prestige = 0) => { for (let p = 1; p <= prestige; p++) messages -= getLevelCost((15 + (5 * (p - 1)))); return messages };
 export function getLevel(messages = 0, prestige = 0) {
     messages = accountForPrestige(messages, prestige);
-    for (let l = 0; l < 15 + (5 * (prestige + 1)); l++) if (messages < getLevelCost(l)) return Math.max(0, l - 1);
+    for (let l = 0; l < 15 + (5 * (prestige + 1)); l++) if (messages < getLevelCost(l)) return Math.max(1, l - 1);
     return 15 + (5 * (prestige));
 }
