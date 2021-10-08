@@ -13,16 +13,18 @@ export async function countMessages(msg: Message) {
     if (not_count_in_channel_ids.includes(msg.channelId)) return;
     let database_path = `/${msg.guildId}/${msg.author.id}`;
     let messages = await (await database.child('lvl' + database_path).once('value')).val();
+    if (!messages) messages = 0;
     messages++;
     database.child('lvl' + database_path).set(messages);
 
     let level_saved = await (await database.child('level' + database_path).once('value')).val();
-    if (!level_saved || typeof level_saved != 'number') return database.child('level' + database_path).set(1);
-    let prestige = await (await database.child('prestige' + database_path).once('value')).val();
-    let current_level = getLevel(messages, prestige);
-    if (current_level > level_saved) msg.channel.send(`${msg.member.displayName} went from level ${level_saved} to level ${current_level}`);
-    database.child('level' + database_path).set(current_level);
-
+    if (!level_saved || typeof level_saved != 'number') database.child('level' + database_path).set(1);
+    else {
+        let prestige = await (await database.child('prestige' + database_path).once('value')).val();
+        let current_level = getLevel(messages, prestige);
+        if (current_level > level_saved) msg.channel.send(`${msg.member.displayName} went from level ${level_saved} to level ${current_level}`);
+        database.child('level' + database_path).set(current_level);
+    }
     let guild = await (await database.child('guild/' + msg.member.id + '/1').once('value')).val();
     if (!guild || typeof guild != 'number') return;
     guild++;

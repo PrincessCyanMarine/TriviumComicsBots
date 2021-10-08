@@ -20,4 +20,7 @@ export const database = admin.database().ref();
 import "./krystal/index"
 import "./sadie/index"
 import "./d20/index"
+import "./slash/d20"
 import "./common/index"
+export const testing = process.env.TESTING == "true";
+console.log("Testing: " + testing);

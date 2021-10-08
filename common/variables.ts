@@ -10,5 +10,5 @@ export const killWords: string[] = ["kill", "beat", "punch", "heal", "shoot", "a
 export const protectedFromKills: string[] = [sadieId, krystalId, EliId, CerbyId];
 export const not_count_in_channel_ids: string[] = [""];
 export const patron_role_id = '611539466670309386';
-export const announcementChannelId: string = '674781280423903264'; // TestChannel
-// export const announcementChannelId: string = '613507549085302796'; // Announcement Channel
+// export const announcementChannelId: string = '674781280423903264'; // TestChannel
+export const announcementChannelId: string = '613507549085302796'; // Announcement Channel

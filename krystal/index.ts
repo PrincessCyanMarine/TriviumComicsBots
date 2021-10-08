@@ -1,3 +1,4 @@
+import { testing } from "..";
 import { krystal } from "../clients";
 import { testChannelId } from "../common/variables";
 import { testCommands } from "./commandHandler";
@@ -8,6 +9,7 @@ testWebtoonEpisode();
 
 krystal.on('messageCreate', (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
-    // if (msg.channelId != testChannelId) return;
+    if (testing && msg.channelId != testChannelId) return;
+    else if (!testing && msg.channelId == testChannelId) return;
     testCommands(msg);
 });
