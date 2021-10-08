@@ -1,7 +1,7 @@
 import { database, testing } from "..";
 import { d20 } from "../clients";
 import { accountForPrestige, createCard, getLevel, getLevelCost, getposition } from "../d20/function";
-import { testChannelId } from "./variables";
+import { ignore_channels, testChannelId } from "./variables";
 const defaultstyle = {
     type: 'normal',
     color: '#00FFFF',
@@ -22,6 +22,7 @@ const defaultstats = {
 
 d20.on('messageCreate', async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
+    if (ignore_channels.includes(msg.channel.id)) return;
     if (testing && msg.channelId != testChannelId) return;
     else if (!testing && msg.channelId == testChannelId) return;
     let args = msg.content;

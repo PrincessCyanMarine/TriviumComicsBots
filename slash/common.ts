@@ -1,59 +1,26 @@
-import { Client, Interaction } from "discord.js";
-
-const Discord = require('discord.js');
-const krystal = new Discord.Client();
-const sadie = new Discord.Client();
-const ray = new Discord.Client();
-const eli = new Discord.Client();
-const d20 = new Discord.Client();
-const cerby = new Discord.Client();
-
-export function reply(client: Client, interaction: Interaction, message: string, exclusive: Boolean) {
-    const data: {
-        content: string;
-        flags: number | undefined;
-    } = {
-        content: message,
-        flags: undefined
-    }
-
-    if (exclusive) data["flags"] = 64;
-    /*
-        client.api.interactions(interaction.id, interaction.token).callback.post({
-            data: {
-                type: 4,
-                data: data
-            }
-        });*/
+import { CommandInteraction, GuildMember, Interaction, TextChannel } from "discord.js";
+function testvalid(interaction: Interaction): boolean {
+    if (!interaction.channel?.isText()) return false;
+    if (interaction.member && !(interaction.member instanceof GuildMember)) return false;
+    if (interaction.channel instanceof TextChannel && interaction.member && !interaction.channel.permissionsFor(interaction.member).has('SEND_MESSAGES')) return false;
+    return true;
+}
+export function reply(interaction: CommandInteraction, message: string, exclusive: boolean = false) {
+    return new Promise((resolve, reject) => {
+        if (!testvalid) return reject('Error!');
+        interaction
+            .reply({ content: message, ephemeral: exclusive })
+            .then(resolve)
+            .catch(reject);
+    })
 }
 
-// /**
-//  * 
-//  * @param {String | Discord.Client} bot 
-//  * @param {Discord.TextChannel} channel 
-//  * @param {Discord.Message} msg 
-//  */
-
-// function say(bot, channel_id, msg, callback) {
-//     bots = {
-//         "eli": eli,
-//         "D20": d20,
-//         "sadie": sadie,
-//         "krystal": krystal,
-//         "ray": ray
-//     }
-
-//     if (typeof bot == 'string')
-//         if (bots[bot]) bot = bots[bot];
-//         else return;
-
-//     bot.channels.fetch(channel_id).then(ch => {
-//         ch.startTyping();
-//         setTimeout(() => {
-//             ch.stopTyping();
-//             ch.send(msg);
-//         }, 1000);
-//     });
-//     if (callback) return callback();
-//     return;
-// }
+export function followup(interaction: CommandInteraction, message: string, exclusive: boolean = false) {
+    return new Promise((resolve, reject) => {
+        if (!testvalid) return reject('Error!');
+        interaction
+            .followUp({ content: message, ephemeral: exclusive })
+            .then(resolve)
+            .catch(reject);
+    })
+}

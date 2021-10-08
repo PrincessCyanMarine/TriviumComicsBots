@@ -20,9 +20,7 @@ export function testAllWords(args: string, ...test: string[]): boolean {
 
 export function say(bot: Client, channel: TextBasedChannels | string, content: string | MessageOptions, delay = 1000): Promise<Message> {
     return new Promise((resolve, reject) => {
-        // console.log(`Pre max ${delay}`);
         delay = Math.max(1, delay);
-        // console.log(`Post max ${delay}`);
         if (typeof content == 'string')
             content = detectEmoji(content);
         else if (content.content)
@@ -30,6 +28,11 @@ export function say(bot: Client, channel: TextBasedChannels | string, content: s
         let id = typeof channel == 'string' ? channel : channel.id;
         bot.channels.fetch(id).then(c => {
             if (c instanceof TextChannel) {
+                if (!bot.user) return;
+                let member = c.members.get(bot.user.id);
+                if (!member) return;
+                if (!c.permissionsFor(member).has('SEND_MESSAGES')) return;
+
                 c.sendTyping().then(() => {
                     setTimeout(() => {
                         c.send(content).then(resolve).catch(reject);

@@ -4,7 +4,7 @@ config();
 
 
 export const krystal = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
 });
 krystal.login(process.env.BOT_KRYSTAL_TOKEN);
 krystal.on('ready', () => { console.log(`${krystal.user ? krystal.user.tag : "Sadie"} is ready!!!`) });
@@ -16,7 +16,7 @@ sadie.login(process.env.BOT_SADIE_TOKEN);
 sadie.on('ready', () => { console.log(`${sadie.user ? sadie.user.tag : "Sadie"} is ready!!!`) });
 
 export const d20 = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
 });
 d20.login(process.env.BOT_D20_TOKEN);
 d20.on('ready', () => { console.log(`${d20.user ? d20.user.tag : "D20"} is ready!!!`) });

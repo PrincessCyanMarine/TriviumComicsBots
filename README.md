@@ -35,7 +35,8 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Cow poopy
 - Greeting
 - *Rebel*
-
+#### Slash commands
+- Whisper
 
 ## Sadie commands (in order of priority)
 - Waifu
