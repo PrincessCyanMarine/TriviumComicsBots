@@ -1,9 +1,11 @@
-import { Canvas, createCanvas, Image, loadImage, NodeCanvasRenderingContext2D, registerFont } from "canvas";
-import { GuildMember, Message } from "discord.js";
-import { createWriteStream } from "fs";
+import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
+import { CommandInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, TextChannel, User } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
+import { d20 } from "../clients";
+import { say } from "../common/functions";
 import { not_count_in_channel_ids, testGuildId, triviumGuildId } from "../common/variables";
+import { reply } from "../slash/common";
 
 registerFont(assets.d20.card.font, { family: 'LETTERER' });
 
@@ -132,6 +134,7 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
         ctx.drawImage(await loadImage('./assets/d20/card/xpbar/bg.png'), 16, 19);
         let xp_bar = await createXpBar(cardoptions.xp_bar.style, cardoptions.xp_bar.color_a, cardoptions.xp_bar.color_b);
         ctx.shadowColor = '#00000000';
+        if (cardoptions.percentage < 0) cardoptions.percentage = cardoptions.percentage * -1;
         cardoptions.percentage = Math.max(Math.min(cardoptions.percentage, 1), 0);
         ctx.drawImage(xp_bar, 0, 0, xp_bar.width * cardoptions.percentage, xp_bar.height, 22, 25, xp_bar.width * cardoptions.percentage, xp_bar.height);
         ctx.shadowColor = '#111111';
@@ -207,6 +210,7 @@ export function getposition(guildid: string, memberid: string): Promise<number> 
         database.child('lvl/' + guildid).once('value').then(a => {
             let messages = a.val()[memberid];
             let ranking: number[] = Object.values(a.val());
+            if (!messages) return resolve(ranking.length);
             ranking.sort((a, b) => b - a);
             for (let i = 0; i < ranking.length; i++)
                 if (messages == ranking[i])
@@ -224,4 +228,177 @@ export function getLevel(messages = 0, prestige = 0) {
     messages = accountForPrestige(messages, prestige);
     for (let l = 0; l < 15 + (5 * (prestige + 1)); l++) if (messages < getLevelCost(l)) return Math.max(1, l - 1);
     return 15 + (5 * (prestige));
+}
+
+export async function prestige(msg: Message | CommandInteraction) {
+    if (!msg.guild) return;
+    let guildId = msg.guildId;
+    let authorId;
+    let displayName;
+    if (msg instanceof Message) {
+        authorId = msg.author.id;
+        displayName = msg.member?.displayName;
+    } else {
+        authorId = msg.user.id;
+        displayName = msg.user.username;
+    }
+    let level = await (await database.child('level/' + guildId + '/' + authorId).once('value')).val();
+    let prestige = await (await database.child('prestige/' + guildId + '/' + authorId).once('value')).val();
+    if (!level) level = 1;
+    if (!prestige) prestige = 0;
+    let min_prestige = 15 + (5 * prestige);
+
+    let maxed = `You already maxed out on prestige!!!\nCongratulations!`;
+    let fail = `You will be able to prestige at level ${min_prestige}\nCurrent level: ${level}`;
+    let success = `${displayName} prestiged!`;
+
+    if (prestige >= 5) {
+        if (msg instanceof Message)
+            say(d20, msg.channel, maxed);
+        else
+            reply(msg, maxed, false);
+        return;
+    };
+
+    if (level >= min_prestige) {
+        prestige++;
+        level = 1;
+        database.child('level/' + guildId + '/' + authorId).set(level);
+        database.child('prestige/' + guildId + '/' + authorId).set(prestige);
+        if (msg instanceof Message)
+            say(d20, msg.channel, success);
+        else
+            reply(msg, success);
+    } else
+        if (msg instanceof Message)
+            say(d20, msg.channel, fail);
+        else
+            reply(msg, fail);
+}
+
+export async function bankick(interaction: CommandInteraction, type: 'ban' | 'kick') {
+    let target = interaction.options.get('player')?.member;
+    let reason = interaction.options.get('reason')?.value;
+    let days = interaction.options.get('days')?.value;
+
+    if (!target || !interaction.guild || !(target instanceof GuildMember)) { reply(interaction, 'Something went wrong'); return; };
+    if (!reason || typeof reason != 'string') reason = '';
+    if (!days || typeof days != 'number') days = 0;
+    days = Math.min(7, Math.max(0, days));
+
+    let author = await interaction.guild.members.fetch(interaction.user.id);
+    let perm: PermissionResolvable = type == 'ban' ? "BAN_MEMBERS" : "KICK_MEMBERS";
+    if (!author.permissions.has(perm)) { reply(interaction, 'You don\' have permission to do that...', true); return; };
+    let target_name = target.displayName;
+
+    let fun = type == 'ban' ? target.ban({ reason: reason, days: days }) : target.kick(reason);
+    fun
+        .then(() => {
+            reply(
+                interaction,
+                `Successfully ${type == 'ban' ? 'banned' : 'kicked'} ${target_name}!${type == 'ban' ? `\nDuration: ${days == 0 ? 'forever' : `${days} days`}` : ''}${reason != '' ? `\nBecause \"${reason}\"` : ''}`
+            );
+        })
+        .catch((er) => {
+            if (er instanceof DiscordAPIError) er = er.message;
+            reply(interaction, `Failed to ${type} ${target_name}...\nReason: ${er}`, true);
+        });
+}
+
+export function generatecard(msg: Message | CommandInteraction): Promise<Buffer> {
+    return new Promise(async (resolve, reject) => {
+        const errormessage = (msg: Message | Interaction) => { if (msg instanceof CommandInteraction) { msg.editReply({ content: 'Failed to create card' }); return reject(); } else return reject(); };
+        if (!msg.guild) return errormessage(msg);
+        const defaultstyle = {
+            type: 'normal',
+            color: '#00FFFF',
+            colorb: '#000000',
+        }
+
+        const defaultstats = {
+            sleep: 0,
+            lamp: 0,
+            box: 0,
+            kill: 0,
+            popcorn: 0,
+            spare: 0,
+            yeet: 0,
+            punch: 0,
+            kick: 0,
+        }
+
+
+        if (!msg.guildId) return reject();
+        if (!msg.member) return reject();
+        let target = msg instanceof Message ?
+            msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member :
+            msg.options.get('player') ? msg.options.get('player')?.user : msg.user;
+        if (!target) return errormessage(msg);
+        if (target instanceof User)
+            target = await msg.guild.members.fetch(target.id);
+
+        let messages = await (await database.child('lvl/' + msg.guildId + '/' + target.id).once('value')).val();
+
+        let prestige = await (await database.child('prestige/' + msg.guildId + '/' + target.id).once('value')).val();
+        let style = await (await database.child(`card/` + target.id).once('value')).val();
+        let stats = await (await database.child('stats/' + target.id).once('value')).val();
+        let warnings_aux = await (await database.child('warnings/' + msg.guildId + '/' + target.id).once('value')).val();
+        let guild = await (await database.child('guild/' + target.id).once('value')).val();
+        if (guild) guild = guild[0];
+
+        if (!messages) messages = 0;
+        if (!prestige) prestige = 0;
+
+        let messages_accounted_for_prestige = accountForPrestige(messages, prestige);
+        let level = getLevel(messages, prestige);
+        let level_cost = getLevelCost(level);
+        let level_cost_next = getLevelCost(level + 1);
+        let position = await getposition(msg.guildId, target.id);
+
+        if (!style)
+            style = defaultstyle;
+        else {
+            if (!style['type']) style['type'] = defaultstyle['type'];
+            if (!style['color']) style['color'] = defaultstyle['color'];
+            if (!style['colorb']) style['colorb'] = defaultstyle['colorb'];
+        }
+
+        if (!stats) stats = defaultstats;
+
+        let date = target.joinedAt;
+        let now = new Date(Date());
+        if (!date) date = now;
+        let months = (((now.getUTCFullYear() - date.getUTCFullYear()) * 12) + (now.getUTCMonth() - date.getUTCMonth()));
+
+        let nextlevel_min_messages = level_cost_next;
+        let message_to_levelup = level_cost_next - messages_accounted_for_prestige;
+
+        let percentage = (messages_accounted_for_prestige - level_cost) / (level_cost_next - level_cost);
+        let warnings = 0;
+        if (warnings_aux && typeof warnings_aux == 'object' && warnings_aux.length) warnings = warnings_aux.length;
+
+        let card = (await createCard({
+            avatar_url: target.user.displayAvatarURL({ format: 'png', size: 1024 }),
+            target: target,
+            level: level,
+            message_to_levelup: message_to_levelup,
+            messages: messages,
+            nextlevel_min_messages: nextlevel_min_messages,
+            percentage: percentage,
+            position: position,
+            time_on_server: months,
+            username: target.displayName,
+            warnings: warnings,
+            xp_bar: {
+                style: style['type'],
+                color_a: style['color'],
+                color_b: style['color2']
+            },
+            guild: guild,
+            prestige: prestige,
+            title: style['title'],
+            stats: stats
+        })).toBuffer();
+        return resolve(card);
+    });
 }

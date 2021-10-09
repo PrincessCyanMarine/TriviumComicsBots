@@ -1,8 +1,7 @@
-import { CommandInteraction, DiscordAPIError, GuildMember, Interaction, InteractionCollector, PermissionResolvable } from "discord.js";
 import { testing } from "..";
 import { d20 } from "../clients";
 import { ignore_channels } from "../common/variables";
-import { reply } from "./common";
+import { bankick, generatecard, prestige } from "../d20/function";
 
 d20.on('ready', async () => {
     console.log("D20 is processing slash commands");
@@ -18,42 +17,24 @@ d20.on('interactionCreate', async (interaction) => {
         case "kick":
             bankick(interaction, interaction.commandName);
             break;
+        case "prestige":
+            prestige(interaction);
+            break;
+        case "card":
+            interaction.deferReply();
+            try {
+                let card = await generatecard(interaction);
+                interaction.editReply({ files: [card] });
+            } catch (er) {
+                console.error(er);
+                interaction.editReply('Something went wrong...');
+            }
+            break;
     }
 });
 
-async function bankick(interaction: CommandInteraction, type: 'ban' | 'kick') {
-    let target = interaction.options.get('player')?.member;
-    let reason = interaction.options.get('reason')?.value;
-    let days = interaction.options.get('days')?.value;
-
-    if (!target || !interaction.guild || !(target instanceof GuildMember)) { reply(interaction, 'Something went wrong'); return; };
-    if (!reason || typeof reason != 'string') reason = '';
-    if (!days || typeof days != 'number') days = 0;
-    days = Math.min(7, Math.max(0, days));
-
-    let author = await interaction.guild.members.fetch(interaction.user.id);
-    let perm: PermissionResolvable = type == 'ban' ? "BAN_MEMBERS" : "KICK_MEMBERS";
-    if (!author.permissions.has(perm)) { reply(interaction, 'You don\' have permission to do that...', true); return; };
-    let target_name = target.displayName;
-
-    let fun = type == 'ban' ? target.ban({ reason: reason, days: days }) : target.kick(reason);
-    fun
-        .then(() => {
-            reply(
-                interaction,
-                `Successfully ${type == 'ban' ? 'banned' : 'kicked'} ${target_name}!${type == 'ban' ? `\nDuration: ${days == 0 ? 'forever' : `${days} days`}` : ''}${reason != '' ? `\nBecause \"${reason}\"` : ''}`
-            );
-        })
-        .catch((er) => {
-            if (er instanceof DiscordAPIError) er = er.message;
-            reply(interaction, `Failed to ${type} ${target_name}...\nReason: ${er}`, true);
-        });
-}
 
 // switch (command) {
-//     case "kick":
-//         kickUser(args["player"], interaction, args["reason"]);
-//         break;
 //     case "warn":
 //         warning(args["player"], interaction, args["reason"]);
 //         break;
@@ -67,25 +48,6 @@ async function bankick(interaction: CommandInteraction, type: 'ban' | 'kick') {
 //     case 'mute':
 //         mute(args["player"], interaction, args["time"], args["timedef"]);
 //         break;
-// }
-
-
-// function kickUser(userId, interaction, reason) {
-//     D20.guilds.fetch(interaction.guild_id).then(guild => {
-//         guild.members.fetch(interaction.member.user.id).then(author => {
-//             if (!author.permissions.has("KICK_MEMBERS")) return reply(D20, interaction, `You have no permission to kick`, true);
-//             guild.members.fetch(userId).then(member => {
-//                 if (member.permissions.has("KICK_MEMBERS")) return reply(D20, interaction, `You have no permission to kick this user`, true);
-//                 if (!reason) reason = 'No reason given';
-//                 member.kick(reason).then(() => {
-//                     reply(D20, interaction, `${member.displayName} has been kicked\nReason: ${reason}`, false)
-//                 }).catch(err => {
-//                     console.error(err);
-//                     reply(D20, interaction, `Couldn't kick ${member}\n reason: ${err}`, true);
-//                 });
-//             }).catch(sendError)
-//         }).catch(sendError);
-//     }).catch(sendError)
 // }
 
 // function mute(target, interaction, time, timedef) {
