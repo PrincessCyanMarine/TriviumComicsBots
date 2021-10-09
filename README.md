@@ -61,4 +61,4 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Card
 
 ## Commands with no specific bot
-- profile
+- Profile

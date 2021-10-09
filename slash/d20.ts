@@ -9,7 +9,7 @@ d20.on('ready', async () => {
 })
 d20.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
-    if (ignore_channels.includes(interaction.channelId)) { reply(interaction, 'Try another channel'); return; }
+    if (ignore_channels.includes(interaction.channelId)) { reply(interaction, 'Try another channel', true); return; }
     if (testing && interaction.channelId != '892800588469911663') return;
     else if (!testing && interaction.channelId == '892800588469911663') return;
 
