@@ -52,3 +52,6 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - *Message counter*
 - Card
 - Card customizer
+
+#### Slash commands
+- Ban

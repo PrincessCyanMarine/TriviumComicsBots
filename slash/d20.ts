@@ -1,4 +1,5 @@
-import { DiscordAPIError, GuildMember, Interaction, InteractionCollector } from "discord.js";
+import { CommandInteraction, DiscordAPIError, GuildMember, Interaction, InteractionCollector, PermissionResolvable } from "discord.js";
+import { testing } from "..";
 import { d20 } from "../clients";
 import { ignore_channels } from "../common/variables";
 import { reply } from "./common";
@@ -9,40 +10,47 @@ d20.on('ready', async () => {
 d20.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
     if (ignore_channels.includes(interaction.channelId)) return;
+    if (testing && interaction.channelId != '892800588469911663') return;
+    else if (!testing && interaction.channelId == '892800588469911663') return;
 
     switch (interaction.commandName) {
         case "ban":
-            let target = interaction.options.get('player')?.member;
-            let reason = interaction.options.get('reason')?.value;
-            let days = interaction.options.get('days')?.value;
-
-            if (!target || !interaction.guild || !(target instanceof GuildMember)) { reply(interaction, 'Something went wrong'); return; };
-            if (!reason || typeof reason != 'string') reason = '';
-            if (!days || typeof days != 'number') days = 0;
-            days = Math.min(7, Math.max(0, days));
-
-            let author = await interaction.guild.members.fetch(interaction.user.id);
-
-            if (!author.permissions.has("BAN_MEMBERS")) { reply(interaction, 'You don\' have permission to do that...', true); return; };
-            target.ban({ reason: reason, days: days })
-                .then(() => {
-                    if (!(target instanceof GuildMember)) return;
-                    reply(interaction, `Successfully banned ${target.displayName}!\nDuration: ${days == 0 ? `${days} days` : 'forever'}${reason != '' ? `\nBecause \"${reason}\"` : ''}`);
-                })
-                .catch((er) => {
-                    if (!(target instanceof GuildMember)) return;
-                    if (er instanceof DiscordAPIError) er = er.message;
-                    reply(interaction, `Failed to ban ${target.displayName}...\nReason: ${er}`, true);
-                });
-
+        case "kick":
+            bankick(interaction, interaction.commandName);
             break;
     }
 });
 
+async function bankick(interaction: CommandInteraction, type: 'ban' | 'kick') {
+    let target = interaction.options.get('player')?.member;
+    let reason = interaction.options.get('reason')?.value;
+    let days = interaction.options.get('days')?.value;
+
+    if (!target || !interaction.guild || !(target instanceof GuildMember)) { reply(interaction, 'Something went wrong'); return; };
+    if (!reason || typeof reason != 'string') reason = '';
+    if (!days || typeof days != 'number') days = 0;
+    days = Math.min(7, Math.max(0, days));
+
+    let author = await interaction.guild.members.fetch(interaction.user.id);
+    let perm: PermissionResolvable = type == 'ban' ? "BAN_MEMBERS" : "KICK_MEMBERS";
+    if (!author.permissions.has(perm)) { reply(interaction, 'You don\' have permission to do that...', true); return; };
+    let target_name = target.displayName;
+
+    let fun = type == 'ban' ? target.ban({ reason: reason, days: days }) : target.kick(reason);
+    fun
+        .then(() => {
+            reply(
+                interaction,
+                `Successfully ${type == 'ban' ? 'banned' : 'kicked'} ${target_name}!${type == 'ban' ? `\nDuration: ${days == 0 ? 'forever' : `${days} days`}` : ''}${reason != '' ? `\nBecause \"${reason}\"` : ''}`
+            );
+        })
+        .catch((er) => {
+            if (er instanceof DiscordAPIError) er = er.message;
+            reply(interaction, `Failed to ${type} ${target_name}...\nReason: ${er}`, true);
+        });
+}
+
 // switch (command) {
-//     case "ban":
-//         banUser(args["player"], interaction, args["reason"], args["days"]);
-//         break;
 //     case "kick":
 //         kickUser(args["player"], interaction, args["reason"]);
 //         break;
@@ -61,45 +69,6 @@ d20.on('interactionCreate', async (interaction) => {
 //         break;
 // }
 
-
-function banUser(userId: string, interaction: Interaction, reason: string, days: number) {
-    // if (!interaction.guild || !interaction.member || !interaction.isCommand()) return;
-    // let guild = interaction.guild;
-    // let permissions = parseInt('' + interaction.member.permissions.valueOf(), 16);
-    // console.log(permissions);
-    // console.log((permissions & 0x40) == 0x40);
-    /*
-        guild.members.fetch(interaction.member.user.id).then(author => {
-            if (!author.permissions.has("BAN_MEMBERS")) return reply(D20, interaction, `You have no permission to ban`, true);
-            guild.members.fetch(userId).then(member => {
-                if (member.permissions.has("BAN_MEMBERS")) return reply(D20, interaction, `You have no permission to ban this user`, true);
-                if (!reason) reason = 'No reason given';
-                if (!days || days < 0) days = 0;
-                if (days > 7) days = 7;
-                member.ban({
-                    reason: reason,
-                    days: days
-                }).then(() => {
-                    reply(D20, interaction, `${member.displayName} has been banned for ${days} days\nReason: ${reason}`, false)
-
-                    let possibleReactions = [
-                        ["eli", interaction.channel_id, "They were one of Trap's alts"],
-                        ["ray", interaction.channel_id, "There goes Longshot133"],
-                        ["ray", interaction.channel_id, "They were with the chair cult"],
-                        ["sadie", interaction.channel_id, `They never paid rent!`]
-                    ];
-
-                    setTimeout(() => {
-                        say(...possibleReactions[Math.floor(Math.random() * possibleReactions.length)]);
-                    }, 1000);
-
-                }).catch(err => {
-                    console.error(err);
-                    reply(D20, interaction, `Couldn't ban ${member}\n reason: ${err}`, true);
-                });
-            }).catch(sendError)
-        }).catch(sendError)*/
-}
 
 // function kickUser(userId, interaction, reason) {
 //     D20.guilds.fetch(interaction.guild_id).then(guild => {
