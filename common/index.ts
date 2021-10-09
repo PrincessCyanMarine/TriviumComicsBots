@@ -22,6 +22,7 @@ d20.on('messageCreate', async (msg) => {
                 prestige(msg);
                 break;
             case 'c':
+            case 'profile':
                 say(d20, msg.channel, 'You can customize your card at https://cyanmarine.net/tc/card/customize');
                 break;
         };
