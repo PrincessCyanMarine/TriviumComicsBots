@@ -21,7 +21,6 @@ d20.on('interactionCreate', async (interaction) => {
             prestige(interaction);
             break;
         case "card":
-            interaction.deferReply();
             try {
                 let card = await generatecard(interaction);
                 interaction.editReply({ files: [card] });

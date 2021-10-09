@@ -377,6 +377,8 @@ export function generatecard(msg: Message | CommandInteraction): Promise<Buffer>
         let warnings = 0;
         if (warnings_aux && typeof warnings_aux == 'object' && warnings_aux.length) warnings = warnings_aux.length;
 
+        if (msg instanceof Interaction) msg.deferReply();
+
         let card = (await createCard({
             avatar_url: target.user.displayAvatarURL({ format: 'png', size: 1024 }),
             target: target,

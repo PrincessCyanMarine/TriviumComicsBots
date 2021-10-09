@@ -59,3 +59,6 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Kick
 - Prestige
 - Card
+
+## Commands with no specific bot
+- profile
