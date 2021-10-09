@@ -66,12 +66,11 @@ This is the repository for the code of the bots from [Trivium comics' official d
 ## Commands with no specific bot
 - Profile
 
+# Author
 -----
+Made by CyanMarine (cyanmarine#2627 on discord)
 
-Made by CyanMarine
-
-cyanmarine#2627 on discord
-
+# Copyright
 -----
 Copyright (C) 2021 Marine Rios
 
