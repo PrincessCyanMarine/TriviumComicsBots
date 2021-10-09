@@ -3,6 +3,8 @@ This is the repository for the code of the bots from [Trivium comics' official d
 
 **Rewrite not finished, expect bugs**
 
+I don't know why you would do that, but you are free to use this for your own bots if you want to. You can even modify it!
+In that case, I just ask that you at least link to this repository and use the same license (what also means making it open source so be careful with tokens and stuff).
 
 
 # Commands
@@ -63,8 +65,9 @@ This is the repository for the code of the bots from [Trivium comics' official d
 ## Commands with no specific bot
 - Profile
 
-
-
+-----
+Made by CyanMarine
+cyanmarine#2627 on discord
 -----
 Copyright (C) 2021 Marine Rios
 
