@@ -76,7 +76,7 @@ export function createXpBar(style: string, color_a: string, color_b: string = '#
     });
 }
 
-type StatsObject = {
+export type StatsObject = {
     sleep: number
     lamp: number
     box: number
@@ -87,7 +87,7 @@ type StatsObject = {
     punch: number
     kick: number
 }
-type CardOptions = {
+export type CardOptions = {
     username: string
     level: number
     messages: number
@@ -305,27 +305,31 @@ export async function bankick(interaction: CommandInteraction, type: 'ban' | 'ki
         });
 }
 
+
+export const defaultstyle = {
+    type: 'normal',
+    color: '#00FFFF',
+    colorb: '#000000',
+    title: undefined
+}
+
+export const defaultstats = {
+    sleep: 0,
+    lamp: 0,
+    box: 0,
+    kill: 0,
+    popcorn: 0,
+    spare: 0,
+    yeet: 0,
+    punch: 0,
+    kick: 0,
+}
+
 export function generatecard(msg: Message | CommandInteraction): Promise<Buffer> {
     return new Promise(async (resolve, reject) => {
         const errormessage = (msg: Message | Interaction) => { if (msg instanceof CommandInteraction) { reply(msg, { content: 'Failed to create card' }); return reject(); } else return reject(); };
         if (!msg.guild) return errormessage(msg);
-        const defaultstyle = {
-            type: 'normal',
-            color: '#00FFFF',
-            colorb: '#000000',
-        }
 
-        const defaultstats = {
-            sleep: 0,
-            lamp: 0,
-            box: 0,
-            kill: 0,
-            popcorn: 0,
-            spare: 0,
-            yeet: 0,
-            punch: 0,
-            kick: 0,
-        }
 
 
         if (!msg.guildId) return reject();
