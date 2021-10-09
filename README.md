@@ -67,7 +67,14 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Profile
 
 # Author
-Made by CyanMarine (cyanmarine#2627 on discord)
+Made by [CyanMarine](https://cyanmarine.net "My website")
+
+Discord: CyanMarine#2627
+
+Reddit: [u/CyanMarine](https://www.reddit.com/user/CyanMarine "Reddit")
+
+Github: [@PrincessCyanMarine](https://github.com/PrincessCyanMarine "Here!")
+
 
 # Copyright
 Copyright (C) 2021 Marine Rios
