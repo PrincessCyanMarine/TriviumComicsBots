@@ -67,11 +67,9 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Profile
 
 # Author
------
 Made by CyanMarine (cyanmarine#2627 on discord)
 
 # Copyright
------
 Copyright (C) 2021 Marine Rios
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
