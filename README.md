@@ -13,7 +13,7 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Yeet
 - Pfft (won't rebel to it)
 - 18?
-- Kill
+- Unalive
 - Run
 - Sleep
 - Absorb
@@ -44,7 +44,7 @@ This is the repository for the code of the bots from [Trivium comics' official d
 ## Sadie commands (in order of priority)
 - Waifu
 - Weeb
-- Kill
+- Punch
 - DM
 - Kick
 - Tsundere (like/love)
