@@ -2,9 +2,9 @@
   "name": "tcbotstypescript",
   "version": "5.1.0",
   "description": "Code of the bots from Trivium comics' official discord server",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node dist/index.js",
     "postinstall": "tsc"
   },
   "engines": {
