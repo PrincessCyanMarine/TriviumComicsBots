@@ -307,7 +307,7 @@ export async function bankick(interaction: CommandInteraction, type: 'ban' | 'ki
 
 export function generatecard(msg: Message | CommandInteraction): Promise<Buffer> {
     return new Promise(async (resolve, reject) => {
-        const errormessage = (msg: Message | Interaction) => { if (msg instanceof CommandInteraction) { msg.editReply({ content: 'Failed to create card' }); return reject(); } else return reject(); };
+        const errormessage = (msg: Message | Interaction) => { if (msg instanceof CommandInteraction) { reply(msg, { content: 'Failed to create card' }); return reject(); } else return reject(); };
         if (!msg.guild) return errormessage(msg);
         const defaultstyle = {
             type: 'normal',
@@ -376,8 +376,6 @@ export function generatecard(msg: Message | CommandInteraction): Promise<Buffer>
         let percentage = (messages_accounted_for_prestige - level_cost) / (level_cost_next - level_cost);
         let warnings = 0;
         if (warnings_aux && typeof warnings_aux == 'object' && warnings_aux.length) warnings = warnings_aux.length;
-
-        if (msg instanceof Interaction) msg.deferReply();
 
         let card = (await createCard({
             avatar_url: target.user.displayAvatarURL({ format: 'png', size: 1024 }),

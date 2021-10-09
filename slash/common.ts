@@ -9,8 +9,12 @@ export function reply(interaction: CommandInteraction, message: string | Interac
     return new Promise((resolve, reject) => {
         if (!testvalid) return reject('Error!');
         if (typeof message == 'string') message = { content: message, ephemeral: exclusive };
-        interaction
-            .reply(message)
+        let fun;
+        if (interaction.replied || interaction.deferred)
+            fun = interaction.editReply(message);
+        else
+            fun = interaction.reply(message);
+        fun
             .then(resolve)
             .catch(reject);
     })

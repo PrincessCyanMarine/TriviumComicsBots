@@ -2,6 +2,7 @@ import { testing } from "..";
 import { d20 } from "../clients";
 import { ignore_channels } from "../common/variables";
 import { bankick, generatecard, prestige } from "../d20/function";
+import { reply } from "./common";
 
 d20.on('ready', async () => {
     console.log("D20 is processing slash commands");
@@ -21,12 +22,13 @@ d20.on('interactionCreate', async (interaction) => {
             prestige(interaction);
             break;
         case "card":
+            interaction.deferReply();
             try {
                 let card = await generatecard(interaction);
-                interaction.editReply({ files: [card] });
+                reply(interaction, { files: [card] });
             } catch (er) {
                 console.error(er);
-                interaction.editReply('Something went wrong...');
+                reply(interaction, 'Something went wrong...');
             }
             break;
     }
