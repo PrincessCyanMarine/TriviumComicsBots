@@ -11,7 +11,7 @@
     "node": ">=16.6.2"
   },
   "author": "CyanMarine",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@types/body-parser": "^1.19.1",
     "@types/cors": "^2.8.12",
