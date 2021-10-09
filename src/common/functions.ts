@@ -97,7 +97,7 @@ export function detectEmoji(content: string): string {
 
 export function getTarget(msg: Message): User | undefined {
     if (msg.mentions.users.first()) return msg.mentions.users.first();
-    if (testWord(msg.content, "me", "I", "Im")) return msg.author;
+    if (testWord(msg.content, "me", "I", "Im", "my")) return msg.author;
     return undefined;
 }
 
