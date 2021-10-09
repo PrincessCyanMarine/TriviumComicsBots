@@ -2,7 +2,7 @@ import { testing } from "..";
 import { d20 } from "../clients";
 import { ignore_channels, testChannelId } from "../common/variables";
 import { testCommands } from "./commandHandler";
-import { countMessages, createCard } from "./function";
+import { countMessages } from "./function";
 
 d20.on('messageCreate', (msg) => {
     if (!msg || !msg.author || msg.author.bot) return;

@@ -55,3 +55,4 @@ This is the repository for the code of the bots from [Trivium comics' official d
 
 #### Slash commands
 - Ban
+- Kick

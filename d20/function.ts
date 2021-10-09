@@ -115,6 +115,7 @@ const podium_fonts = [gold_font_color, silver_font_color, bronze_font_color];
 
 export function createCard(cardoptions: CardOptions): Promise<Canvas> {
     return new Promise(async (resolve, reject) => {
+        // console.log(cardoptions);
         let canvas = createCanvas(1000, 750);
         let ctx = canvas.getContext('2d');
         ctx.font = '32px "LETTERER", cursive, sans-serif, serif, Verdana, Arial, Helvetica';
@@ -131,6 +132,7 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
         ctx.drawImage(await loadImage('./assets/d20/card/xpbar/bg.png'), 16, 19);
         let xp_bar = await createXpBar(cardoptions.xp_bar.style, cardoptions.xp_bar.color_a, cardoptions.xp_bar.color_b);
         ctx.shadowColor = '#00000000';
+        cardoptions.percentage = Math.max(Math.min(cardoptions.percentage, 1), 0);
         ctx.drawImage(xp_bar, 0, 0, xp_bar.width * cardoptions.percentage, xp_bar.height, 22, 25, xp_bar.width * cardoptions.percentage, xp_bar.height);
         ctx.shadowColor = '#111111';
 

@@ -1,6 +1,7 @@
 import { database, testing } from "..";
 import { d20 } from "../clients";
 import { accountForPrestige, createCard, getLevel, getLevelCost, getposition } from "../d20/function";
+import { say } from "./functions";
 import { ignore_channels, testChannelId } from "./variables";
 const defaultstyle = {
     type: 'normal',
@@ -29,7 +30,7 @@ d20.on('messageCreate', async (msg) => {
     if (args.startsWith('!')) {
         args = args.replace(/!/, '');
         switch (args.split(' ')[0]) {
-            case 'card':
+            case 'card': {
                 if (!msg.guildId) return;
                 msg.channel.sendTyping();
                 let target = msg.mentions.members?.first();
@@ -99,6 +100,23 @@ d20.on('messageCreate', async (msg) => {
                 })).toBuffer();
                 msg.channel.send({ files: [card] });
                 break;
+            }
+            case 'prestige': {
+                let level = await (await database.child('level/' + msg.guildId + '/' + msg.author.id).once('value')).val();
+                let prestige = await (await database.child('prestige/' + msg.guildId + '/' + msg.author.id).once('value')).val();
+                if (!level) level = 1;
+                if (!prestige) prestige = 0;
+                if (prestige >= 5) { say(d20, msg.channel, `You already maxed out on prestige!!!\nCongratulations!`); return; };
+                let min_prestige = 15 + (5 * prestige);
+                if (level >= min_prestige) {
+                    prestige++;
+                    level = 1;
+                    database.child('level/' + msg.guildId + '/' + msg.author.id).set(level);
+                    database.child('prestige/' + msg.guildId + '/' + msg.author.id).set(prestige);
+                    say(d20, msg.channel, `${msg.member.displayName} prestiged!`);
+                } else say(d20, msg.channel, `You will be able to prestige at level ${min_prestige}\nCurrent level: ${level}`);
+                break;
+            }
         }
     }
 })
