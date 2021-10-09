@@ -9,18 +9,11 @@ d20.on('ready', async () => {
 })
 d20.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
-    if (ignore_channels.includes(interaction.channelId)) return;
+    if (ignore_channels.includes(interaction.channelId)) { reply(interaction, 'Try another channel'); return; }
     if (testing && interaction.channelId != '892800588469911663') return;
     else if (!testing && interaction.channelId == '892800588469911663') return;
 
     switch (interaction.commandName) {
-        case "ban":
-        case "kick":
-            bankick(interaction, interaction.commandName);
-            break;
-        case "prestige":
-            prestige(interaction);
-            break;
         case "card":
             interaction.deferReply();
             try {
@@ -30,6 +23,13 @@ d20.on('interactionCreate', async (interaction) => {
                 console.error(er);
                 reply(interaction, 'Something went wrong...');
             }
+            break;
+        case "ban":
+        case "kick":
+            bankick(interaction, interaction.commandName);
+            break;
+        case "prestige":
+            prestige(interaction);
             break;
     }
 });
