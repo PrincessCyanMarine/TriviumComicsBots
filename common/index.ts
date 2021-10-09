@@ -1,6 +1,7 @@
 import { database, testing } from "..";
-import { d20 } from "../clients";
+import { d20, krystal } from "../clients";
 import { accountForPrestige, createCard, generatecard, getLevel, getLevelCost, getposition, prestige } from "../d20/function";
+import { killing } from "../krystal/functions";
 import { say } from "./functions";
 import { ignore_channels, testChannelId } from "./variables";
 
@@ -22,8 +23,17 @@ d20.on('messageCreate', async (msg) => {
                 prestige(msg);
                 break;
             case 'c':
-            case 'profile':
                 say(d20, msg.channel, 'You can customize your card at https://cyanmarine.net/tc/card/customize');
+                break;
+            case 'profile':
+                let target = msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member;
+                const profile = [
+                    () => { say(d20, msg.channel, 'You can customize your card at https://cyanmarine.net/tc/card/customize') },
+                    () => { msg.channel.sendTyping(); generatecard(msg).then(card => { msg.channel.send({ files: [card] }) }); },
+                    () => { say(krystal, msg.channel, `!profile <@${target?.id}>`); },
+                    () => { killing(msg, target?.user, "normal", "Cyan asked me to kill whoever did that :GMKrystalDevious: :GMKrystalDevious:"); }
+                ]
+                profile[Math.floor(Math.random() * profile.length)]();
                 break;
         };
     };

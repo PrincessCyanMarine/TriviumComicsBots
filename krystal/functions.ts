@@ -27,12 +27,12 @@ export function prideful(msg: Message) { say(krystal, msg.channel, { files: [pri
 export function pong(msg: Message) { msg.channel.send('Pong!'); };
 export function bullshit(msg: Message) { say(krystal, msg.channel, 'Cow poopy'); };
 
-export function killing(msg: Message, target: User | undefined = getTarget(msg), type: 'normal' | 'revenge' = 'normal'): any {
+export function killing(msg: Message, target: User | undefined = getTarget(msg), type: 'normal' | 'revenge' = 'normal', text?: string): any {
     let startTime = new Date().valueOf();
 
     if (type != 'revenge' && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
 
-    let text =
+    if (!text) text =
         type == 'revenge' ? `Sorry, <@${msg.author}>, Sadie asked me to spare that player` :
             target ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***` :
                 `***I will unalive now :GMKrystalDevious:***`
