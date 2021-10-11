@@ -43,7 +43,7 @@ d20.on('interactionCreate', async (interaction) => {
                 typeof command != 'string' ||
                 !(command.match(command_list_string))
             ) { reply(interaction, commandlisttext, true); return; };
-            { reply(interaction, `Here's how that command works: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/${command.replace(/\s/g, '_')}`); return; };
+            { reply(interaction, `Here's how that command works: https://github.com/PrincessCyanMarine/TriviumComicsBots/wiki/${command.replace(/\s/g, '_')}`); return; };
         case 'announce':
             let channel = interaction.options.get('target-channel')?.channel?.id;
             if (!channel) channel = '624774782180917278';
