@@ -205,17 +205,17 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
     });
 }
 
-export function getposition(guildid: string, memberid: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-        database.child('lvl/' + guildid).once('value').then(a => {
-            let messages = a.val()[memberid];
-            let ranking: number[] = Object.values(a.val());
-            if (!messages) return resolve(ranking.length);
-            ranking.sort((a, b) => b - a);
-            for (let i = 0; i < ranking.length; i++)
-                if (messages == ranking[i])
-                    resolve(i + 1);
-        });
+export function getposition(guildid: string, memberid: string, all_messages?: { [id: string]: number; }): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+        if (!all_messages) all_messages = await (await database.child('lvl/' + guildid).once('value')).val();
+        if (!all_messages) return resolve(1);
+        let messages = all_messages[memberid];
+        let ranking: number[] = Object.values(all_messages);
+        if (!messages) return resolve(ranking.length);
+        ranking.sort((a, b) => b - a);
+        for (let i = 0; i < ranking.length; i++)
+            if (messages == ranking[i])
+                resolve(i + 1);
     });
 }
 
@@ -341,7 +341,9 @@ export function generatecard(msg: Message | CommandInteraction): Promise<Buffer>
         if (target instanceof User)
             target = await msg.guild.members.fetch(target.id);
 
-        let messages = await (await database.child('lvl/' + msg.guildId + '/' + target.id).once('value')).val();
+        let all_messages = await (await database.child('lvl/' + msg.guildId).once('value')).val();
+        if (!all_messages) all_messages[target.id] = 0;
+        let messages = all_messages[target.id];
 
         let prestige = await (await database.child('prestige/' + msg.guildId + '/' + target.id).once('value')).val();
         let style = await (await database.child(`card/` + target.id).once('value')).val();
@@ -357,7 +359,7 @@ export function generatecard(msg: Message | CommandInteraction): Promise<Buffer>
         let level = getLevel(messages, prestige);
         let level_cost = getLevelCost(level);
         let level_cost_next = getLevelCost(level + 1);
-        let position = await getposition(msg.guildId, target.id);
+        let position = await getposition(msg.guildId, target.id, all_messages);
 
         if (!style)
             style = defaultstyle;
