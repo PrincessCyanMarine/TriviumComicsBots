@@ -30,7 +30,6 @@ export function bullshit(msg: Message) { say(krystal, msg.channel, 'Cow poopy');
 export function killing(msg: Message, target: User | undefined = getTarget(msg), type: 'normal' | 'revenge' = 'normal', text?: string): any {
     let startTime = new Date().valueOf();
 
-    if (type != 'revenge' && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
 
     if (!text) text =
         type == 'revenge' ? `Sorry, <@${msg.author}>, Sadie asked me to spare that player` :
@@ -38,6 +37,7 @@ export function killing(msg: Message, target: User | undefined = getTarget(msg),
                 `***I will unalive now :GMKrystalDevious:***`
 
     if (!target) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
+    if (type != 'revenge' && msg.author.id == target.id && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
     if (protectedFromKills.includes(target.id)) return killing(msg, msg.author, 'revenge');
 
     if (target.id == spared_player_id) return say(krystal, msg.channel, `Sorry, <@${msg.author}>, I was asked to spare that unattractive weeb`);
