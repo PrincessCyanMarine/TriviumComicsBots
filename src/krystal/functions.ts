@@ -1,5 +1,5 @@
 import { createCanvas, loadImage } from "canvas";
-import { GuildMember, Interaction, Message, MessageAttachment, User } from "discord.js";
+import { GuildMember, Message, MessageAttachment, User } from "discord.js";
 import got from "got/dist/source";
 import { database } from "..";
 import assets from "../assetsIndexes";

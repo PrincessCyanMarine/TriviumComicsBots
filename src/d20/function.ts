@@ -1,10 +1,10 @@
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
-import { CommandInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, TextChannel, User } from "discord.js";
+import { CommandInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
 import { d20 } from "../clients";
 import { say } from "../common/functions";
-import { not_count_in_channel_ids, testGuildId, triviumGuildId } from "../common/variables";
+import { not_count_in_channel_ids } from "../common/variables";
 import { reply } from "../slash/common";
 
 registerFont(assets.d20.card.font, { family: 'LETTERER' });
@@ -342,8 +342,9 @@ export function generatecard(msg: Message | CommandInteraction): Promise<Buffer>
             target = await msg.guild.members.fetch(target.id);
 
         let all_messages = await (await database.child('lvl/' + msg.guildId).once('value')).val();
-        if (!all_messages) all_messages[target.id] = 0;
-        let messages = all_messages[target.id];
+        let messages: number;
+        if (!all_messages) messages = 0;
+        else messages = all_messages[target.id];
 
         let prestige = await (await database.child('prestige/' + msg.guildId + '/' + target.id).once('value')).val();
         let style = await (await database.child(`card/` + target.id).once('value')).val();

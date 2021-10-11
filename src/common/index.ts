@@ -1,7 +1,6 @@
-import { database, testing } from "..";
+import { testing } from "..";
 import { d20, krystal } from "../clients";
-import { command_list } from "../commandlist";
-import { accountForPrestige, createCard, generatecard, getLevel, getLevelCost, getposition, prestige } from "../d20/function";
+import { generatecard, prestige } from "../d20/function";
 import { killing } from "../krystal/functions";
 import { say } from "./functions";
 import { ignore_channels, testChannelId } from "./variables";
