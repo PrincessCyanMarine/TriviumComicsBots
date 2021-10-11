@@ -14,8 +14,6 @@ d20.on('interactionCreate', async (interaction) => {
     if (testing && interaction.channelId != '892800588469911663') return;
     else if (!testing && interaction.channelId == '892800588469911663') return;
 
-    console.log(interaction.commandName);
-
     switch (interaction.commandName) {
         case "card":
             interaction.deferReply();
@@ -37,7 +35,6 @@ d20.on('interactionCreate', async (interaction) => {
         case 'help':
             let commandlisttext = `Commands\nKrystal:\n\`\`\`${command_list.Krystal.join(', ')}\`\`\`\nSadie:\n\`\`\`${command_list.sadie.join(', ')}\`\`\`\nD20:\n\`\`\`${command_list.d20.join(', ')}\`\`\`\nMultiple\n\`\`\`${command_list.multiple.join(', ')}\`\`\``;
             let command = interaction.options.get('command')?.value;
-            console.log(command, command_list_string);
             if (
                 !command ||
                 typeof command != 'string' ||
