@@ -35,10 +35,11 @@ d20.on('interactionCreate', async (interaction) => {
         case 'help':
             let commandlisttext = `Commands\nKrystal:\n\`\`\`${command_list.Krystal.join(', ')}\`\`\`\nSadie:\n\`\`\`${command_list.sadie.join(', ')}\`\`\`\nD20:\n\`\`\`${command_list.d20.join(', ')}\`\`\`\nMultiple\n\`\`\`${command_list.multiple.join(', ')}\`\`\``;
             let command = interaction.options.get('command')?.value;
+            console.log(command_list_string);
             if (
                 !command ||
                 typeof command != 'string' ||
-                !command_list_string.includes(command.toLowerCase())
+                !(command.match(command_list_string))
             ) { reply(interaction, commandlisttext, true); return; };
             { reply(interaction, `Here's how that command works: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/${command.replace(/\s/g, '_')}`); return; };
         default:
