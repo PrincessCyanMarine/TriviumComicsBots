@@ -7,7 +7,10 @@ import { say } from "../common/functions";
 import { not_count_in_channel_ids } from "../common/variables";
 import { reply } from "../slash/common";
 
-registerFont(assets.d20.card.font, { family: 'LETTERER' });
+registerFont(assets.d20.card.fonts.letterer, { family: 'LETTERER' });
+registerFont(assets.d20.card.fonts.kosugiMaru, { family: 'KOSUGIMARU' });
+registerFont(assets.d20.card.fonts.opensans, { family: 'OPENSANS' });
+registerFont(assets.d20.card.fonts.notosans, { family: 'NOTOSANS' });
 
 export async function countMessages(msg: Message) {
     if (!msg.guildId || !msg.member) return;
@@ -120,7 +123,7 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
         // console.log(cardoptions);
         let canvas = createCanvas(1000, 750);
         let ctx = canvas.getContext('2d');
-        ctx.font = '32px "LETTERER", cursive, sans-serif, serif, Verdana, Arial, Helvetica';
+        ctx.font = '32px "LETTERER", "KOSUGIMARU", "OPENSANS", "NOTOSANS"';
         // ctx.fillStyle = '#212121';
         // ctx.fillRect(0, 0, canvas.width, canvas.height);
 

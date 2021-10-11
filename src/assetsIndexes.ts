@@ -22,7 +22,12 @@ const assets = {
     },
     d20: {
         card: {
-            font: './assets/d20/card/VTC_LETTERER_PRO.TTF'
+            fonts: {
+                letterer: './assets/d20/card/fonts/VTC_LETTERER_PRO.TTF',
+                kosugiMaru: './assets/d20/card/fonts/KosugiMaru-Regular.ttf',
+                opensans: './assets/d20/card/fonts/OpenSans-VariableFont_wdth,wght.ttf',
+                notosans: './assets/d20/card/fonts/NotoSansJP-Regular.otf',
+            }
         }
     }
 }
