@@ -111,34 +111,51 @@ export function punching(msg: Message, target: User | undefined = getTarget(msg)
 
 export function dm(msg: Message) { say(sadie, msg.channel, 'I already got my own group of idiots to DM.\nGo ask someone else.'); }
 
-export async function kicking(msg: Message, target: User | undefined = getTarget(msg)) {
-    if (!target) return say(sadie, msg.channel, { files: [kick] });
+export async function kicking(msg: Message, avatars: string[] = []) {
+    console.log(msg.mentions.users);
+    console.time('A');
     let startTime = new Date().valueOf();
+    if (avatars.length == 0) avatars = msg.mentions.users.map((user, i) => user.displayAvatarURL({ format: 'png', size: 1024 }));
+    if (avatars.length == 0)
+        if (testWord(msg.content, 'me')) avatars[0] = msg.author.displayAvatarURL({ format: 'png', size: 1024 });
+        else return say(sadie, msg.channel, { files: [kick] });
+    if (avatars.length < 3 && testWord(msg.content, 'me')) avatars[avatars.length] = msg.author.displayAvatarURL({ format: 'png', size: 1024 });
+    console.log(avatars);
+    console.timeLog('A');
 
+
+    console.time('B');
     let canvas = createCanvas(868, 587);
     let ctx = canvas.getContext('2d');
-    let saveavatar_canvas = createCanvas(256, 256);
-    let saveavatar_ctx = saveavatar_canvas.getContext('2d');
 
-    let ki1 = await (await database.child('canvas_ki1').once('value')).val();
-    let ki2 = await (await database.child('canvas_ki2').once('value')).val();
-    let avatarURL = target.displayAvatarURL({ format: 'png', size: 1024 });
-    loadImage('./assets/sadie/kick/kick.png').then(bg => {
-        loadImage(avatarURL).then(avatar => {
-            loadImage(ki1).then(avatar1 => {
-                loadImage(ki2).then(avatar2 => {
-                    saveavatar_ctx.drawImage(avatar, 0, 0);
-                    ctx.drawImage(bg, 0, 0);
-                    ctx.drawImage(avatar1, 78, 79, 72, 72);
-                    ctx.drawImage(avatar, 341, 57, 191, 191);
-                    ctx.drawImage(avatar2, 706, 37, 71, 71);
-                    say(sadie, msg.channel, { files: [new MessageAttachment(canvas.toBuffer(), 'Kick.png')] }, 1000 - (new Date().valueOf() - startTime));
-                    database.child('canvas_ki1').set(saveavatar_canvas.toDataURL());
-                    database.child('canvas_ki2').set(ki1);
-                })
-            })
-        })
-    })
+    let imgs;
+    if (!avatars[1] || !avatars[2]) imgs = await (await database.child('images/sadie').once('value')).val();
+    let avatar = await loadImage(avatars[0]);
+    let bg = await loadImage('./assets/sadie/kick/kick.png');
+    let avatar1 = await loadImage(avatars[1] ? avatars[1] : imgs['kick1']);
+    let avatar2 = await loadImage(avatars[2] ? avatars[2] : imgs['kick2']);
+    console.timeEnd('B');
+    console.timeLog('A');
+
+    let save_canvas1 = createCanvas(1024, 1024);
+    save_canvas1.getContext('2d').drawImage(avatar, 0, 0, 1024, 1024);
+    let save_canvas2 = createCanvas(1024, 1024);
+    save_canvas2.getContext('2d').drawImage(avatar1, 0, 0, 1024, 1024);
+    console.timeLog('A');
+
+    ctx.drawImage(bg, 0, 0);
+    ctx.drawImage(avatar1, 78, 79, 72, 72);
+    ctx.drawImage(avatar, 341, 57, 191, 191);
+    ctx.drawImage(avatar2, 706, 37, 71, 71);
+    say(sadie, msg.channel, { files: [new MessageAttachment(canvas.toBuffer(), 'Kick.png')] }, 1000 - (new Date().valueOf() - startTime));
+    console.timeLog('A');
+
+
+    database.child('images/sadie/kick1').set(save_canvas1.toDataURL());
+    database.child('images/sadie/kick2').set(save_canvas2.toDataURL());
+    console.timeLog('A');
+
+    console.timeEnd('A');
 }
 
 export function tsundere(msg: Message) { return punching(msg, msg.author, 'tsundere'); }
