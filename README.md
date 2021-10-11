@@ -13,7 +13,7 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Yeet
 - Pfft (won't rebel to it)
 - 18?
-- Unalive
+- [Unalive][Unalive]
 - Run
 - Sleep
 - Absorb
@@ -31,7 +31,7 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Talk
 - Drown
 - Despacito
-- Spare
+- [Spare][Spare]
 - Expired
 - Support
 - Ping
@@ -66,6 +66,7 @@ This is the repository for the code of the bots from [Trivium comics' official d
 ## Commands with no specific bot
 - Profile
 
+
 # Author
 Made by [CyanMarine](https://cyanmarine.net "My website")
 
@@ -84,3 +85,11 @@ This program is free software: you can redistribute it and/or modify it under th
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
+
+
+[spare]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Spare "Open on wiki"
+
+[unalive]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Unalive "Open on wiki"
