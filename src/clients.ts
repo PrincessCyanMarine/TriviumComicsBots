@@ -34,3 +34,15 @@ export const eli = new Client({
 });
 eli.login(process.env.BOT_ELI_TOKEN);
 eli.on('ready', () => { console.log(`${eli.user ? eli.user.tag : "Eli"} is ready!!!`) });
+
+
+
+
+
+export const clients: { [bot: string]: Client } = {
+    'd20': d20,
+    'sadie': sadie,
+    'krystal': krystal,
+    'eli': eli,
+    'ray': ray,
+}

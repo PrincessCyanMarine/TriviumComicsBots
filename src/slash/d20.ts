@@ -1,9 +1,11 @@
+import { Message } from "discord.js";
 import { testing } from "..";
-import { d20 } from "../clients";
+import { clients, d20 } from "../clients";
 import { command_list, command_list_string } from "../commandlist";
+import { say } from "../common/functions";
 import { ignore_channels } from "../common/variables";
 import { bankick, generatecard, prestige } from "../d20/function";
-import { reply } from "./common";
+import { followup, reply } from "./common";
 
 d20.on('ready', async () => {
     console.log("D20 is processing slash commands");
@@ -42,6 +44,20 @@ d20.on('interactionCreate', async (interaction) => {
                 !(command.match(command_list_string))
             ) { reply(interaction, commandlisttext, true); return; };
             { reply(interaction, `Here's how that command works: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/${command.replace(/\s/g, '_')}`); return; };
+        case 'announce':
+            let channel = interaction.options.get('target-channel')?.channel?.id;
+            if (!channel) channel = '624774782180917278';
+            let botName = interaction.options.get('bot')?.value;
+            if (typeof botName != 'string' || !interaction.channel) { reply(interaction, 'Something went wrong', true); return; };
+            let bot = clients[botName];
+            reply(interaction, "Waiting for message...", true);
+            let collected = (await interaction.channel.awaitMessages({ time: 60000, max: 1 })).first();
+            if (!collected || !(collected instanceof Message)) { reply(interaction, 'Failed collection', true); return; };
+            let content = collected.content;
+            let attachments = Array.from(collected.attachments.values());
+            say(bot, channel, { content: content, files: attachments });
+            followup(interaction, "Announced!", true);
+            break;
         default:
             reply(interaction, 'Sorry, I don\'t know that command', true);
             break;

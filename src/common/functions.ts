@@ -88,9 +88,10 @@ export function detectEmoji(content: string): string {
     if (text_emojis) for (let emoji of text_emojis) {
         if (changed.includes(emoji)) continue;
         changed.push(emoji);
-        let regexp = new RegExp(emoji, 'gi');
-        emoji = emoji.split(':')[1];
-        if (emojis[emoji]) content = content.replace(regexp, emojis[emoji]);
+        if (emojis[emoji]) {
+            let regexp = new RegExp(emoji, 'gi');
+            content = content.replace(regexp, emojis[emoji]);
+        }
     }
     return content;
 }
