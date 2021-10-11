@@ -56,12 +56,12 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Card
 - Card customizer
 - Prestige
-
 #### Slash commands
 - Ban
 - Kick
 - Prestige
 - Card
+- Help
 
 ## Commands with no specific bot
 - Profile
