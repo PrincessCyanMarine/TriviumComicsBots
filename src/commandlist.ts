@@ -50,3 +50,5 @@ export const command_list = {
         "Profile"
     ]
 };
+
+export const command_list_string = (command_list.Krystal.join(', ') + command_list.sadie.join(', ') + command_list.d20.join(', ') + command_list.multiple.join(', ')).toLowerCase();

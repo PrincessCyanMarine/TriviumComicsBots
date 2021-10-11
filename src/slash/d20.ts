@@ -1,5 +1,6 @@
 import { testing } from "..";
 import { d20 } from "../clients";
+import { command_list, command_list_string } from "../commandlist";
 import { ignore_channels } from "../common/variables";
 import { bankick, generatecard, prestige } from "../d20/function";
 import { reply } from "./common";
@@ -12,6 +13,8 @@ d20.on('interactionCreate', async (interaction) => {
     if (ignore_channels.includes(interaction.channelId)) { reply(interaction, 'Try another channel', true); return; }
     if (testing && interaction.channelId != '892800588469911663') return;
     else if (!testing && interaction.channelId == '892800588469911663') return;
+
+    console.log(interaction.commandName);
 
     switch (interaction.commandName) {
         case "card":
@@ -30,6 +33,19 @@ d20.on('interactionCreate', async (interaction) => {
             break;
         case "prestige":
             prestige(interaction);
+            break;
+        case 'help':
+            let commandlisttext = `Commands\nKrystal:\n\`\`\`${command_list.Krystal.join(', ')}\`\`\`\nSadie:\n\`\`\`${command_list.sadie.join(', ')}\`\`\`\nD20:\n\`\`\`${command_list.d20.join(', ')}\`\`\`\nMultiple\n\`\`\`${command_list.multiple.join(', ')}\`\`\``;
+            let command = interaction.options.get('command')?.value;
+            console.log(command, command_list_string);
+            if (
+                !command ||
+                typeof command != 'string' ||
+                !command_list_string.includes(command.toLowerCase())
+            ) { reply(interaction, commandlisttext, true); return; };
+            { reply(interaction, `Here's how that command works: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/${command.replace(/\s/g, '_')}`); return; };
+        default:
+            reply(interaction, 'Sorry, I don\'t know that command', true);
             break;
     }
 });

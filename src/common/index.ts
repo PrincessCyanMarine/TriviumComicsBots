@@ -37,21 +37,6 @@ d20.on('messageCreate', async (msg) => {
                 ]
                 profile[Math.floor(Math.random() * profile.length)]();
                 break;
-            case 'help':
-                let commandlisttext = `Commands\nKrystal:\n\`\`\`${command_list.Krystal.join(', ')}\`\`\`\nSadie:\n\`\`\`${command_list.sadie.join(', ')}\`\`\`\nD20:\n\`\`\`${command_list.d20.join(', ')}\`\`\`\nMultiple\n\`\`\`${command_list.multiple.join(', ')}\`\`\``;
-                if (!options[1]) { say(d20, msg.channel, commandlisttext); return; }
-                options.shift();
-                let command: string | string[] = options.join(' ').toLowerCase().split('');
-                command[0] = command[0].toUpperCase();
-                command = command.join('');
-                if (
-                    command_list.Krystal.includes(command) ||
-                    command_list.sadie.includes(command) ||
-                    command_list.d20.includes(command) ||
-                    command_list.multiple.includes(command)
-                ) { say(d20, msg.channel, `Here's how that command works: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/${command.replace(/\s/g, '_')}`); return; };
-                say(d20, msg.channel, commandlisttext); return;
-                break;
         };
     };
 });
