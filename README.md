@@ -50,6 +50,8 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Tsundere (like/love)
 - Greeting
 
+## Ray commands
+- roll
 
 ## D20 commands
 - *Message counter*
