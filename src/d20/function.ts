@@ -30,10 +30,12 @@ export async function countMessages(msg: Message) {
         if (current_level > level_saved) msg.channel.send(`${msg.member.displayName} went from level ${level_saved} to level ${current_level}`);
         database.child('level' + database_path).set(current_level);
     }
-    let guild = await (await database.child('guild/' + msg.member.id + '/1').once('value')).val();
-    if (!guild || typeof guild != 'number') return;
-    guild++;
-    database.child('guild/' + msg.member.id + '/1').set(guild);
+    let guild = await (await database.child('guild/' + msg.member.id).once('value')).val();
+    if (!guild || typeof guild != 'string') return;
+    let guild_messages = await (await database.child('guilds/' + msg.guildId + '/' + guild).once('value')).val();
+    if (!guild_messages || typeof guild_messages != 'number') guild_messages = 0;
+    guild_messages++;
+    database.child('guilds/' + msg.guildId + '/' + guild).set(guild_messages);
 }
 
 export function createXpBar(style: string, color_a: string, color_b: string = '#000000'): Promise<Canvas> {
@@ -354,7 +356,6 @@ export function generatecard(msg: Message | CommandInteraction): Promise<Buffer>
         let stats = await (await database.child('stats/' + target.id).once('value')).val();
         let warnings_aux = await (await database.child('warnings/' + msg.guildId + '/' + target.id).once('value')).val();
         let guild = await (await database.child('guild/' + target.id).once('value')).val();
-        if (guild) guild = guild[0];
 
         if (!messages) messages = 0;
         if (!prestige) prestige = 0;
