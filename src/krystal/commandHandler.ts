@@ -11,6 +11,7 @@ export function testCommands(msg: Message) {
     else if (args == '18?') eighteen(msg);
     else if (testWord(args, "(I|Im|I am)\\s(will|going to|gonna|shall)\\s(bed|sleep)")) sleeping(msg, msg.author);
     else if (testWord(args, "(I|Im|I am|(I (will|((am|m)\\s(going\\sto|gonna))|shall)))\\s(hungry|eat)")) eating(msg, msg.author);
+    else if (testWord(args, "cow poop(y?)", "ox excrement", "bullshit")) bullshit(msg);
     else if (testWord(args, "krystal")) {
         msg.channel.sendTyping();
         if (willRebel()) rebel(msg, false);
@@ -36,7 +37,6 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "expired", "dead", "died")) dead(msg);
         else if (testWord(args, "support", "patr(e?)on")) pattron(msg);
         else if (testWord(args, "ping")) pong(msg);
-        else if (testWord(args, "cow poop(y?)", "ox excrement", "bullshit")) bullshit(msg);
         else greet(msg);
     }
 }
