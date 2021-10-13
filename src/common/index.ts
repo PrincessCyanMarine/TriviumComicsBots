@@ -1,6 +1,6 @@
 import { MessageAttachment } from "discord.js";
-import { testing } from "..";
-import { d20, krystal, ray } from "../clients";
+import { database, testing } from "..";
+import { d20, eli, krystal, ray } from "../clients";
 import { generatecard, prestige } from "../d20/function";
 import { killing } from "../krystal/functions";
 import { say } from "./functions";
@@ -69,6 +69,30 @@ d20.on('messageCreate', async (msg) => {
                 if (rolltext.length > 1000) rolltext = total.toString();
 
                 say(ray, msg.channel, rolltext);
+
+                break;
+            case 'guild':
+            case 'guilds':
+                let guilds = ['Krystal', 'Sadie', 'Ray', 'Eli'];
+                let guilds_compare = guilds.map(g => g.toLowerCase());
+                let authorGuild = (await (await database.child(`guild/${msg.author.id}`).once('value')).val());
+                if ((!options[1] && !authorGuild) || (options[1] && options[1].toLowerCase() == 'available')) { say(eli, msg.channel, `The available guilds are: ${guilds.join(', ')}!`); return; };
+
+                if (!options[1] || (options[1] && options[1] == 'ranking')) {
+                    let restext = '';
+                    let ranking: { [guild: string]: number } = await (await database.child(`guilds/${msg.guildId}`).once('value')).val();
+                    Object.entries(ranking).forEach(e => {
+                        restext += `${e[0]}: ${e[1]}\n`;
+                    });
+                    say(eli, msg.channel, restext);
+                    return;
+                }
+
+                if (guilds_compare.includes(options[1].toLowerCase())) {
+                    database.child(`guild / ${msg.author.id}`).set(options[1].toLowerCase());
+                    say(eli, msg.channel, `<@${msg.author.id}> joined ${options[1]} \'s guild!'`);
+                    return;
+                }
 
                 break;
         };

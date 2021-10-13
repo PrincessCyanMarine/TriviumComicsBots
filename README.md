@@ -51,7 +51,10 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Greeting
 
 ## Ray commands
-- roll
+- Roll
+
+## Eli commands
+- [Guild][Guild]
 
 ## D20 commands
 - *Message counter*
@@ -95,3 +98,5 @@ You should have received a copy of the GNU General Public License along with thi
 [spare]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Spare "Open on wiki"
 
 [unalive]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Unalive "Open on wiki"
+
+[guild]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Guild "Open on wiki"
