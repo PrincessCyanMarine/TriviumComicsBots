@@ -1,5 +1,5 @@
 import { testing } from "..";
-import { d20, krystal } from "../clients";
+import { d20, krystal, ray } from "../clients";
 import { generatecard, prestige } from "../d20/function";
 import { killing } from "../krystal/functions";
 import { say } from "./functions";
@@ -35,6 +35,37 @@ d20.on('messageCreate', async (msg) => {
                     () => { killing(msg, target?.user, "normal", "Cyan asked me to kill whoever did that :GMKrystalDevious: :GMKrystalDevious:"); }
                 ]
                 profile[Math.floor(Math.random() * profile.length)]();
+                break;
+            case 'roll':
+                if (!options[1]) { say(ray, msg.channel, 'Missing arguments!'); return; };
+                let dice: number, ammount: number;
+                if (options[1].includes('d')) {
+                    dice = parseInt(options[1].split('d')[1]);
+                    if (options[1].split('d')[0] == '')
+                        ammount = 1;
+                    else
+                        ammount = parseInt(options[1].split('d')[0]);
+                } else {
+                    dice = parseInt(options[1]);
+                    ammount = 1;
+                }
+                if (isNaN(dice) || isNaN(ammount) || dice < 0 || ammount < 0) { say(ray, msg.channel, 'Incorrect arguments!'); return; };
+                if (ammount > 9999) { say(ray, msg.channel, 'Number too big!'); return; };
+                console.log(dice, ammount)
+                let results: number[] = [];
+
+                let i: number;
+                for (i = 0; i < ammount; i++) results.push(Math.ceil(Math.random() * dice));
+
+                let total = 0;
+                results.forEach(roll => { total += roll; });
+
+                let rolltext = ammount > 1 ? `${total.toString()}\n\`\`\`${results.join(', ')}\`\`\`` : total.toString();
+
+                if (rolltext.length > 1000) rolltext = total.toString();
+
+                say(ray, msg.channel, rolltext);
+
                 break;
         };
     };
