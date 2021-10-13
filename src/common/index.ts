@@ -1,3 +1,4 @@
+import { MessageAttachment } from "discord.js";
 import { testing } from "..";
 import { d20, krystal, ray } from "../clients";
 import { generatecard, prestige } from "../d20/function";
@@ -51,11 +52,14 @@ d20.on('messageCreate', async (msg) => {
                 }
                 if (isNaN(dice) || isNaN(ammount) || dice < 0 || ammount < 0) { say(ray, msg.channel, 'Incorrect arguments!'); return; };
                 if (ammount > 9999) { say(ray, msg.channel, 'Number too big!'); return; };
-                console.log(dice, ammount)
+
+
                 let results: number[] = [];
 
                 let i: number;
                 for (i = 0; i < ammount; i++) results.push(Math.ceil(Math.random() * dice));
+
+                if (ammount == 1 && dice == 20) { say(ray, msg.channel, { files: [new MessageAttachment(`./assets/ray/roll/${results[0]}.gif`, 'Roll.gif')] }); return; };
 
                 let total = 0;
                 results.forEach(roll => { total += roll; });
