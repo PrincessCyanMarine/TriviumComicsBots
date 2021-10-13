@@ -47,6 +47,12 @@ export const command_list = {
         "Kick",
         "Help"
     ],
+    "ray": [
+        "roll"
+    ],
+    "eli": [
+        "guild"
+    ],
     "multiple": [
         "Profile"
     ]
