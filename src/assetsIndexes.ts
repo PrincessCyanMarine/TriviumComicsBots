@@ -12,6 +12,15 @@ const assets = {
         }
     },
     krystal: {
+        avatars: {
+            normal: './assets/krystal/avatars/normal.png',
+            burn: './assets/krystal/avatars/burn.png',
+            dnd: './assets/krystal/avatars/dnd.png',
+            lamp: './assets/krystal/avatars/lamp.png',
+            padoru: './assets/krystal/avatars/padoru.png',
+            sadie: './assets/krystal/avatars/sadie.png',
+            sleep: './assets/krystal/avatars/sleep.png',
+        },
         absorb: './assets/krystal/absorb/absorb.png',
         box: './assets/krystal/box/top.png',
         lamp: './assets/krystal/lamp/top.png',
