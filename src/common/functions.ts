@@ -1,5 +1,5 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { Client, GuildMember, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
+import { ActivityType, Client, GuildMember, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { eli, krystal, ray, sadie } from "../clients";
@@ -112,3 +112,7 @@ export function notificationCult(channel_id: string) {
     [krystal, sadie, ray, eli].forEach(bot => { say(bot, channel_id, ':GMBelleNotificationNew:').catch(console.error); });
 }
 
+export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer) {
+    bot.user?.setActivity(text, { type: type, name: text });
+    if (avatar) bot.user?.setAvatar(avatar);
+};

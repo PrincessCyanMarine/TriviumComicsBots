@@ -1,6 +1,9 @@
 import { Client, Intents } from "discord.js";
 import { config } from "dotenv";
+import { eli_activities } from "./eli/activities";
 import { krystal_activities } from "./krystal/activities";
+import { ray_activities } from "./ray/activities";
+import { sadie_activities } from "./sadie/activities";
 config();
 
 
@@ -18,7 +21,11 @@ export const sadie = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
 });
 sadie.login(process.env.BOT_SADIE_TOKEN);
-sadie.on('ready', () => { console.log(`${sadie.user ? sadie.user.tag : "Sadie"} is ready!!!`) });
+sadie.on('ready', () => {
+    console.log(`${sadie.user ? sadie.user.tag : "Sadie"} is ready!!!`);
+    sadie_activities[Math.floor(Math.random() * sadie_activities.length)]();
+    setInterval(() => { sadie_activities[Math.floor(Math.random() * sadie_activities.length)](); }, 1800000);
+});
 
 export const d20 = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
@@ -31,14 +38,22 @@ export const ray = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
 });
 ray.login(process.env.BOT_RAY_TOKEN);
-ray.on('ready', () => { console.log(`${ray.user ? ray.user.tag : "Ray"} is ready!!!`) });
+ray.on('ready', () => {
+    console.log(`${ray.user ? ray.user.tag : "Ray"} is ready!!!`);
+    ray_activities[Math.floor(Math.random() * ray_activities.length)]();
+    setInterval(() => { ray_activities[Math.floor(Math.random() * ray_activities.length)](); }, 1800000);
+});
 
 
 export const eli = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
 });
 eli.login(process.env.BOT_ELI_TOKEN);
-eli.on('ready', () => { console.log(`${eli.user ? eli.user.tag : "Eli"} is ready!!!`) });
+eli.on('ready', () => {
+    console.log(`${eli.user ? eli.user.tag : "Eli"} is ready!!!`);
+    eli_activities[Math.floor(Math.random() * eli_activities.length)]();
+    setInterval(() => { eli_activities[Math.floor(Math.random() * eli_activities.length)](); }, 1800000);
+});
 
 
 

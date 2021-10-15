@@ -1,5 +1,5 @@
-import { ActivityType, Client } from "discord.js";
 import { krystal } from "../clients";
+import { changeActivity } from "../common/functions";
 
 export const krystal_activities = [
     () => { changeActivity(krystal, "PLAYING", "Dungeons & Dragons"); },
@@ -11,13 +11,5 @@ export const krystal_activities = [
     () => { changeActivity(krystal, "PLAYING", "Dress up as Sadie"); },
     () => { changeActivity(krystal, "WATCHING", "the world burn"); },
     () => { changeActivity(krystal, "PLAYING", "hide in a lamp"); },
-    () => { changeActivity(krystal, "PLAYING", "Sonic Adventure 3"); },
-    // () => { changeActivity(krystal, "PLAYING", ""); },
+    () => { changeActivity(krystal, "PLAYING", "Sonic Adventure 3"); }
 ];
-
-
-
-function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer) {
-    bot.user?.setActivity(text, { type: type, name: text });
-    if (avatar) bot.user?.setAvatar(avatar);
-};
