@@ -3,7 +3,7 @@ import { GuildMember, Message, MessageAttachment, User } from "discord.js";
 import got from "got/dist/source";
 import { database } from "..";
 import assets from "../assetsIndexes";
-import { absorb, box, drown, fire, fly, glitch, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
+import { absorb, box, drown, fire, fireball, fly, glitch, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
 import { krystal } from "../clients";
 import { edit, getMember, getTarget, notificationCult, say, testWord } from "../common/functions";
 import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
@@ -141,10 +141,13 @@ export function swimming(msg: Message) {
         say(krystal, msg.channel, { files: [swim] });
 
 };
-/**
- * TODO DND Fireball
- * */
-export function burning(msg: Message) { say(krystal, msg.channel, { files: [fire] }) };
+export async function burning(msg: Message) {
+    let activity = await (await database.child('activities/Krystal').once('value')).val();
+    if (activity == 'Dungeons & Dragons')
+        say(krystal, msg.channel, { files: [fireball] });
+    else
+        say(krystal, msg.channel, { files: [fire] });
+};
 export function crashing(msg: Message) {
     say(krystal, msg.channel, 'Invalid result...', 1500).then(message => {
         edit(message, 'Krystal.exe stopped responding!', 1000).then(() => {

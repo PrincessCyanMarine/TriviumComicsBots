@@ -2,6 +2,7 @@ import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
 import { ActivityType, Client, GuildMember, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
+import { database } from "..";
 import { eli, krystal, ray, sadie } from "../clients";
 import emojis from "./emojis";
 
@@ -114,5 +115,6 @@ export function notificationCult(channel_id: string) {
 
 export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer) {
     bot.user?.setActivity(text, { type: type, name: text });
-    if (avatar) bot.user?.setAvatar(avatar);
+    if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
+    database.child('activities/' + bot.user?.username).set(text);
 };
