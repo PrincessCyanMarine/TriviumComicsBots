@@ -93,7 +93,8 @@ d20.on('messageCreate', async (msg) => {
                     say(eli, msg.channel, `<@${msg.author.id}> joined ${options[1]} \'s guild!'`);
                     return;
                 }
-
+                break;
+            case 'play':
                 break;
         };
     };

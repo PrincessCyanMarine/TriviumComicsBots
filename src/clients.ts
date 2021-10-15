@@ -1,5 +1,6 @@
 import { Client, Intents } from "discord.js";
 import { config } from "dotenv";
+import { krystal_activities } from "./krystal/activities";
 config();
 
 
@@ -7,7 +8,11 @@ export const krystal = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
 });
 krystal.login(process.env.BOT_KRYSTAL_TOKEN);
-krystal.on('ready', () => { console.log(`${krystal.user ? krystal.user.tag : "Sadie"} is ready!!!`) });
+krystal.on('ready', () => {
+    console.log(`${krystal.user ? krystal.user.tag : "Sadie"} is ready!!!`);
+    krystal_activities[Math.floor(Math.random() * krystal_activities.length)]();
+    setInterval(() => { krystal_activities[Math.floor(Math.random() * krystal_activities.length)](); }, 1800000);
+});
 
 export const sadie = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
