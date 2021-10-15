@@ -6,3 +6,4 @@ package-lock.json
 dist/
 **.sql
 vscode-profile**
+**.code-workspace
