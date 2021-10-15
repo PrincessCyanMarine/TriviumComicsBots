@@ -17,7 +17,7 @@ export const krystal_activities = [
 
 
 
-function changeActivity(bot: Client, type: ActivityType, text: string, avatar?: string | Buffer) {
+function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer) {
     bot.user?.setActivity(text, { type: type, name: text });
     if (avatar) bot.user?.setAvatar(avatar);
 };
