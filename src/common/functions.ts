@@ -113,8 +113,8 @@ export function notificationCult(channel_id: string) {
     [krystal, sadie, ray, eli].forEach(bot => { say(bot, channel_id, ':GMBelleNotificationNew:').catch(console.error); });
 }
 
-export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer) {
-    bot.user?.setActivity(text, { type: type, name: text });
+export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = type) {
+    bot.user?.setActivity(text, { type: type, name: name });
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
-    database.child('activities/' + bot.user?.username).set(text);
+    database.child('activities/' + bot.user?.username).set(name);
 };

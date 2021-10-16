@@ -143,7 +143,7 @@ export function swimming(msg: Message) {
 };
 export async function burning(msg: Message) {
     let activity = await (await database.child('activities/Krystal').once('value')).val();
-    if (activity == 'Dungeons & Dragons')
+    if (activity == 'dnd')
         say(krystal, msg.channel, { files: [fireball] });
     else
         say(krystal, msg.channel, { files: [fire] });
