@@ -67,6 +67,8 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Prestige
 - Card
 - Help
+- Warn
+- Warnings
 
 ## Commands with no specific bot
 - Profile
