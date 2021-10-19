@@ -67,8 +67,8 @@ This is the repository for the code of the bots from [Trivium comics' official d
 - Prestige
 - Card
 - Help
-- Warn
-- Warnings
+- [Warn][Warn]
+- [Warnings][Warnings]
 
 ## Commands with no specific bot
 - Profile
@@ -104,3 +104,6 @@ You should have received a copy of the GNU General Public License along with thi
 [guild]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Guild "Open on wiki"
 
 [roll]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Roll "Open on wiki"
+
+[warn]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Warn "Open on wiki"
+[warnings]: https://github.com/PrincessCyanMarine/TriviumComicsBotsTypeScript/wiki/Warnings "Open on wiki"
