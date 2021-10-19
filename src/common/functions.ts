@@ -6,7 +6,7 @@ import { database } from "..";
 import { eli, krystal, ray, sadie } from "../clients";
 import emojis from "./emojis";
 
-const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '');
+export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '');
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join('(?![A-Z0-9])|(?<![A-Z0-9])')}(?![A-Z0-9]))`, 'gi');
 
 const argMatch = (args: string, test: string[]): RegExpMatchArray | null => argClean(args).match(createRegex(test));

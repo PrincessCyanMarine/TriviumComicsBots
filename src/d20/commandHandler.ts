@@ -3,6 +3,10 @@ import { Message } from "discord.js";
 export function testCommands(msg: Message) {
     let args = msg.content.toLowerCase();
 
-    if ((args.match(/nitro/gi) || args.match(/discord/gi)) && (args.match(/.+?\..+?/gi) || args.match(/http/gi))) return msg.channel.send('<@&609593848448155668> please confirm this isn\'t a free nitro scam');
+    if ((args.match(/free/gi) && args.match(/nitro/gi)) || (args.match(/(nitro)|(discord)/gi) && args.match(/(.+?\..+?)|(http)/gi)))
+        return msg.channel.send('<@&609593848448155668> please confirm this isn\'t a free nitro scam');
+    for (let { title, description } of msg.embeds)
+        if (title?.includes("nitro") || description?.includes("nitro"))
+            return msg.channel.send('<@&609593848448155668> please confirm this isn\'t a free nitro scam');
 
 }
