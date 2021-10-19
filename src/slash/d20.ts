@@ -1,5 +1,5 @@
-import { Message } from "discord.js";
-import { testing } from "..";
+import { GuildMember, Message } from "discord.js";
+import { database, testing } from "..";
 import { clients, d20 } from "../clients";
 import { command_list, command_list_string } from "../commandlist";
 import { say } from "../common/functions";
@@ -58,6 +58,34 @@ d20.on('interactionCreate', async (interaction) => {
             say(bot, channel, { content: content, files: attachments });
             followup(interaction, "Announced!", true);
             break;
+        case 'warn': {
+            let reason = interaction.options.get('reason')?.value;
+            let player = interaction.options.get('player')?.member;
+
+            if (!interaction.guild?.members.cache.get(interaction.user.id)?.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
+            if (!player || !(player instanceof GuildMember) || !reason) { reply(interaction, 'Something went wrong', true); return; };
+
+            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once('value')).val();
+            if (!warnings || typeof warnings != 'object') warnings = [];
+            warnings.push(reason);
+            database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+            reply(interaction, `${player.user.username} has ${warnings.length} warnings`);
+            break;
+        }
+        case 'warnings': {
+            let player = interaction.options.get('player')?.member;
+            if (!player || !(player instanceof GuildMember)) { reply(interaction, 'Something went wrong', true); return; };
+            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once('value')).val();
+            if (!warnings || typeof warnings != 'object') warnings = [];
+            let text = `${player.user.username} has ${warnings.length} warnings`;
+            if (warnings.length > 0) {
+                text += '```';
+                for (let w in warnings) text += `\n${parseInt(w) + 1}: ${warnings[parseInt(w)]}`;
+                text += '```';
+            }
+            reply(interaction, text);
+            break;
+        }
         default:
             reply(interaction, 'Sorry, I don\'t know that command', true);
             break;
