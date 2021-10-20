@@ -13,7 +13,7 @@ d20.on('messageCreate', (msg) => {
     else if (!testing && msg.channelId == testChannelId) return;
     countMessages(msg);
     testCommands(msg);
-    if (testing && msg.channelId == testChannelId) msg.channel.send({
+    /*if (testing && msg.channelId == testChannelId) msg.channel.send({
         content: 'Test',
         components: [
             new MessageActionRow()
@@ -25,5 +25,5 @@ d20.on('messageCreate', (msg) => {
                     customId: "gamemastersfanrole"
                 }])
         ]
-    });
+    });*/
 });

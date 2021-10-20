@@ -10,8 +10,8 @@ krystal.on('interactionCreate', async (interaction) => {
 
     switch (interaction.customId) {
         case "gamemastersfanrole":
-            if (!interaction.guildId || !interaction.guild || !interaction.member || !(interaction.member instanceof GuildMember) || ![triviumGuildId, testGuildId].includes(interaction.guildId)) return;
-            let role_id = interaction.guildId == triviumGuildId ? "774127564675481600" : "781715781234720768";
+            if (!interaction.guildId || !interaction.guild || !interaction.member || !(interaction.member instanceof GuildMember) || triviumGuildId != interaction.guildId) return;
+            let role_id = "774127564675481600";
             let role = interaction.guild.roles.cache.get(role_id);
             if (!role) return;
             let roles = interaction.member.roles;
