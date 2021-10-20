@@ -7,7 +7,7 @@ krystal.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
     if (testing && interaction.channelId != '892800588469911663') return;
     else if (!testing && interaction.channelId == '892800588469911663') return;
-    console.log(interaction.customId);
+    // console.log(interaction.customId);
     switch (interaction.customId) {
         case "gamemastersfanrole":
         case "queensbladetogglealerts":
