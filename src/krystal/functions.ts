@@ -99,19 +99,25 @@ export function absorbing(msg: Message, target: User | undefined = getTarget(msg
         })
     })
 };
-export function eating(msg: Message, target: User | undefined = getTarget(msg)) {
-    if (!target) return say(krystal, msg.channel, { files: [popcorn] });
-    let startTime = new Date().valueOf();
-    let canvas = createCanvas(1200, 713);
-    let ctx = canvas.getContext('2d');
-    let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
-    loadImage(assets.krystal.popcorn.base).then(bg => {
-        loadImage(assets.krystal.popcorn.top).then(top => {
-            loadImage(avatarURL).then(avatar => {
-                ctx.drawImage(bg, 0, 0);
-                ctx.drawImage(avatar, 125, 200, 500, 500);
-                ctx.drawImage(top, 0, 0);
-                say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
+export function eating(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<MessageAttachment | Buffer> {
+    return new Promise((resolve, reject) => {
+        if (!target)
+            if (msg) return say(krystal, msg.channel, { files: [popcorn] });
+            else return resolve(popcorn);
+        let startTime = new Date().valueOf();
+        let canvas = createCanvas(1200, 713);
+        let ctx = canvas.getContext('2d');
+        let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
+        loadImage(assets.krystal.popcorn.base).then(bg => {
+            loadImage(assets.krystal.popcorn.top).then(top => {
+                loadImage(avatarURL).then(avatar => {
+                    ctx.drawImage(bg, 0, 0);
+                    ctx.drawImage(avatar, 125, 200, 500, 500);
+                    ctx.drawImage(top, 0, 0);
+                    if (msg)
+                        say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
+                    else resolve(canvas.toBuffer());
+                });
             });
         });
     });

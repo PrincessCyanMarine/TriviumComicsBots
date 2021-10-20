@@ -1,5 +1,5 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { ActivityType, Client, GuildMember, Message, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
+import { ActivityType, Client, GuildMember, Message, MessageEmbed, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database } from "..";
@@ -118,3 +118,17 @@ export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM"
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
     database.child('activities/' + bot.user?.username).set(name);
 };
+
+export let msg2embed = (msg: Message) => {
+    let embed = new MessageEmbed()
+        .setAuthor(msg.author.username, msg.author.displayAvatarURL(), msg.url)
+        .setDescription(msg.content)
+        .setTimestamp(msg.createdTimestamp)
+        .setURL(msg.url)
+        .setColor(msg.member?.displayHexColor || "WHITE")
+    let img = msg.attachments.first()?.url;
+    if (img) embed.setImage(img);
+    let embeds = msg.embeds;
+    embeds.unshift(embed);
+    return embeds;
+}

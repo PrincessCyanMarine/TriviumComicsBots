@@ -1,6 +1,7 @@
 import { Message, MessageEmbed, WebhookClient } from "discord.js";
 import { testing } from "..";
 import { mod_alert_webhook } from "../clients";
+import { msg2embed } from "../common/functions";
 import { testGuildId, triviumGuildId } from "../common/variables";
 
 export function testCommands(msg: Message) {
@@ -27,18 +28,4 @@ function nitro(msg: Message) {
         content: `<@&900363259188772865> please confirm the message below isn\'t a free nitro scam\nMessage url: ${msg.url}`,
         embeds: msg2embed(msg)
     });
-}
-
-let msg2embed = (msg: Message) => {
-    let embed = new MessageEmbed()
-        .setAuthor(msg.author.username, msg.author.displayAvatarURL(), msg.url)
-        .setDescription(msg.content)
-        .setTimestamp(msg.createdTimestamp)
-        .setURL(msg.url)
-        .setColor(msg.member?.displayHexColor || "WHITE")
-    let img = msg.attachments.first()?.url;
-    if (img) embed.setImage(img);
-    let embeds = msg.embeds;
-    embeds.unshift(embed);
-    return embeds;
 }

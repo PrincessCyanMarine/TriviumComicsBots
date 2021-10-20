@@ -9,7 +9,7 @@ config();
 
 
 export const krystal = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_MEMBERS]
 });
 krystal.login(process.env.BOT_KRYSTAL_TOKEN);
 krystal.on('ready', () => {
