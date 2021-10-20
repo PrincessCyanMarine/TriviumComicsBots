@@ -126,13 +126,13 @@ krystal.on('guildMemberAdd', async (member) => {
 const welcome_functions = [
     (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `Welcome to the game of life, ${memberNicknameMention(member.id)}!`)
-            .then(resolve)    //         .catch(reject);
+            .then(resolve).catch(reject);
     }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         await say(krystal, channel, {
-            content: `I would welcome you, ${memberNicknameMention(member.id)}, but I\'m currently a lamp and lampds do not talk.`,
+            content: `I would welcome you, ${memberNicknameMention(member.id)}, but I\'m currently a lamp and lamps do not talk.`,
             files: [lamp]
-        }).then(resolve)    //         .catch(reject);
+        }).then(resolve).catch(reject);
     }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `Greetings, ${memberNicknameMention(member.id)}! \nRay told me to tell you that I'm his girlfriend, so don't try anything. \nThen Sadie told me to tell you to tell you that I'm not Ray's girlfriend. \nThen Eli told me they are both wrong and that I'm his girlfriend. \nThey're still arguing, so I still don't know who's girfriend I am.`)
