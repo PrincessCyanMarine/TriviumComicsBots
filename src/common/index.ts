@@ -8,6 +8,7 @@ import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./v
 import { channelMention, memberNicknameMention } from "@discordjs/builders"
 import { lamp, sleep } from "../attachments";
 import { get_rps_interactible } from "../games/common";
+import { bot_enum, rockpaperscissors_messages } from "../games/rockpaperscissors";
 
 
 d20.on('messageCreate', async (msg) => {
@@ -111,19 +112,14 @@ d20.on('messageCreate', async (msg) => {
             case 'play':
             case 'play_button':
             case 'play_list':
-                let bots = Object.values(clients);
-                let bot;
-                if (!options[1] || !clients[options[1]])
-                    bot = bots[Math.floor(Math.random() * bots.length)];
-                else
-                    bot = clients[options[1]];
-
-                // console.log(options[1])
+                let bots = ["ray", "sadie", /* "krystal", */ "eli"];
+                let bot_name = bots[Math.floor(Math.random() * bots.length)];
+                let bot = clients[bot_name];
 
                 let type = options[0] == "!play_list" ? true : false;
-                let method = get_rps_interactible(msg.author.id, type)
+                let method = get_rps_interactible(msg.author.id, type);
                 say(bot, msg.channel, {
-                    content: 'Choose one',
+                    content: rockpaperscissors_messages["challenged"][bot_enum[bot_name]],
                     components: [new MessageActionRow().addComponents(method)]
                 });
                 break;

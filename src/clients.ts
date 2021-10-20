@@ -71,3 +71,11 @@ export const clients: { [bot: string]: Client } = {
     'eli': eli,
     'ray': ray,
 }
+
+export const id2bot: { [bot: string]: string } = {
+    "743606862578057277": 'd20',
+    "622898538514350085": 'sadie',
+    "620634675454541844": 'krystal',
+    "666872683530813441": 'eli',
+    "666795899879424020": 'ray',
+}
