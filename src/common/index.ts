@@ -124,49 +124,49 @@ krystal.on('guildMemberAdd', async (member) => {
         await say(krystal, channel, `Get a free Role for reading the ${channelMention("611572782832287754")} channel!`);
 });
 const welcome_functions = [
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `Welcome to the game of life, ${memberNicknameMention(member.id)}!`)
             .then(resolve)    //         .catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         await say(krystal, channel, {
             content: `I would welcome you, ${memberNicknameMention(member.id)}, but I\'m currently a lamp and lampds do not talk.`,
             files: [lamp]
         }).then(resolve)    //         .catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `Greetings, ${memberNicknameMention(member.id)}! \nRay told me to tell you that I'm his girlfriend, so don't try anything. \nThen Sadie told me to tell you to tell you that I'm not Ray's girlfriend. \nThen Eli told me they are both wrong and that I'm his girlfriend. \nThey're still arguing, so I still don't know who's girfriend I am.`)
             .then(resolve).catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, {
             content: `Welcome, ${memberNicknameMention(member.id)}!\nNow that you are properly greeted, I will return to the clothes pile.`,
             files: [sleep]
         }).then(resolve).catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `Welcome, ${memberNicknameMention(member.id)}!\nIf I had what you call "emotions", I would be happy that you're here`)
             .then(resolve).catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `Konnichiwa, ${memberNicknameMention(member.id)}-Chan (◕ᴗ◕✿)`)
             .then(resolve).catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `For some reason the residence of this place keep on saying something like \"I would tell you to grab a chair, but we can\'t afford those\" when new people join. \nI don\'t really know what that means, but welcome anyways, ${memberNicknameMention(member.id)}.`)
             .then(resolve).catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, `Welcome, to what the residents of this place call \"Hell\", ${memberNicknameMention(member.id)}. Hope you like it in here`)
             .then(resolve).catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         await say(ray, channel, `Hi, longshot133!`);
         await say(krystal, channel, `I think their name is ${memberNicknameMention(member.id)}`);
         say(ray, channel, `You just don't get jokes, do you?`)
             .then(resolve).catch(reject);
     }),
-    (member: GuildMember, channel: TextChannel): Promise<Message> => new Promise(async (resolve, reject) => {
+    (member: GuildMember, channel: TextChannel | string): Promise<Message> => new Promise(async (resolve, reject) => {
         say(krystal, channel, {
             content: `Welcome, ${member}. I heard that you humans like popcorn, so here is some.`,
             files: [await eating(undefined, member.user)]
