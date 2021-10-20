@@ -1,5 +1,6 @@
-import { Client, Intents } from "discord.js";
+import { Client, Intents, WebhookClient } from "discord.js";
 import { config } from "dotenv";
+import { testing } from ".";
 import { eli_activities } from "./eli/activities";
 import { krystal_activities } from "./krystal/activities";
 import { ray_activities } from "./ray/activities";
@@ -55,9 +56,13 @@ eli.on('ready', () => {
     setInterval(() => { eli_activities[Math.floor(Math.random() * eli_activities.length)](); }, 1800000);
 });
 
-
-
-
+export const mod_alert_webhook = (testing: boolean) => testing ?
+    new WebhookClient({
+        url: "https://discord.com/api/webhooks/900374491916558386/w1tTmMj9W7ycpYBUNwMYC0eW_K00kJMGGKJO8pax85Ztu2HFWqDq71Rs5jffzf-EQv1N"
+    }) :
+    new WebhookClient({
+        url: "https://discord.com/api/webhooks/900363561019269130/1qlWM7j3zBdP_OC7GdZReUbFAobAunEcr6uOWNC3HA67_brENhnoSBnO-CJLnZXRvgTH"
+    });
 
 export const clients: { [bot: string]: Client } = {
     'd20': d20,
