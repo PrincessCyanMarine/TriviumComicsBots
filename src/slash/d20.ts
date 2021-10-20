@@ -69,7 +69,7 @@ d20.on('interactionCreate', async (interaction) => {
             if (!warnings || typeof warnings != 'object') warnings = [];
             warnings.push(reason);
             database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
-            reply(interaction, `${player.user.username} has ${warnings.length} warnings`);
+            reply(interaction, `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings`);
             break;
         }
         case 'warnings': {

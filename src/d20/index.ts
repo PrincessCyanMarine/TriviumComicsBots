@@ -12,4 +12,4 @@ d20.on('messageCreate', (msg) => {
     else if (!testing && msg.channelId == testChannelId) return;
     countMessages(msg);
     testCommands(msg);
-})
+});
