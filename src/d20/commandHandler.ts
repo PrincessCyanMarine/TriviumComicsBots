@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, WebhookClient } from "discord.js";
 import { d20 } from "../clients";
 import { say } from "../common/functions";
 import { triviumGuildId } from "../common/variables";
@@ -14,7 +14,10 @@ export function testCommands(msg: Message) {
 
 }
 
+const webhook = new WebhookClient({
+    url: "https://discord.com/api/webhooks/900363561019269130/1qlWM7j3zBdP_OC7GdZReUbFAobAunEcr6uOWNC3HA67_brENhnoSBnO-CJLnZXRvgTH"
+});
 function nitro(msg: Message) {
     if (msg.guildId != triviumGuildId) return;
-    say(d20, "900362801992835073", `<@&900363259188772865> please confirm the message ${msg.url} isn\'t a free nitro scam`);
+    webhook.send(`<@&900363259188772865> please confirm the message ${msg.url} isn\'t a free nitro scam`);
 }
