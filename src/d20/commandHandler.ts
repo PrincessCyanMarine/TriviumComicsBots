@@ -14,12 +14,15 @@ export function testCommands(msg: Message) {
         if (title?.includes("nitro") || description?.includes("nitro"))
             nitro(msg);
 
-    if (args.match(/n[ei]gg?[re]?[orae]?|fag|nip/gi))
+    let slur_detection = args.match(/n[ei]gg?[re]?[orae]?|fag|nip/gi);
+    if (slur_detection) {
+        // console.log(slur_detection);
         mod_alert_webhook(testing)
             .send({
-                content: `<@&900363259188772865> please confirm the message below doesn\'t include a slur\nMessage url: ${msg.url}`,
+                content: `<@&900363259188772865> please confirm the message below doesn\'t include a slur (flagged: "${slur_detection}")\nMessage url: ${msg.url}`,
                 embeds: msg2embed(msg)
             });
+    }
 
 }
 
