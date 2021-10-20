@@ -72,16 +72,18 @@ function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction
         }
         else {
             let components = interaction.message.components?.map(c => c instanceof MessageActionRow ? c : new MessageActionRow);
-            console.log(interaction.message instanceof Message && interaction.message.deletable)
-            console.log(interaction.customId)
-            if (components?.length == 1 && !interaction.customId.startsWith('a'))
-                components.push(new MessageActionRow().addComponents(
-                    new MessageButton()
-                        .setCustomId('Remove-' + playerId)
-                        .setLabel('Remove')
-                        .setStyle('DANGER')
-                        .setEmoji("✖️")
-                ))
+            // console.log(interaction.message instanceof Message && interaction.message.deletable)
+            // console.log(interaction.customId)
+            if (components?.length == 1 && components[0].components.length < 4 && !interaction.customId.startsWith('a')) {
+                let delete_button = new MessageButton()
+                    .setCustomId('Remove-' + playerId)
+                    .setLabel('Remove')
+                    .setStyle('DANGER')
+                    .setEmoji("✖️");
+                if (interaction instanceof SelectMenuInteraction)
+                    components.push(new MessageActionRow().addComponents(delete_button));
+                else components[0].addComponents(delete_button);
+            }
             update(interaction, { content: text, components: components });
         }
     }
