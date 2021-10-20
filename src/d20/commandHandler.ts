@@ -8,5 +8,4 @@ export function testCommands(msg: Message) {
     for (let { title, description } of msg.embeds)
         if (title?.includes("nitro") || description?.includes("nitro"))
             return msg.channel.send('<@&609593848448155668> please confirm this isn\'t a free nitro scam');
-
 }
