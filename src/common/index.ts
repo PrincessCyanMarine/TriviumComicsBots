@@ -1,12 +1,13 @@
-import { GuildMember, Message, MessageActionRow, MessageAttachment, TextChannel } from "discord.js";
+import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
-import { d20, eli, krystal, ray } from "../clients";
+import { clients, d20, eli, krystal, ray } from "../clients";
 import { generatecard, prestige } from "../d20/function";
 import { eating, killing } from "../krystal/functions";
 import { say } from "./functions";
 import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, memberNicknameMention } from "@discordjs/builders"
 import { lamp, sleep } from "../attachments";
+import { get_rps_interactible } from "../games/common";
 
 
 d20.on('messageCreate', async (msg) => {
@@ -108,6 +109,23 @@ d20.on('messageCreate', async (msg) => {
                 }
                 break;
             case 'play':
+            case 'play_button':
+            case 'play_list':
+                let bots = Object.values(clients);
+                let bot;
+                if (!options[1] || !clients[options[1]])
+                    bot = bots[Math.floor(Math.random() * bots.length)];
+                else
+                    bot = clients[options[1]];
+
+                // console.log(options[1])
+
+                let type = options[0] == "!play_list" ? true : false;
+                let method = get_rps_interactible(msg.author.id, type)
+                say(bot, msg.channel, {
+                    content: 'Choose one',
+                    components: [new MessageActionRow().addComponents(method)]
+                });
                 break;
         };
     };

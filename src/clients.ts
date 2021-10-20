@@ -36,7 +36,7 @@ d20.on('ready', () => { console.log(`${d20.user ? d20.user.tag : "D20"} is ready
 
 
 export const ray = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
 });
 ray.login(process.env.BOT_RAY_TOKEN);
 ray.on('ready', () => {

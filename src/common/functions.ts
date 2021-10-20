@@ -1,3 +1,4 @@
+import { hyperlink } from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
 import { ActivityType, Client, GuildMember, Message, MessageEmbed, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
@@ -122,7 +123,7 @@ export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM"
 export let msg2embed = (msg: Message) => {
     let embed = new MessageEmbed()
         .setAuthor(msg.author.username, msg.author.displayAvatarURL(), msg.url)
-        .setDescription(msg.content)
+        .setDescription(hyperlink(msg.content, msg.url))
         .setTimestamp(msg.createdTimestamp)
         .setURL(msg.url)
         .setColor(msg.member?.displayHexColor || "WHITE")

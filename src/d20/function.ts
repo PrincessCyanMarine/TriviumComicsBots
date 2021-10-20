@@ -5,7 +5,7 @@ import assets from "../assetsIndexes";
 import { d20 } from "../clients";
 import { say } from "../common/functions";
 import { not_count_in_channel_ids } from "../common/variables";
-import { reply } from "../slash/common";
+import { reply } from "../interactions/slash/common";
 
 registerFont(assets.d20.card.fonts.letterer, { family: 'LETTERER' });
 registerFont(assets.d20.card.fonts.kosugiMaru, { family: 'KOSUGIMARU' });
