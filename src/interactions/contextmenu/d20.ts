@@ -11,16 +11,13 @@ d20.on('interactionCreate', async (interaction) => {
 
     switch (interaction.commandName) {
         case "card":
-            interaction.deferReply();
+            // interaction.deferReply();
             try {
                 let card = await generatecard(interaction);
-                if (interaction.deferred)
-                    interaction.editReply(({ files: [card] }));
-                else
-                    interaction.reply(({ files: [card] }));
+                interaction.reply(({ files: [card] }));
             } catch (er) {
                 console.error(er);
-                interaction.editReply({ content: 'Something went wrong...' });
+                interaction.reply({ content: 'Something went wrong...' });
             }
             break;
         case "get profile picture":
