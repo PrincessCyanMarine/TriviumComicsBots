@@ -1,5 +1,5 @@
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
-import { CommandInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User } from "discord.js";
+import { CommandInteraction, ContextMenuInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
 import { d20 } from "../clients";
@@ -330,7 +330,7 @@ export const defaultstats = {
     kick: 0,
 }
 
-export function generatecard(msg: Message | CommandInteraction): Promise<Buffer> {
+export function generatecard(msg: Message | CommandInteraction | ContextMenuInteraction): Promise<Buffer> {
     return new Promise(async (resolve, reject) => {
         const errormessage = (msg: Message | Interaction) => { if (msg instanceof CommandInteraction) { reply(msg, { content: 'Failed to create card' }); return reject(); } else return reject(); };
         if (!msg.guild) return errormessage(msg);
@@ -341,7 +341,9 @@ export function generatecard(msg: Message | CommandInteraction): Promise<Buffer>
         if (!msg.member) return reject();
         let target = msg instanceof Message ?
             msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member :
-            msg.options.get('player') ? msg.options.get('player')?.user : msg.user;
+            msg.options.get('player') ? msg.options.get('player')?.user :
+                msg.options.getUser('user') ? msg.options.getUser('user') :
+                    msg.user;
         if (!target) return errormessage(msg);
         if (target instanceof User)
             target = await msg.guild.members.fetch(target.id);
