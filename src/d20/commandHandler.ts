@@ -14,7 +14,7 @@ export function testCommands(msg: Message) {
         if (title?.includes("nitro") || description?.includes("nitro"))
             nitro(msg);
 
-    let slur_detection = args.match(/n[ei]gg?[re]?[orae]?|fag|nip/gi);
+    let slur_detection = args.match(/n(e|ig)g?[re]?[orae]?|fag|nip/gi);
     if (slur_detection) {
         // console.log(slur_detection);
         mod_alert_webhook(testing)

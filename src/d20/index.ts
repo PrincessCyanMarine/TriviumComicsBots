@@ -12,17 +12,4 @@ d20.on('messageCreate', (msg) => {
     else if (!testing && msg.channelId == testChannelId) return;
     countMessages(msg);
     testCommands(msg);
-    /*if (testing && msg.channelId == testChannelId) msg.channel.send({
-        content: 'Test',
-        components: [
-            new MessageActionRow()
-                .addComponents([{
-                    type: "BUTTON",
-                    label: "Test",
-                    emoji: "<:GMBelleNotificationNew:724792043880055094>",
-                    style: "PRIMARY",
-                    customId: "gamemastersfanrole"
-                }])
-        ]
-    });*/
 });
