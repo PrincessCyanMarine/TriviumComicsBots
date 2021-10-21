@@ -2,15 +2,23 @@ import { User } from "discord.js";
 import { testing } from "../..";
 import { d20 } from "../../clients";
 import { testChannelId } from "../../common/variables";
+import { generatecard } from "../../d20/function";
 
-d20.on('interactionCreate', (interaction) => {
+d20.on('interactionCreate', async (interaction) => {
     if (!interaction.isContextMenu()) return;
     if (testing && interaction.channelId != testChannelId) return;
     else if (!testing && interaction.channelId == testChannelId) return;
 
     switch (interaction.commandName) {
         case "card":
-
+            interaction.deferReply();
+            try {
+                let card = await generatecard(interaction);
+                interaction.editReply({ files: [card] });
+            } catch (er) {
+                console.error(er);
+                interaction.editReply({ content: 'Something went wrong...' });
+            }
             break;
         case "get profile picture":
             let user;

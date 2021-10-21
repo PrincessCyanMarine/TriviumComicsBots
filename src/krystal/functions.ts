@@ -27,34 +27,46 @@ export function prideful(msg: Message) { say(krystal, msg.channel, { files: [pri
 export function pong(msg: Message) { msg.channel.send('Pong!'); };
 export function bullshit(msg: Message) { say(krystal, msg.channel, 'Cow poopy'); };
 
-export function killing(msg: Message, target: User | undefined = getTarget(msg), type: 'normal' | 'revenge' = 'normal', text?: string): any {
-    let startTime = new Date().valueOf();
+export function killing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined, type: 'normal' | 'revenge' = 'normal', text?: string): Promise<Buffer | MessageAttachment> {
+    return new Promise((resolve, reject) => {
+
+        let startTime = new Date().valueOf();
 
 
-    if (!text) text =
-        type == 'revenge' ? `Sorry, <@${msg.author}>, Sadie asked me to spare that player` :
-            target ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***` :
-                `***I will unalive now :GMKrystalDevious:***`
+        let avatarURL: string;
+        if (msg) {
+            if (!text) text =
+                type == 'revenge' ? `Sorry, <@${msg.author}>, Sadie asked me to spare that player` :
+                    target ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***` :
+                        `***I will unalive now :GMKrystalDevious:***`
 
-    if (!target) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
-    if (type != 'revenge' && msg.author.id == target.id && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
-    if (protectedFromKills.includes(target.id)) return killing(msg, msg.author, 'revenge');
+            if (!target) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
+            if (type != 'revenge' && msg.author.id == target.id && Math.floor(Math.random() * 10) == 0) return say(krystal, msg.channel, ':GMKrystalDevious: I do not condone suicide')
+            if (protectedFromKills.includes(target.id)) return killing(msg, msg.author, 'revenge');
 
-    if (target.id == spared_player_id) return say(krystal, msg.channel, `Sorry, <@${msg.author}>, I was asked to spare that unattractive weeb`);
+            if (target.id == spared_player_id) return say(krystal, msg.channel, `Sorry, <@${msg.author}>, I was asked to spare that unattractive weeb`);
+            avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });
+            if (avatarURL == null) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
+        }
+        else if (target)
+            avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });
+        else return resolve(kill);
 
-    let avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });
-    if (avatarURL == null) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
+        let canvas = createCanvas(1200, 713);
+        let ctx = canvas.getContext('2d');
 
-    let canvas = createCanvas(1200, 713);
-    let ctx = canvas.getContext('2d');
-
-    let base = Math.floor(Math.random() * 2);
-    loadImage(assets.krystal.kill[base]).then(bg => {
-        if (target) loadImage(avatarURL).then(avatar => {
-            ctx.drawImage(bg, 0, 0);
-            ctx.drawImage(avatar, 150, 200, 500, 500);
-            say(krystal, msg.channel, { content: text, files: [new MessageAttachment(canvas.toBuffer(), 'Kill.png')] }, 1000 - (new Date().valueOf() - startTime))
+        let base = Math.floor(Math.random() * 2);
+        loadImage(assets.krystal.kill[base]).then(bg => {
+            if (target) loadImage(avatarURL).then(avatar => {
+                ctx.drawImage(bg, 0, 0);
+                ctx.drawImage(avatar, 150, 200, 500, 500);
+                if (msg)
+                    say(krystal, msg.channel, { content: text, files: [new MessageAttachment(canvas.toBuffer(), 'Kill.png')] }, 1000 - (new Date().valueOf() - startTime))
+                else
+                    resolve(canvas.toBuffer());
+            })
         })
+
     })
 };
 /**
