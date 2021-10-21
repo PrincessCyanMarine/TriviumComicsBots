@@ -343,7 +343,9 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
             msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member :
             msg.options.get('player') ? msg.options.get('player')?.user :
                 msg.options.getUser('user') ? msg.options.getUser('user') :
-                    msg.user;
+                    msg.options.getMessage('message') ? msg.options.getMessage('message')?.author :
+                        msg.user;
+        if (!target || !(target instanceof User)) return;
         if (!target) return errormessage(msg);
         if (target instanceof User)
             target = await msg.guild.members.fetch(target.id);
