@@ -97,7 +97,10 @@ const emojis: { [key: string]: string } = {
     ":GMKattyUwu:": "<:GMKattyUwu:850431548099657738>",
     ":GMSadieEvilSmug:": "<:GMSadieEvilSmug:850431548134391829>",
     ":GMRayScared:": "<:GMRayScared:850431548599304285>",
-    ":GMSadieISleep:": "<:GMSadieISleep:850431548633382972>"
+    ":GMSadieISleep:": "<:GMSadieISleep:850431548633382972>",
+    ":rock:": "<:stone:725123426687123516>",
+    ":paper:": "<:paper:725123426452242482>",
+    ":scissors:": "✂️",
 }
 
 export default emojis;

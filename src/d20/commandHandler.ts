@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, MessageActionRow, MessageButton } from "discord.js";
 import { testing } from "..";
 import { mod_alert_webhook } from "../clients";
 import { msg2embed } from "../common/functions";
@@ -19,8 +19,10 @@ export function testCommands(msg: Message) {
         console.log(slur_detection.join(', '));
         mod_alert_webhook(testing)
             .send({
-                content: `<@&${alert_role_id}> please confirm the message below doesn\'t include a slur (flagged: "${slur_detection.join(', ')}")\nMessage url: ${msg.url}`,
-                embeds: msg2embed(msg)
+                content: `<@&${alert_role_id}> please confirm the message below doesn\'t include a slur (flagged: "${slur_detection.join(', ')}")`,
+                embeds: msg2embed(msg),
+                username: "Mod alert - Slur!",
+                avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",
             });
     }
 
@@ -28,7 +30,11 @@ export function testCommands(msg: Message) {
 
 function nitro(msg: Message) {
     mod_alert_webhook(testing).send({
-        content: `<@&${alert_role_id}> please confirm the message below isn\'t a free nitro scam\nMessage url: ${msg.url}`,
+        content: `<@&${alert_role_id}> please confirm the message below isn\'t a free nitro scam`,
+        username: "Mod alert - Free nitro!",
+        avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",
         embeds: msg2embed(msg)
     });
 }
+
+const button_message_link = (url: string) => new MessageButton().setStyle("LINK").setURL(url).setLabel("Go to message");

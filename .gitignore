@@ -7,3 +7,4 @@ dist/
 **.sql
 vscode-profile**
 **.code-workspace
+TODO.md

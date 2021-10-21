@@ -1,14 +1,13 @@
-import { GuildMember, Message, MessageActionRow, MessageAttachment, TextChannel } from "discord.js";
+import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
-import { clients, d20, eli, krystal, ray } from "../clients";
+import { d20, eli, krystal, ray } from "../clients";
 import { generatecard, prestige } from "../d20/function";
 import { eating, killing } from "../krystal/functions";
 import { say } from "./functions";
 import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, memberNicknameMention } from "@discordjs/builders"
 import { lamp, sleep } from "../attachments";
-import { get_rps_interactible } from "../games/common";
-import { bot_enum, rockpaperscissors_messages } from "../games/rockpaperscissors";
+import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 
 
 d20.on('messageCreate', async (msg) => {
@@ -112,16 +111,54 @@ d20.on('messageCreate', async (msg) => {
             case 'play':
             case 'play_button':
             case 'play_list':
-                let bots = ["ray", "sadie", /* "krystal", */ "eli"];
-                let bot_name = bots[Math.floor(Math.random() * bots.length)];
-                let bot = clients[bot_name];
+                let bot_name;
 
-                let type = options[0] == "!play_list" ? true : false;
-                let method = get_rps_interactible(msg.author.id, type);
-                say(bot, msg.channel, {
-                    content: rockpaperscissors_messages["challenged"][bot_enum[bot_name]],
-                    components: [new MessageActionRow().addComponents(method)]
+                let list = options[0] == "!play_list" ? true : false;
+                if (options[1] && rps_bots.includes(options[1])) {
+                    bot_name = options[1];
+                    playrps(bot_name, msg.author.id, msg.channel, list);
+                    return;
+                }
+
+                let components: MessageActionRow[] = [];
+                if (!list) {
+                    rps_bots.forEach(bot => {
+                        if (components.length == 0 || components[components.length - 1].components.length == 5)
+                            components.push(new MessageActionRow());
+
+                        components[components.length - 1]
+                            .addComponents(
+                                new MessageButton()
+                                    .setCustomId(`play-against=${bot}&id=${msg.author.id}&list=0`)
+                                    .setLabel(bot.toUpperCase())
+                                    .setStyle("SECONDARY")
+                                    .setEmoji(rps_bots_emojis[bot])
+                            )
+                    });
+                } else {
+                    components.push(new MessageActionRow()
+                        .addComponents(
+                            new MessageSelectMenu()
+                                .addOptions(
+                                    // { label, value, description, default, emoji}
+                                    rps_bots.map(bot => ({
+                                        label: bot.toUpperCase(),
+                                        value: `play-against=${bot}&id=${msg.author.id}&list=1}`,
+                                        description: bot == "random" ? `Play against a random character` : `Play against ${bot}`,
+                                        emoji: rps_bots_emojis[bot]
+                                    }))
+                                )
+                                .setCustomId("play-against-list")
+                                .setPlaceholder("Choose")
+                        )
+                    )
+                }
+
+                msg.channel.send({
+                    content: "Who do you want to play against?",
+                    components: components
                 });
+
                 break;
         };
     };

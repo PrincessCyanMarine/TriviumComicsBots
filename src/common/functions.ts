@@ -120,12 +120,13 @@ export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM"
     database.child('activities/' + bot.user?.username).set(name);
 };
 
-export let msg2embed = (msg: Message) => {
+export const msg2embed = (msg: Message) => {
     let embed = new MessageEmbed()
         .setAuthor(msg.author.username, msg.author.displayAvatarURL(), msg.url)
-        .setDescription(hyperlink(msg.content, msg.url))
-        .setTimestamp(msg.createdTimestamp)
+        .setTitle("Go to original")
         .setURL(msg.url)
+        .setDescription(msg.content)
+        .setTimestamp(msg.createdTimestamp)
         .setColor(msg.member?.displayHexColor || "WHITE")
     let img = msg.attachments.first()?.url;
     if (img) embed.setImage(img);
@@ -133,3 +134,5 @@ export let msg2embed = (msg: Message) => {
     embeds.unshift(embed);
     return embeds;
 }
+
+export const random_from_array = (array: any[]) => array[Math.floor(Math.random() * array.length)];
