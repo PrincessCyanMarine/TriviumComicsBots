@@ -58,10 +58,10 @@ eli.on('ready', () => {
 
 export const mod_alert_webhook = (testing: boolean) => testing ?
     new WebhookClient({
-        url: "https://discord.com/api/webhooks/900374491916558386/w1tTmMj9W7ycpYBUNwMYC0eW_K00kJMGGKJO8pax85Ztu2HFWqDq71Rs5jffzf-EQv1N"
+        url: process.env.WEBHOOK_TESTING_CHANNEL || ""
     }) :
     new WebhookClient({
-        url: "https://discord.com/api/webhooks/900363561019269130/1qlWM7j3zBdP_OC7GdZReUbFAobAunEcr6uOWNC3HA67_brENhnoSBnO-CJLnZXRvgTH"
+        url: process.env.WEBHOOK_ALERT_CHANNEL || ""
     });
 
 export const clients: { [bot: string]: Client } = {
