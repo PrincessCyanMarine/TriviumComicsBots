@@ -14,7 +14,10 @@ d20.on('interactionCreate', async (interaction) => {
             interaction.deferReply();
             try {
                 let card = await generatecard(interaction);
-                interaction.editReply({ files: [card] });
+                if (interaction.deferred)
+                    interaction.editReply(({ files: [card] }));
+                else
+                    interaction.reply(({ files: [card] }));
             } catch (er) {
                 console.error(er);
                 interaction.editReply({ content: 'Something went wrong...' });
