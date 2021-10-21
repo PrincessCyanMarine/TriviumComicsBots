@@ -1,4 +1,4 @@
-import { createCanvas, Image, loadImage } from "canvas";
+import { createCanvas, loadImage } from "canvas";
 import { Message, MessageAttachment, User } from "discord.js";
 import { sadie } from "../clients";
 import { createEncoder, getTarget, say, testWord } from "../common/functions";
@@ -8,11 +8,6 @@ import assets from "../assetsIndexes";
 import { database } from "..";
 import { kick, punch } from "../attachments";
 
-var images: {
-    punch: Image[]
-} = {
-    punch: []
-};
 
 export function greet(msg: Message, greeting = Math.floor(Math.random() * greetings.length)) { greetings[greeting](msg); };
 

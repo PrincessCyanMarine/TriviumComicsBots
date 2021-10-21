@@ -1,3 +1,5 @@
+// IDs are already public
+
 export const testGuildId: string = '620635349173010465';
 export const triviumGuildId: string = '562429293364248587';
 export const testChannelId: string = '892800588469911663';
@@ -13,3 +15,4 @@ export const ignore_channels: string[] = ["728081841139220552", "725932268891406
 export const patron_role_id = '611539466670309386';
 // export const announcementChannelId: string = '674781280423903264'; // TestChannel
 export const announcementChannelId: string = '613507549085302796'; // Announcement Channel
+export const alert_role_id: string = "900363259188772865";

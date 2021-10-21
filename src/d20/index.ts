@@ -1,4 +1,3 @@
-import { MessageActionRow, MessageButton } from "discord.js";
 import { testing } from "..";
 import { d20 } from "../clients";
 import { ignore_channels, testChannelId } from "../common/variables";

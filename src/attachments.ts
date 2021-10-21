@@ -1,4 +1,3 @@
-import { loadImage } from "canvas";
 import { MessageAttachment } from "discord.js";
 
 export const stare = new MessageAttachment("./assets/krystal/greetings/stare.png", "FEAR.png");

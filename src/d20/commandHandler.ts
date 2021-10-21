@@ -1,8 +1,8 @@
-import { Message, MessageEmbed, WebhookClient } from "discord.js";
+import { Message } from "discord.js";
 import { testing } from "..";
 import { mod_alert_webhook } from "../clients";
 import { msg2embed } from "../common/functions";
-import { testGuildId, triviumGuildId } from "../common/variables";
+import { alert_role_id, triviumGuildId } from "../common/variables";
 
 export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;
@@ -19,7 +19,7 @@ export function testCommands(msg: Message) {
         // console.log(slur_detection);
         mod_alert_webhook(testing)
             .send({
-                content: `<@&900363259188772865> please confirm the message below doesn\'t include a slur (flagged: "${slur_detection}")\nMessage url: ${msg.url}`,
+                content: `<@&${alert_role_id}> please confirm the message below doesn\'t include a slur (flagged: "${slur_detection}")\nMessage url: ${msg.url}`,
                 embeds: msg2embed(msg)
             });
     }
@@ -28,7 +28,7 @@ export function testCommands(msg: Message) {
 
 function nitro(msg: Message) {
     mod_alert_webhook(testing).send({
-        content: `<@&900363259188772865> please confirm the message below isn\'t a free nitro scam\nMessage url: ${msg.url}`,
+        content: `<@&${alert_role_id}> please confirm the message below isn\'t a free nitro scam\nMessage url: ${msg.url}`,
         embeds: msg2embed(msg)
     });
 }

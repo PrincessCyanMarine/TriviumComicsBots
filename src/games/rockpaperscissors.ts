@@ -1,10 +1,9 @@
 import { userMention } from "@discordjs/builders";
-import { ButtonInteraction, GuildChannel, GuildMember, Message, MessageActionRow, MessageButton, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, Message, MessageActionRow, MessageButton, SelectMenuInteraction } from "discord.js";
 import { testing } from "..";
-import { clients, d20, id2bot, krystal, ray } from "../clients";
-import { krystalId, RayId, testGuildId, triviumGuildId } from "../common/variables";
-import { killing } from "../krystal/functions";
-import { get_rps_interactible, reply, update } from "./common";
+import { clients, d20, id2bot } from "../clients";
+import { RayId } from "../common/variables";
+import { get_rps_interactible, update } from "./common";
 
 Object.values(clients).forEach(bot => {
     bot.on('interactionCreate', async (interaction) => {

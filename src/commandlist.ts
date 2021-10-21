@@ -45,7 +45,9 @@ export const command_list = {
         "Prestige",
         "Ban",
         "Kick",
-        "Help"
+        "Help",
+        "warn",
+        "warning"
     ],
     "ray": [
         "roll"
@@ -54,7 +56,8 @@ export const command_list = {
         "guild"
     ],
     "multiple": [
-        "Profile"
+        "Profile",
+        "roll"
     ]
 };
 

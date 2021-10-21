@@ -7,7 +7,6 @@ import { get } from "https";
 import { accountForPrestige, createCard, createXpBar, defaultstats, defaultstyle, getLevel, getLevelCost, getposition, StatsObject } from "./d20/function";
 import { triviumGuildId } from "./common/variables";
 import { d20 } from "./clients";
-import { Canvas } from "canvas";
 
 const express_app = express();
 const server = createServer(express_app);

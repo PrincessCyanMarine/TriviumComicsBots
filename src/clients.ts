@@ -1,6 +1,5 @@
 import { Client, Intents, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { testing } from ".";
 import { eli_activities } from "./eli/activities";
 import { krystal_activities } from "./krystal/activities";
 import { ray_activities } from "./ray/activities";
@@ -72,6 +71,7 @@ export const clients: { [bot: string]: Client } = {
     'ray': ray,
 }
 
+// IDs are already public
 export const id2bot: { [bot: string]: string } = {
     "743606862578057277": 'd20',
     "622898538514350085": 'sadie',

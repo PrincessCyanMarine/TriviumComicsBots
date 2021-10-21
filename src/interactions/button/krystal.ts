@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { testing } from "../..";
 import { krystal } from "../../clients";
-import { testGuildId, triviumGuildId } from "../../common/variables";
+import { triviumGuildId } from "../../common/variables";
 
 krystal.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
