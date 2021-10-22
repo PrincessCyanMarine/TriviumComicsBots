@@ -345,10 +345,11 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
                 msg.options.getUser('user') ? msg.options.getUser('user') :
                     msg.options.getMessage('message') ? msg.options.getMessage('message')?.author :
                         msg.user;
-        if (!target || !(target instanceof User)) return;
+        console.log('A')
+        if (target instanceof User) target = await msg.guild.members.fetch(target.id);
+        if (!target || !(target instanceof GuildMember)) return;
         if (!target) return errormessage(msg);
-        if (target instanceof User)
-            target = await msg.guild.members.fetch(target.id);
+        console.log('A')
 
         let all_messages = await (await database.child('lvl/' + msg.guildId).once('value')).val();
         let messages: number;
