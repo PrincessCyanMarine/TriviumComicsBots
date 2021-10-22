@@ -20,12 +20,12 @@ Object.values(clients).forEach(bot => {
 
         let challeging = interaction.customId.match(/play-against=(?<bot>.+?)&id=(?<player_id>.+?)&list=(?<list>[01])/i);
         if (challeging && challeging.groups && interaction.channel?.isText()) {
-            interaction.deferUpdate();
+            // interaction.deferUpdate();
             let bot_name = challeging.groups.bot;
             let player_id = challeging.groups.player_id;
             if (interaction.user.id != player_id) {
-                sendtoplayer(interaction, rockpaperscissors_messages.challenged[bot_name]);
-                return;
+                // sendtoplayer(interaction, rockpaperscissors_messages.challenged[bot_name]);
+                return interaction.reply({ content: 'You can\'t do that', ephemeral: true });
             }
 
             let list = challeging.groups.list == "1";
@@ -43,7 +43,7 @@ Object.values(clients).forEach(bot => {
         else if (interaction.customId.includes("Continue-")) {
             let text = rockpaperscissors_messages.challenged[id2bot[interaction.message.author.id]];
             if (interaction.user.id != interaction.customId.split('Continue-')[1])
-                return sendtoplayer(interaction, text);
+                return interaction.reply({ content: 'You can\'t do that', ephemeral: true }); //sendtoplayer(interaction, text);
             interaction.update({
                 content: text,
                 components: [
@@ -132,7 +132,7 @@ async function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInter
         let playerId = interaction.customId.split('rpssp-')[1].split('/')[0];
         // console.log(playerId, interaction.user.id, interaction.user.id == playerId);
 
-        if (interaction.user.id != playerId) return sendtoplayer(interaction, rockpaperscissors_messages.challenged[id2bot[interaction.message.author.id]]);
+        if (interaction.user.id != playerId) return interaction.reply({ content: 'You can\'t do that', ephemeral: true }); //sendtoplayer(interaction, rockpaperscissors_messages.challenged[id2bot[interaction.message.author.id]]);
 
         let choice_name;
         if (interaction instanceof SelectMenuInteraction)
