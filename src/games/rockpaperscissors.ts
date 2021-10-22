@@ -37,18 +37,18 @@ Object.values(clients).forEach(bot => {
             if (interaction.user.id != interaction.customId.split('Remove-')[1]) return interaction.reply({ content: 'You can\'t do that', ephemeral: true });
             if (!(interaction.message instanceof Message)) return
             // console.log(interaction.message.interaction);
-            interaction.message.edit({ content: interaction.message.content.replace('Play again?', ''), components: [] })
+            interaction.message.edit({ content: interaction.message.content.replace('Play again?', ''), components: [], embeds: [] })
         }
         else if (interaction.customId.includes("Continue-")) {
             let text = rockpaperscissors_messages.challenged[id2bot[interaction.message.author.id]];
             if (interaction.user.id != interaction.customId.split('Continue-')[1])
                 return sendtoplayer(interaction, text);
-            update(interaction, {
+            interaction.update({
                 content: text,
                 components: [
                     new MessageActionRow()
                         .addComponents(get_rps_interactible(interaction.user.id, interaction.customId.startsWith('a')))
-                ]
+                ], embeds: []
             });
         }
     });
@@ -158,34 +158,38 @@ function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction
         //     return;
         // };
 
-        let text = `${userMention(interaction.user.id)} chose ${choice_name}\n`;
-        text += `${userMention(interaction.message.author.id)} chose ${["rock", "paper", "scissors"][pc]}\n\n`;
+        // let text = `${userMention(interaction.user.id)} chose ${choice_name}\n`;
+        // text += `${userMention(interaction.message.author.id)} chose ${["rock", "paper", "scissors"][pc]}\n\n`;
 
         let components = interaction.message.components?.map(c => c instanceof MessageActionRow ? c : new MessageActionRow);
         // console.log(interaction.message instanceof Message && interaction.message.deletable)
         // console.log(interaction.customId)
-        if (!interaction.customId.startsWith('a')) {
-            components = [new MessageActionRow().addComponents(
-                new MessageButton()
-                    .setCustomId(`${interaction instanceof SelectMenuInteraction ? 'a' : ''}Continue-${playerId}`)
-                    .setLabel('Yes')
-                    .setStyle('SUCCESS')
-                    .setEmoji("✔️"),
-                new MessageButton()
-                    .setCustomId('Remove-' + playerId)
-                    .setLabel('No')
-                    .setStyle('DANGER')
-                    .setEmoji("✖️"),
-            )];
+        // if (!interaction.customId.startsWith('a')) {
+        components = [new MessageActionRow().addComponents(
+            new MessageButton()
+                .setCustomId(`${interaction instanceof SelectMenuInteraction ? 'a' : ''}Continue-${playerId}`)
+                .setLabel('Yes')
+                .setStyle('SUCCESS')
+                .setEmoji("✔️"),
+            new MessageButton()
+                .setCustomId('Remove-' + playerId)
+                .setLabel('No')
+                .setStyle('DANGER')
+                .setEmoji("✖️"),
+        )];
 
-            text += '\nPlay again?'
-        } else
-            components = [];
+        // text += '\nPlay again?'
+        // } else
+        //     components = [];
+
+        let bot_name = id2bot[interaction.message.author.id];
 
         let embed = new MessageEmbed()
             .setAuthor("The Cosmic D20", "https://cdn.discordapp.com/avatars/743606862578057277/86f4b6b4075938799f679e80f75634ab.png?size=1024")
-            .addField("Result", result == "DRAW" ? 'It\'s a draw!\n' : `${result == "PLAYER_WON" ? userMention(interaction.user.id) : userMention(interaction.message.author.id)} won!\n`);
-        let bot_name = id2bot[interaction.message.author.id];
+            .addField(interaction.member && interaction.member instanceof GuildMember ? interaction.member.displayName : interaction.user.username, choice_name)
+            .addField(bot_name, ["rock", "paper", "scissors"][pc])
+            .addField("Result", result == "DRAW" ? 'It\'s a draw!\n' : `${result == "PLAYER_WON" ? userMention(interaction.user.id) : userMention(interaction.message.author.id)} won!\n`)
+
 
         interaction.update({ embeds: [embed], content: rockpaperscissors_messages[result == "DRAW" ? "PLAYER_WON" : result][bot_name] + "\nPlay again?", components: components });
     }
