@@ -114,8 +114,8 @@ d20.on('messageCreate', async (msg) => {
                 let bot_name;
 
                 let list = options[0] == "!play_list" ? true : false;
-                if (options[1] && rps_bots.includes(options[1])) {
-                    bot_name = options[1];
+                if (options[1] && rps_bots.includes(options[1].toLowerCase())) {
+                    bot_name = options[1].toLowerCase();
                     playrps(bot_name, msg.author.id, msg.channel, list);
                     return;
                 }

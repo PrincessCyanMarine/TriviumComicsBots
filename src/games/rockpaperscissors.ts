@@ -157,6 +157,13 @@ async function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInter
                 .addField("Krystal", ["popcorn...?", "gun...?", "fireball...?"][pc])
                 .addField("Result", "Krystal wins... Somehow...")
                 .setColor('RED');
+
+            let text = random_from_array([
+                "You need to get better at this game " + userMention(interaction.user.id) + "chan.",
+                "I win again.",
+                "I think I am beginning to understand this game!",
+            ]);
+
             let file = [
                 () => eating(undefined, interaction.user),
                 () => killing(undefined, interaction.user),
@@ -164,6 +171,7 @@ async function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInter
             ][pc];
 
             interaction.update({
+                content: text,
                 embeds: [embed],
                 files: [await file()],
                 components: []
