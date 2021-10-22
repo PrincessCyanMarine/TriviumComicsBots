@@ -159,12 +159,20 @@ export function swimming(msg: Message) {
         say(krystal, msg.channel, { files: [swim] });
 
 };
-export async function burning(msg: Message) {
-    let activity = await (await database.child('activities/Krystal').once('value')).val();
-    if (activity == 'dnd')
-        say(krystal, msg.channel, { files: [fireball] });
-    else
-        say(krystal, msg.channel, { files: [fire] });
+export async function burning(msg?: Message): Promise<MessageAttachment> {
+    return new Promise(async (resolve, reject) => {
+        let activity = await (await database.child('activities/Krystal').once('value')).val();
+        if (activity == 'dnd')
+            if (msg)
+                say(krystal, msg.channel, { files: [fireball] });
+            else
+                return resolve(fireball);
+        else
+            if (msg)
+                say(krystal, msg.channel, { files: [fire] });
+            else
+                return resolve(fire);
+    });
 };
 export function crashing(msg: Message) {
     say(krystal, msg.channel, 'Invalid result...', 1500).then(message => {

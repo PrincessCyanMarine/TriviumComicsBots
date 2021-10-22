@@ -4,7 +4,8 @@ import { testing } from "..";
 import { clients, d20, id2bot } from "../clients";
 import emojis from "../common/emojis";
 import { random_from_array, say } from "../common/functions";
-import { RayId } from "../common/variables";
+import { krystalId, RayId } from "../common/variables";
+import { burning, eating, killing } from "../krystal/functions";
 import { get_rps_interactible, reply, update } from "./common";
 
 Object.values(clients).forEach(bot => {
@@ -37,7 +38,7 @@ Object.values(clients).forEach(bot => {
             if (interaction.user.id != interaction.customId.split('Remove-')[1]) return interaction.reply({ content: 'You can\'t do that', ephemeral: true });
             if (!(interaction.message instanceof Message)) return
             // console.log(interaction.message.interaction);
-            interaction.message.edit({ content: interaction.message.content.replace('Play again?', ''), components: [], embeds: [] })
+            interaction.message.edit({ content: interaction.message.content.replace('Play again?', ''), components: []/* , embeds: [] */ })
         }
         else if (interaction.customId.includes("Continue-")) {
             let text = rockpaperscissors_messages.challenged[id2bot[interaction.message.author.id]];
@@ -67,7 +68,7 @@ export function playrps(bot_name: string, id: string, channel: TextBasedChannels
     }, 100);
 }
 
-export const rps_bots = ["ray", "sadie", /* "krystal", */ "eli", "random"];
+export const rps_bots = ["ray", "sadie", "krystal", "eli", "random"];
 export const rps_bots_emojis: { [bot: string]: string } = {
     "ray": emojis[":GMRayFakRight:"],
     "sadie": emojis[":GMSadieTheSadist:"],
@@ -126,7 +127,7 @@ export const rockpaperscissors_messages: { [key: string]: { [key: string]: strin
 
     }
 }
-function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction) {
+async function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction) {
     if (interaction.customId.includes('rpssp')) {
         let playerId = interaction.customId.split('rpssp-')[1].split('/')[0];
         // console.log(playerId, interaction.user.id, interaction.user.id == playerId);
@@ -149,14 +150,27 @@ function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction
         let result = RockPaperScissorTable[choice][pc];
 
         //TODO Krystal
-        // if (interaction.message.author.id == krystalId) {
-        //     [
-        //         () => { },
-        //         () => { },
-        //         () => { },
-        //     ][pc]();
-        //     return;
-        // };
+        if (interaction.message.author.id == krystalId) {
+            let embed = new MessageEmbed()
+                .setAuthor("The Cosmic D20", "https://cdn.discordapp.com/avatars/743606862578057277/86f4b6b4075938799f679e80f75634ab.png?size=1024")
+                .addField(interaction.member && interaction.member instanceof GuildMember ? interaction.member.displayName : interaction.user.username, choice_name)
+                .addField("Krystal", ["popcorn...?", "gun...?", "fireball...?"][pc])
+                .addField("Result", "Krystal wins... Somehow...")
+                .setColor('RED');
+            let file = [
+                () => eating(undefined, interaction.user),
+                () => killing(undefined, interaction.user),
+                () => burning(undefined),
+            ][pc];
+
+            interaction.update({
+                embeds: [embed],
+                files: [await file()],
+                components: []
+            })
+
+            return;
+        };
 
         // let text = `${userMention(interaction.user.id)} chose ${choice_name}\n`;
         // text += `${userMention(interaction.message.author.id)} chose ${["rock", "paper", "scissors"][pc]}\n\n`;
@@ -189,6 +203,7 @@ function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction
             .addField(interaction.member && interaction.member instanceof GuildMember ? interaction.member.displayName : interaction.user.username, choice_name)
             .addField(bot_name, ["rock", "paper", "scissors"][pc])
             .addField("Result", result == "DRAW" ? 'It\'s a draw!\n' : `${result == "PLAYER_WON" ? userMention(interaction.user.id) : userMention(interaction.message.author.id)} won!\n`)
+            .setColor(result == "DRAW" ? "YELLOW" : result == "PLAYER_WON" ? "GREEN" : "RED");
 
 
         interaction.update({ embeds: [embed], content: rockpaperscissors_messages[result == "DRAW" ? "PLAYER_WON" : result][bot_name] + "\nPlay again?", components: components });
