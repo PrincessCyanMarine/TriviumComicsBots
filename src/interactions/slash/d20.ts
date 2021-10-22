@@ -18,7 +18,6 @@ d20.on('interactionCreate', async (interaction) => {
 
     switch (interaction.commandName) {
         case "card":
-            interaction.deferReply();
             try {
                 let card = await generatecard(interaction);
                 reply(interaction, { files: [card] });
