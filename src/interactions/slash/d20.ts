@@ -79,7 +79,7 @@ d20.on('interactionCreate', async (interaction) => {
                 for (let w in warnings) text += `\n${parseInt(w) + 1}: ${warnings[parseInt(w)]}`;
                 text += '```';
             }
-            reply(interaction, text);
+            reply(interaction, text, interaction.channel);
             break;
         }
         default:
