@@ -38,7 +38,7 @@ function nitro(msg: Message) {
     });
 
     if (msg.member && msg.member instanceof GuildMember && msg.guild) 
-        warn(msg.member, msg.guild.id, "Possible free nitro scam");
+        warn(msg.member, msg.guild.id, "Possible free nitro scam", msg.channel);
 }
 
 const button_message_link = (url: string) => new MessageButton().setStyle("LINK").setURL(url).setLabel("Go to message");

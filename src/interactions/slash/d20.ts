@@ -67,7 +67,7 @@ d20.on('interactionCreate', async (interaction) => {
                 reply(interaction, 'Something went wrong', true); 
                 return;
             } 
-            warn(player, interaction.guildId, reason, interaction.channel);
+            warn(player, interaction.guildId, reason, interaction);
             break;
         }
         case 'warnings': {

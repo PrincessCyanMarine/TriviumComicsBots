@@ -417,12 +417,16 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
     });
 }
 
-export async function warn(player: GuildMember, guildId: string, reason: string, channel?: TextBasedChannels) {
+export async function warn(player: GuildMember, guildId: string, reason: string, replyMethod: TextBasedChannels | Interaction) {
     let warnings = await (await database.child(`warnings/${guildId}/${player.id}`).once('value')).val();
     if (!warnings || typeof warnings != 'object') warnings = [];
     warnings.push(reason);
+    let text = `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings${warnings.length == 2 ? '\nIf you receive one more warning, you will be kicked from the server': warnings.length >= 3 ? 'Therefore they were kicked from the server': '3 warns will result on you being kicked from the server'}\nIf you think this warning was undeserved, talk to a Queensblade`;
     database.child(`warnings/${guildId}/${player.id}`).set(warnings);
-    if(channel) say(d20, channel,`${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings${warnings.length == 2 ? '\nIf you receive one more warning, you will be kicked from the server':''}\nIf you think this warning was undeserved, talk to a Queensblade`);
+    if(replyMethod instanceof TextBasedChannels) 
+        say(d20, channel, text);
+    else
+        replyMethod.reply(text);
     if (warnings.length >= 3) 
         player.kick()
             .catch(console.error);
