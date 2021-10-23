@@ -160,6 +160,9 @@ d20.on('messageCreate', async (msg) => {
                 });
 
                 break;
+                case 'mute':
+                    // if ()
+                    break;
         };
     };
 });

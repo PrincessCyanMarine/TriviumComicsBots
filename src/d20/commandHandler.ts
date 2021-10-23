@@ -1,8 +1,9 @@
-import { Message, MessageActionRow, MessageButton } from "discord.js";
+import { Message, MessageActionRow, MessageButton, GuildMember } from "discord.js";
 import { testing } from "..";
 import { mod_alert_webhook } from "../clients";
 import { msg2embed } from "../common/functions";
 import { alert_role_id, triviumGuildId } from "../common/variables";
+import { warn } from "./function";
 
 export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;
@@ -35,6 +36,9 @@ function nitro(msg: Message) {
         avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",
         embeds: msg2embed(msg)
     });
+
+    if (msg.member && msg.member instanceof GuildMember) 
+        warn(msg.member, msg.guild.id, "Possible free nitro scam");
 }
 
 const button_message_link = (url: string) => new MessageButton().setStyle("LINK").setURL(url).setLabel("Go to message");

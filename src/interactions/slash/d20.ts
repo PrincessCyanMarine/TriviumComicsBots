@@ -4,7 +4,7 @@ import { clients, d20 } from "../../clients";
 import { command_list, command_list_string } from "../../commandlist";
 import { say } from "../../common/functions";
 import { ignore_channels } from "../../common/variables";
-import { bankick, generatecard, prestige } from "../../d20/function";
+import { bankick, generatecard, prestige, warn } from "../../d20/function";
 import { followup, reply } from "./common";
 
 d20.on('ready', async () => {
@@ -61,14 +61,11 @@ d20.on('interactionCreate', async (interaction) => {
             let reason = interaction.options.get('reason')?.value;
             let player = interaction.options.get('player')?.member;
 
-            if (!interaction.guild?.members.cache.get(interaction.user.id)?.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
+            if (!(interaction.member instanceof GuildMember)) return;
+            if (!interaction.member.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
             if (!player || !(player instanceof GuildMember) || !reason) { reply(interaction, 'Something went wrong', true); return; };
 
-            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once('value')).val();
-            if (!warnings || typeof warnings != 'object') warnings = [];
-            warnings.push(reason);
-            database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
-            reply(interaction, `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings`);
+            warn(player, interaction.guildId, reason);
             break;
         }
         case 'warnings': {

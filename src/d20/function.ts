@@ -416,3 +416,14 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
         return resolve(card);
     });
 }
+
+function warn(target: GuildMember, guildId: string, reason: string) {
+    let warnings = await (await database.child(`warnings/${guildId}/${player.id}`).once('value')).val();
+    if (!warnings || typeof warnings != 'object') warnings = [];
+    warnings.push(reason);
+    database.child(`warnings/${guildId}/${player.id}`).set(warnings);
+    reply(interaction, `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings${warnings.length == 2 ? '\nIf you receive one more warning, you will be kicked from the server':''}\nIf you think this warning was undeserved, talk to a Queensblade`);
+    if (warnings.length >= 3) 
+        player.kick()
+            .catch(console.error);
+}
