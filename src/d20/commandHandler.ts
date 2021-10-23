@@ -37,7 +37,7 @@ function nitro(msg: Message) {
         embeds: msg2embed(msg)
     });
 
-    if (msg.member && msg.member instanceof GuildMember) 
+    if (msg.member && msg.member instanceof GuildMember && msg.guild) 
         warn(msg.member, msg.guild.id, "Possible free nitro scam");
 }
 

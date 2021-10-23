@@ -417,7 +417,7 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
     });
 }
 
-export async function warn(player: GuildMember, guildId: string, reason: string, channel: TextBasedChannels) {
+export async function warn(player: GuildMember, guildId: string, reason: string, channel?: TextBasedChannels) {
     let warnings = await (await database.child(`warnings/${guildId}/${player.id}`).once('value')).val();
     if (!warnings || typeof warnings != 'object') warnings = [];
     warnings.push(reason);
