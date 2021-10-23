@@ -63,7 +63,7 @@ d20.on('interactionCreate', async (interaction) => {
 
             if (!(interaction.member instanceof GuildMember)) return;
             if (!interaction.member.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
-            if (!player || !(player instanceof GuildMember) || !reason) { reply(interaction, 'Something went wrong', true); return; };
+            if (!player || !(player instanceof GuildMember) || !reason || !(typeof reason == "string")) { reply(interaction, 'Something went wrong', true); return; };
 
             warn(player, interaction.guildId, reason, interaction.channel);
             break;
