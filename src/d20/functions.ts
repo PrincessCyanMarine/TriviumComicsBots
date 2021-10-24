@@ -442,9 +442,19 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
             });
 }
 
-export const mute_unmute = (player: GuildMember, type: 'mute' | 'unmute') => new Promise((resolve, reject) => {
-    let mute_role = player.guild.roles.cache.get(player.guild.id == triviumGuildId ? "806648884754382889" : "781715781234720768");
-    if (!mute_role) return reject();
+export const mute_unmute = async (interaction: CommandInteraction | ContextMenuInteraction) => {
+    let player = interaction.isContextMenu() ? interaction.options.getMember('user') : interaction.options.getMember('player');
+    if (!(interaction.member instanceof GuildMember) || !(interaction.member.permissions.has("KICK_MEMBERS"))) { interaction.reply({ content: "You can't do that", ephemeral: true }); return; };
+    if (!(player instanceof GuildMember)) return;
 
-    resolve(type == 'mute' ? player.roles.add(mute_role) : player.roles.remove(mute_role));
-});
+
+    let mute_role = player.guild.roles.cache.get(player.guild.id == triviumGuildId ? "806648884754382889" : "781715781234720768");
+    if (!mute_role) return;
+
+    if (interaction.commandName == 'mute')
+        await player.roles.add(mute_role)
+    else
+        await player.roles.remove(mute_role);
+    let text = interaction.commandName + 'd ' + player.user.username;
+    interaction.reply(text).catch(() => { });
+};

@@ -31,13 +31,7 @@ d20.on('interactionCreate', async (interaction) => {
             break;
         case "mute":
         case "unmute":
-            let player = interaction.options.getMember('user');
-            if (!(interaction.member instanceof GuildMember) || !(interaction.member.permissions.has("KICK_MEMBERS"))) { interaction.reply({ content: "You can't do that", ephemeral: true }); return; };
-            if (!(player instanceof GuildMember)) return;
-
-            await mute_unmute(player, interaction.commandName);
-
-            interaction.reply(interaction.commandName + 'd ' + player.user.username);
+            mute_unmute(interaction);
             break;
     };
 });

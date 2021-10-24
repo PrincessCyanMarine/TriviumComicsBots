@@ -4,7 +4,7 @@ import { clients, d20 } from "../../clients";
 import { command_list, command_list_string } from "../../commandlist";
 import { say } from "../../common/functions";
 import { ignore_channels } from "../../common/variables";
-import { bankick, generatecard, prestige, warn } from "../../d20/functions";
+import { bankick, generatecard, mute_unmute, prestige, warn } from "../../d20/functions";
 import { followup, reply } from "./common";
 
 d20.on('ready', async () => {
@@ -17,6 +17,10 @@ d20.on('interactionCreate', async (interaction) => {
     else if (!testing && interaction.channelId == '892800588469911663') return;
 
     switch (interaction.commandName) {
+        case 'mute':
+        case 'unmute':
+            mute_unmute(interaction);
+            break;
         case "card":
             try {
                 let card = await generatecard(interaction);
