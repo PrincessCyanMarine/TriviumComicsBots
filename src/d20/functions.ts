@@ -1,10 +1,10 @@
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
-import { CommandInteraction, ContextMenuInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User, TextBasedChannels } from "discord.js";
+import { CommandInteraction, ContextMenuInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User, TextBasedChannels, Role } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
 import { d20 } from "../clients";
 import { say } from "../common/functions";
-import { not_count_in_channel_ids } from "../common/variables";
+import { not_count_in_channel_ids, testGuildId, triviumGuildId } from "../common/variables";
 import { reply } from "../interactions/slash/common";
 
 registerFont(assets.d20.card.fonts.letterer, { family: 'LETTERER' });
@@ -441,3 +441,10 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
                 player.send('You received 3 or more warnings and got kicked from the server\nIf you think it was undeserved, please contact a moderator');
             });
 }
+
+export const mute_unmute = (player: GuildMember, type: 'mute' | 'unmute') => new Promise((resolve, reject) => {
+    let mute_role = player.guild.roles.cache.get(player.guild.id == triviumGuildId ? "806648884754382889" : "781715781234720768");
+    if (!mute_role) return reject();
+
+    resolve(type == 'mute' ? player.roles.add(mute_role) : player.roles.remove(mute_role));
+});
