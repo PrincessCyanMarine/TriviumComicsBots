@@ -462,7 +462,6 @@ export const mute_unmute = async (interaction: CommandInteraction | ContextMenuI
     if (!(player instanceof GuildMember)) return;
     if (player.permissions.has('KICK_MEMBERS') && interaction.commandName == 'mute') { interaction.reply({ content: 'Can\'t mute that player', ephemeral: true }); };
 
-
     let mute_role = player.guild.roles.cache.get(player.guild.id == triviumGuildId ? "806648884754382889" : "781715781234720768");
     if (!mute_role) return;
 
