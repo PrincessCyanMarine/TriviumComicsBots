@@ -2,7 +2,7 @@ import { User } from "discord.js";
 import { testing } from "../..";
 import { d20 } from "../../clients";
 import { testChannelId } from "../../common/variables";
-import { generatecard } from "../../d20/function";
+import { generatecard } from "../../d20/functions";
 
 d20.on('interactionCreate', async (interaction) => {
     if (!interaction.isContextMenu()) return;

@@ -1,7 +1,7 @@
 import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
 import { d20, eli, krystal, ray } from "../clients";
-import { generatecard, prestige } from "../d20/function";
+import { generatecard, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { say } from "./functions";
 import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./variables";
@@ -160,9 +160,6 @@ d20.on('messageCreate', async (msg) => {
                 });
 
                 break;
-                case 'mute':
-                    // if ()
-                    break;
         };
     };
 });

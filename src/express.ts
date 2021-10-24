@@ -4,7 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import { createServer } from "http";
 import { get } from "https";
-import { accountForPrestige, createCard, createXpBar, defaultstats, defaultstyle, getLevel, getLevelCost, getposition, StatsObject } from "./d20/function";
+import { accountForPrestige, createCard, createXpBar, defaultstats, defaultstyle, getLevel, getLevelCost, getposition, StatsObject } from "./d20/functions";
 import { triviumGuildId } from "./common/variables";
 import { d20 } from "./clients";
 

@@ -3,7 +3,7 @@ import { testing } from "..";
 import { mod_alert_webhook } from "../clients";
 import { msg2embed } from "../common/functions";
 import { alert_role_id, triviumGuildId } from "../common/variables";
-import { warn } from "./function";
+import { warn } from "./functions";
 
 export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;

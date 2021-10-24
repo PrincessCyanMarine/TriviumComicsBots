@@ -4,7 +4,7 @@ import { clients, d20 } from "../../clients";
 import { command_list, command_list_string } from "../../commandlist";
 import { say } from "../../common/functions";
 import { ignore_channels } from "../../common/variables";
-import { bankick, generatecard, prestige, warn } from "../../d20/function";
+import { bankick, generatecard, prestige, warn } from "../../d20/functions";
 import { followup, reply } from "./common";
 
 d20.on('ready', async () => {
@@ -63,13 +63,48 @@ d20.on('interactionCreate', async (interaction) => {
 
             if (!(interaction.member instanceof GuildMember)) return;
             if (!interaction.member.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
-            if (!player || !(player instanceof GuildMember) || !reason || !(typeof reason == "string") || !interaction.guildId || !interaction.channel){
-                reply(interaction, 'Something went wrong', true); 
+            if (!player || !(player instanceof GuildMember) || !reason || !(typeof reason == "string") || !interaction.guildId || !interaction.channel) {
+                reply(interaction, 'Something went wrong', true);
                 return;
-            } 
+            }
             warn(player, interaction.guildId, reason, interaction);
             break;
         }
+        case 'unwarn':
+            let start = interaction.options.get('warning_start')?.value;
+            let end = interaction.options.get('warning_end')?.value;
+            let player = interaction.options.get('player')?.member;
+            if (typeof start == "number") start--;
+            else start = -1;
+            if (typeof end == "number") end--;
+            else end = start;
+
+            if (!(interaction.member instanceof GuildMember)) return;
+            if (!interaction.member.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
+            if (!player || !(player instanceof GuildMember) || !(typeof start == "number") || !(typeof end == "number") || !interaction.guildId || !interaction.channel) {
+                reply(interaction, 'Something went wrong', true);
+                return;
+            }
+
+            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once('value')).val();
+            if (!warnings || typeof warnings != 'object') {
+                warnings = [];
+                database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+                reply(interaction, "This player has no warnings!", true);
+                return;
+            }
+
+            let i;
+            let reason = '';
+            for (i = 0; i <= (end - start); i++) {
+                // console.log(warnings, start, warnings[start]);
+                reason += warnings.splice(start, 1) + '\n';
+            }
+
+            database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+            interaction.reply(`Removed ${end - start} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`);
+
+            break;
         case 'warnings': {
             let player = interaction.options.get('player')?.member;
             if (!player || !(player instanceof GuildMember)) { reply(interaction, 'Something went wrong', true); return; };
