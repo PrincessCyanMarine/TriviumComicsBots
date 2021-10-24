@@ -1,3 +1,4 @@
+import { userMention } from "@discordjs/builders";
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
 import { CommandInteraction, ContextMenuInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User, TextBasedChannels, Role } from "discord.js";
 import { database } from "..";
@@ -421,13 +422,26 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
     let warnings = await (await database.child(`warnings/${guildId}/${player.id}`).once('value')).val();
     if (!warnings || typeof warnings != 'object') warnings = [];
     warnings.push(reason);
-    let text = `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings\n${warnings.length == 2 ? 'If you receive one more warning, you will be kicked from the server' : warnings.length >= 3 ? 'Therefore they were kicked from the server' : '3 warns will result on you being kicked from the server'}\nIf you think this warning was undeserved, talk to a Queensblade`;
+    let text = `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings\n${warnings.length == 2 ? 'If they receive one more warning, they will be kicked from the server' : warnings.length >= 3 ? 'Therefore they were kicked from the server' : 'The next warning will result on them getting muted'}\nIf you think this warning was undeserved, talk to a Queensblade`;
     database.child(`warnings/${guildId}/${player.id}`).set(warnings);
     if (replyMethod instanceof CommandInteraction)
         replyMethod.reply(text);
     else
         say(d20, replyMethod, text);
-    if (warnings.length >= 3)
+
+    if (warnings.length == 2 && [triviumGuildId, testGuildId].includes(guildId)) {
+        let mute_role = player.guild.roles.cache.get(guildId == triviumGuildId ? "806648884754382889" : "781715781234720768");
+        if (!mute_role) return;
+        await player.roles.add(mute_role);
+        let text = userMention(player.id) + ' received 2 warnings and got muted';
+        if (replyMethod instanceof CommandInteraction) {
+            if (replyMethod.channel)
+                say(d20, replyMethod.channel, text);
+        } else
+            say(d20, replyMethod, text);
+
+    }
+    else if (warnings.length >= 3)
         player.kick()
             .catch(() => {
                 text = "Failed to kick " + player.user.username;
@@ -446,6 +460,7 @@ export const mute_unmute = async (interaction: CommandInteraction | ContextMenuI
     let player = interaction.isContextMenu() ? interaction.options.getMember('user') : interaction.options.getMember('player');
     if (!(interaction.member instanceof GuildMember) || !(interaction.member.permissions.has("KICK_MEMBERS"))) { interaction.reply({ content: "You can't do that", ephemeral: true }); return; };
     if (!(player instanceof GuildMember)) return;
+    if (player.permissions.has('KICK_MEMBERS') && interaction.commandName == 'mute') { interaction.reply({ content: 'Can\'t mute that player', ephemeral: true }); };
 
 
     let mute_role = player.guild.roles.cache.get(player.guild.id == triviumGuildId ? "806648884754382889" : "781715781234720768");
