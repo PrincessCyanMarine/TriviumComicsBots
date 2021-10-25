@@ -106,7 +106,7 @@ d20.on('interactionCreate', async (interaction) => {
             }
 
             database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
-            interaction.reply(`Removed ${end - start} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`);
+            interaction.reply(`Removed ${i} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`);
 
             break;
         case 'warnings': {
