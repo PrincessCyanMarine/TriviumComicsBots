@@ -160,6 +160,16 @@ d20.on('messageCreate', async (msg) => {
                 });
 
                 break;
+            case 'rank':
+                let all_messages = await (await database.child('lvl/' + msg.guildId).once('value')).val();
+                if (!all_messages) say(ray, msg.channel, "No messages were sent on this server");
+                let ranking: [string, number][] = Object.entries(all_messages);
+                ranking.sort((a, b) => b[1] - a[1]);
+                let text = '```';
+                for (let i = 0; i < 10 && i < ranking.length; i++) text += `${i + 1}: ${await (await msg.guild?.members.cache.has(ranking[i][0])) ? msg.guild?.members.cache.get(ranking[i][0])?.displayName : 'Unknown'} (${ranking[i][1]} messages)\n`;
+                text += '```';
+                say(ray, msg.channel, text);
+                break;
         };
     };
 });

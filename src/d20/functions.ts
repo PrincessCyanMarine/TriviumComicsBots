@@ -225,7 +225,6 @@ export function getposition(guildid: string, memberid: string, all_messages?: { 
     });
 }
 
-
 const lvl_base = 18;
 const xp_cost_increase = 22;
 export const getLevelCost = (level: number): number => (level - 1) * (lvl_base + (xp_cost_increase / 2 * (level - 2)));
