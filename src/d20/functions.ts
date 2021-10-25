@@ -472,43 +472,64 @@ export const mute_unmute = async (interaction: CommandInteraction | ContextMenuI
     interaction.reply(text).catch(() => { });
 };
 
-var saved_messages: { [guildId: string]: { [memberId: string]: number } } = {};
-export function get_rank_message(guild: Guild, authorId: string, all_messages = saved_messages[guild.id], page: number = 0): Promise<{ content: string, components?: MessageActionRow[] } | string> {
+var saved_messages: { [guildId: string]: [string, number][] } = {};
+export function get_rank_message(guild: Guild, authorId: string, all_messages?: Object, page: number = 0): Promise<{ content: string, components?: MessageActionRow[] } | string> {
     return new Promise(async (resolve, reject) => {
-        all_messages = all_messages || await (await database.child('lvl/' + guild.id).once('value')).val();
-        saved_messages[guild.id] = all_messages;
-        if (!all_messages) return resolve("No messages were sent on this server");
-        let ranking: [string, number][] = Object.entries(all_messages);
-        ranking.sort((a, b) => b[1] - a[1]);
-        let text = '```';
+        let ranking: [string, number][];
+        if (!saved_messages[guild.id] && !all_messages) {
+            all_messages = await (await database.child('lvl/' + guild.id).once('value')).val();
+            if (!all_messages) return resolve("No messages were sent on this server");
+            ranking = Object.entries(all_messages).sort((a, b) => b[1] - a[1]);
+        } else {
+            if (all_messages)
+                ranking = Object.entries(all_messages).sort((a, b) => b[1] - a[1]);
+            else
+                ranking = saved_messages[guild.id];
+        }
+        saved_messages[guild.id] = ranking;
 
-        for (let i = page * 10; i < ((page * 10) + 10) && i < ranking.length; i++) {
-            let ranking_member_name
-            try {
-                ranking_member_name = await (await guild.members.fetch(ranking[i][0]))?.displayName;
-            } catch {
-                ranking_member_name = 'Unknown';
-            }
+        let text = '```';
+        let start = page * 10;
+        let end = start + 10;
+        let members = await guild.members.fetch({ user: ranking.slice(start, end).map(u => u[0]) });
+
+        for (let i = start; i < end && i < ranking.length; i++) {
+            let ranking_member_name = members.get(ranking[i][0])?.displayName;
+            if (!ranking_member_name) ranking_member_name = "Unknown";
             text += `${i + 1}: ${ranking_member_name} (${ranking[i][1]} messages)\n`;
         }
 
         text += '```';
 
         let rank_components = new MessageActionRow();
-        let rank_previous_button = new MessageButton()
-            .setCustomId(`rank?p=${page - 1}&id=${authorId}`)
-            .setLabel('Previous')
-            .setStyle('PRIMARY');
-        let rank_next_button = new MessageButton()
-            .setCustomId(`rank?p=${page + 1}&id=${authorId}`)
-            .setLabel('Next')
-            .setStyle('SUCCESS');
-
         if (page > 0)
-            rank_components.addComponents(rank_previous_button);
+            rank_components.addComponents(
+                new MessageButton()
+                    .setCustomId(`rank?p=${page - 1}`)
+                    .setLabel('Previous')
+                    .setStyle('PRIMARY')
+            );
+        else
+            rank_components.addComponents(
+                new MessageButton()
+                    .setCustomId(`rank?p=${Math.floor((ranking.length - 1) / 10)}`)
+                    .setLabel('Last page')
+                    .setStyle('DANGER'));
 
-        if (ranking.length > (page * 10) + 10)
-            rank_components.addComponents(rank_next_button);
+        if (ranking.length > end)
+            rank_components.addComponents(
+                new MessageButton()
+                    .setCustomId(`rank?p=${page + 1}`)
+                    .setLabel('Next')
+                    .setStyle('SUCCESS'));
+        else
+            rank_components.addComponents(
+                new MessageButton()
+                    .setCustomId(`rank?p=0`)
+                    .setLabel('First page')
+                    .setStyle('DANGER'));
+
+
 
         if (rank_components.components.length > 0)
             resolve({ content: text, components: [rank_components] });
