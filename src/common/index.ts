@@ -166,9 +166,22 @@ d20.on('messageCreate', async (msg) => {
                 let ranking: [string, number][] = Object.entries(all_messages);
                 ranking.sort((a, b) => b[1] - a[1]);
                 let text = '```';
-                for (let i = 0; i < 10 && i < ranking.length; i++) text += `${i + 1}: ${await (await msg.guild?.members.cache.has(ranking[i][0])) ? msg.guild?.members.cache.get(ranking[i][0])?.displayName : 'Unknown'} (${ranking[i][1]} messages)\n`;
+
+                for (let i = 0; i < 10 && i < ranking.length; i++) {
+                    let ranking_member_name
+                    try {
+                        ranking_member_name = await (await msg.guild?.members.fetch(ranking[i][0]))?.displayName;
+                    } catch {
+                        ranking_member_name = 'Unknown';
+                    }
+                    text += `${i + 1}: ${ranking_member_name} (${ranking[i][1]} messages)\n`;
+                }
+
                 text += '```';
-                say(ray, msg.channel, text);
+
+                // let rank_components = [new MessageActionRow()];
+
+                say(ray, msg.channel, { content: text/* , components: rank_components */ });
                 break;
         };
     };
