@@ -1,7 +1,7 @@
 import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
 import { d20, eli, krystal, ray } from "../clients";
-import { generatecard, prestige } from "../d20/functions";
+import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { say } from "./functions";
 import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./variables";
@@ -161,27 +161,11 @@ d20.on('messageCreate', async (msg) => {
 
                 break;
             case 'rank':
-                let all_messages = await (await database.child('lvl/' + msg.guildId).once('value')).val();
-                if (!all_messages) say(ray, msg.channel, "No messages were sent on this server");
-                let ranking: [string, number][] = Object.entries(all_messages);
-                ranking.sort((a, b) => b[1] - a[1]);
-                let text = '```';
-
-                for (let i = 0; i < 10 && i < ranking.length; i++) {
-                    let ranking_member_name
-                    try {
-                        ranking_member_name = await (await msg.guild?.members.fetch(ranking[i][0]))?.displayName;
-                    } catch {
-                        ranking_member_name = 'Unknown';
-                    }
-                    text += `${i + 1}: ${ranking_member_name} (${ranking[i][1]} messages)\n`;
-                }
-
-                text += '```';
-
-                // let rank_components = [new MessageActionRow()];
-
-                say(ray, msg.channel, { content: text/* , components: rank_components */ });
+                if (!msg.guild) return;
+                let ray_channel = await ray.channels.fetch(msg.channel.id);
+                if (!ray_channel?.isText()) return;
+                ray_channel.sendTyping();
+                say(ray, ray_channel, await get_rank_message(msg.guild, msg.author.id, await (await database.child('lvl/' + msg.guild.id).once('value')).val(), 0));
                 break;
         };
     };

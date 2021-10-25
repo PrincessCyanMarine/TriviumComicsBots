@@ -1,6 +1,6 @@
 import { userMention } from "@discordjs/builders";
 import { Canvas, createCanvas, Image, loadImage, registerFont } from "canvas";
-import { CommandInteraction, ContextMenuInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User, TextBasedChannels, Role } from "discord.js";
+import { CommandInteraction, ContextMenuInteraction, DiscordAPIError, GuildMember, Interaction, Message, PermissionResolvable, User, TextBasedChannels, Role, MessageActionRow, Guild, MessageButton } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
 import { d20 } from "../clients";
@@ -471,3 +471,49 @@ export const mute_unmute = async (interaction: CommandInteraction | ContextMenuI
     let text = interaction.commandName + 'd ' + player.user.username;
     interaction.reply(text).catch(() => { });
 };
+
+var saved_messages: { [guildId: string]: { [memberId: string]: number } } = {};
+export function get_rank_message(guild: Guild, authorId: string, all_messages = saved_messages[guild.id], page: number = 0): Promise<{ content: string, components?: MessageActionRow[] } | string> {
+    return new Promise(async (resolve, reject) => {
+        all_messages = all_messages || await (await database.child('lvl/' + guild.id).once('value')).val();
+        saved_messages[guild.id] = all_messages;
+        if (!all_messages) return resolve("No messages were sent on this server");
+        let ranking: [string, number][] = Object.entries(all_messages);
+        ranking.sort((a, b) => b[1] - a[1]);
+        let text = '```';
+
+        for (let i = page * 10; i < ((page * 10) + 10) && i < ranking.length; i++) {
+            let ranking_member_name
+            try {
+                ranking_member_name = await (await guild.members.fetch(ranking[i][0]))?.displayName;
+            } catch {
+                ranking_member_name = 'Unknown';
+            }
+            text += `${i + 1}: ${ranking_member_name} (${ranking[i][1]} messages)\n`;
+        }
+
+        text += '```';
+
+        let rank_components = new MessageActionRow();
+        let rank_previous_button = new MessageButton()
+            .setCustomId(`rank?p=${page - 1}&id=${authorId}`)
+            .setLabel('Previous')
+            .setStyle('PRIMARY');
+        let rank_next_button = new MessageButton()
+            .setCustomId(`rank?p=${page + 1}&id=${authorId}`)
+            .setLabel('Next')
+            .setStyle('SUCCESS');
+
+        if (page > 0)
+            rank_components.addComponents(rank_previous_button);
+
+        if (ranking.length > (page * 10) + 10)
+            rank_components.addComponents(rank_next_button);
+
+        if (rank_components.components.length > 0)
+            resolve({ content: text, components: [rank_components] });
+        else
+            resolve(text);
+
+    });
+}
