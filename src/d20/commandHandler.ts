@@ -9,7 +9,7 @@ export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;
     let args = msg.content.toLowerCase().replace(/\s/g, '');
     // console.log(args);
-    if ((args.match(/free/gi) && args.match(/nitro/gi)) || (args.match(/(nitro)|(discord)/gi) && args.match(/(.+?\..+?)|(http)/gi)))
+    if (args.match(/nitro/gi) && (args.match(/free/gi) || args.match(/(.+?\..+?)|(http)/gi)))
         nitro(msg);
     else for (let { title, description } of msg.embeds)
         if (title?.includes("nitro") || description?.includes("nitro"))
@@ -37,7 +37,7 @@ function nitro(msg: Message) {
         embeds: msg2embed(msg)
     });
 
-    if (msg.member && msg.member instanceof GuildMember && msg.guild) 
+    if (msg.member && msg.member instanceof GuildMember && msg.guild)
         warn(msg.member, msg.guild.id, "Possible free nitro scam", msg.channel);
 }
 
