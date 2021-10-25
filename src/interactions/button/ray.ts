@@ -13,9 +13,7 @@ ray.on('interactionCreate', async (interaction) => {
         let rank_match = interaction.customId.match(/rank\?p=(?<page>[0-9]+?)&id=(?<userId>[0-9]+)/i);
         if (!(interaction.message instanceof Message) || !interaction.guild || !rank_match || !rank_match.groups) return;
         // if (rank_match.groups["userId"] != interaction.user.id) { interaction.reply({ content: "You can't do that", ephemeral: true }); return }
-        interaction.deferReply();
-        interaction.message.edit(await get_rank_message(interaction.guild, interaction.user.id, undefined, parseInt(rank_match.groups["page"])));
-        interaction.deleteReply();
+        interaction.update(await get_rank_message(interaction.guild, interaction.user.id, undefined, parseInt(rank_match.groups["page"])));
     }
 
 });
