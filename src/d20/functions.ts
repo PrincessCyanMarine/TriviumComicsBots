@@ -502,39 +502,48 @@ export function get_rank_message(guild: Guild, authorId: string, all_messages?: 
 
         text += '```';
 
-        let rank_components = [new MessageActionRow(), new MessageActionRow()];
-        if (page > 0)
-            rank_components[0].addComponents(
+        let buttons = {
+            previous:
                 new MessageButton()
                     .setCustomId(`rank?p=${page - 1}`)
                     .setLabel('Previous')
-                    .setStyle('PRIMARY')
-            );
-        if (ranking.length > 10)
-            rank_components[1].addComponents(
-                new MessageButton()
-                    .setCustomId(`rank?p=${Math.floor((ranking.length - 1) / 10)}`)
-                    .setLabel('Last page')
-                    .setStyle('DANGER'));
-
-        if (ranking.length > end)
-            rank_components[0].addComponents(
+                    .setStyle('PRIMARY'),
+            next:
                 new MessageButton()
                     .setCustomId(`rank?p=${page + 1}`)
                     .setLabel('Next')
-                    .setStyle('SUCCESS'));
-
-        if (ranking.length > 10)
-            rank_components[1].addComponents(
+                    .setStyle('SUCCESS'),
+            first:
                 new MessageButton()
-                    .setCustomId(`rank?p=0`)
+                    .setCustomId(`rank?p=0_`)
                     .setLabel('First page')
-                    .setStyle('DANGER'));
+                    .setStyle('DANGER'),
+            last:
+                new MessageButton()
+                    .setCustomId(`rank?p=${Math.floor((ranking.length - 1) / 10)}_`)
+                    .setLabel('Last page')
+                    .setStyle('DANGER'),
+        }
+
+        let rank_components = new MessageActionRow();
+
+        if (page > 0) {
+            if (ranking.length > 10)
+                rank_components.addComponents(buttons.first);
+            rank_components.addComponents(buttons.previous);
+        }
+
+        if (ranking.length > end) {
+            rank_components.addComponents(buttons.next);
+            if (ranking.length > 10)
+                rank_components.addComponents(buttons.last);
+        }
 
 
 
-        if (rank_components[0].components.length > 0)
-            resolve({ content: text, components: rank_components });
+
+        if (rank_components.components.length > 0)
+            resolve({ content: text, components: [rank_components] });
         else
             resolve(text);
 
