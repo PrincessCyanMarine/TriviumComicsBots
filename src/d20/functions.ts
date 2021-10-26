@@ -525,25 +525,24 @@ export function get_rank_message(guild: Guild, authorId: string, all_messages?: 
                     .setStyle('DANGER'),
         }
 
-        let rank_components = new MessageActionRow();
-
+        let rank_components = [new MessageActionRow(), new MessageActionRow()];
         if (page > 0) {
+            rank_components[0].addComponents(buttons.previous);
             if (ranking.length > 10)
-                rank_components.addComponents(buttons.first);
-            rank_components.addComponents(buttons.previous);
+                rank_components[1].addComponents(buttons.first);
         }
 
         if (ranking.length > end) {
-            rank_components.addComponents(buttons.next);
+            rank_components[0].addComponents(buttons.next);
             if (ranking.length > 10)
-                rank_components.addComponents(buttons.last);
+                rank_components[1].addComponents(buttons.last);
         }
 
 
 
 
-        if (rank_components.components.length > 0)
-            resolve({ content: text, components: [rank_components] });
+        if (rank_components[0].components.length > 0)
+            resolve({ content: text, components: rank_components[1].components.length > 0 ? rank_components : [rank_components[0]] });
         else
             resolve(text);
 
