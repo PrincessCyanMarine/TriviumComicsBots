@@ -502,29 +502,30 @@ export function get_rank_message(guild: Guild, authorId: string, all_messages?: 
 
         text += '```';
 
-        let rank_components = new MessageActionRow();
+        let rank_components = [new MessageActionRow(), new MessageActionRow()];
         if (page > 0)
-            rank_components.addComponents(
+            rank_components[0].addComponents(
                 new MessageButton()
                     .setCustomId(`rank?p=${page - 1}`)
                     .setLabel('Previous')
                     .setStyle('PRIMARY')
             );
-        else
-            rank_components.addComponents(
+        if (ranking.length > 10)
+            rank_components[1].addComponents(
                 new MessageButton()
                     .setCustomId(`rank?p=${Math.floor((ranking.length - 1) / 10)}`)
                     .setLabel('Last page')
                     .setStyle('DANGER'));
 
         if (ranking.length > end)
-            rank_components.addComponents(
+            rank_components[0].addComponents(
                 new MessageButton()
                     .setCustomId(`rank?p=${page + 1}`)
                     .setLabel('Next')
                     .setStyle('SUCCESS'));
-        else
-            rank_components.addComponents(
+
+        if (ranking.length > 10)
+            rank_components[1].addComponents(
                 new MessageButton()
                     .setCustomId(`rank?p=0`)
                     .setLabel('First page')
@@ -532,8 +533,8 @@ export function get_rank_message(guild: Guild, authorId: string, all_messages?: 
 
 
 
-        if (rank_components.components.length > 0)
-            resolve({ content: text, components: [rank_components] });
+        if (rank_components[0].components.length > 0)
+            resolve({ content: text, components: rank_components });
         else
             resolve(text);
 
