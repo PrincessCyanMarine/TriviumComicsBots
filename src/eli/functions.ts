@@ -16,7 +16,7 @@ export function dodoOnline(msg: Message) {
 
     const fail = () => { };
 
-    msg.guild?.members.fetch('580178931559432212')
+    msg.guild?.members.fetch('297531251081084941')
         .then(success)
         .catch(fail)
 }
