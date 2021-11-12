@@ -428,7 +428,7 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
     else
         say(d20, replyMethod, text);
 
-    if (warnings.length == 2 && [triviumGuildId, testGuildId].includes(guildId)) {
+    if (!(player.permissions.has("KICK_MEMBERS")) && warnings.length == 2 && [triviumGuildId, testGuildId].includes(guildId)) {
         let mute_role = player.guild.roles.cache.get(guildId == triviumGuildId ? "806648884754382889" : "781715781234720768");
         if (!mute_role) return;
         await player.roles.add(mute_role);
