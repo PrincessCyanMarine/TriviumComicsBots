@@ -1,5 +1,5 @@
 import { userMention } from "@discordjs/builders";
-import { ButtonInteraction, GuildMember, Message, MessageActionRow, MessageButton, MessageEmbed, SelectMenuInteraction, TextBasedChannels, TextChannel } from "discord.js";
+import { ButtonInteraction, GuildMember, Interaction, Message, MessageActionRow, MessageButton, MessageEmbed, SelectMenuInteraction, TextBasedChannels, TextChannel } from "discord.js";
 import { testing } from "..";
 import { clients, d20, id2bot } from "../clients";
 import emojis from "../common/emojis";
@@ -41,6 +41,7 @@ Object.values(clients).forEach(bot => {
             interaction.message.edit({ content: interaction.message.content.replace('Play again?', ''), components: []/* , embeds: [] */ })
         }
         else if (interaction.customId.includes("Continue-")) {
+            if (!(interaction.message instanceof Message)) return;
             let text = rockpaperscissors_messages.challenged[id2bot[interaction.message.author.id]];
             if (interaction.user.id != interaction.customId.split('Continue-')[1])
                 return interaction.reply({ content: 'You can\'t do that', ephemeral: true }); //sendtoplayer(interaction, text);
@@ -127,7 +128,8 @@ export const rockpaperscissors_messages: { [key: string]: { [key: string]: strin
 
     }
 }
-async function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction) {
+async function handleSelectMenu(interaction: SelectMenuInteraction<any> | ButtonInteraction<any>) {
+    if (!(interaction.message instanceof Message)) return;
     if (interaction.customId.includes('rpssp')) {
         let playerId = interaction.customId.split('rpssp-')[1].split('/')[0];
         // console.log(playerId, interaction.user.id, interaction.user.id == playerId);

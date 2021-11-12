@@ -1,5 +1,6 @@
 import { createCanvas, loadImage } from "canvas";
 import { GuildMember, Message, MessageAttachment, User } from "discord.js";
+import { writeFileSync } from "fs";
 import got from "got/dist/source";
 import { database } from "..";
 import assets from "../assetsIndexes";
@@ -244,10 +245,8 @@ export function sparing(msg: Message, target: User | undefined = getTarget(msg))
 
 export async function testWebtoonEpisode() {
     let mostRecentEpisode = await (await database.child('mostRecentEpisode').once('value')).val();
-    let response = await got('https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252')
+    let response = await got('https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252');
     let webtoonEpisode: RegExpMatchArray | null | string = response.body.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
-    if (!webtoonEpisode) return;
-    webtoonEpisode[0].match(/<li[\s\S]+?<\/li>/);
     if (!webtoonEpisode) return;
     webtoonEpisode = webtoonEpisode[0];
     if (typeof webtoonEpisode != 'string') return;

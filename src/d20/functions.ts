@@ -340,10 +340,10 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
         if (!msg.guildId) return reject();
         if (!msg.member) return reject();
         let target = msg instanceof Message ?
-            msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member :
-            msg.options.get('player') ? msg.options.get('player')?.user :
+            msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member
+            : msg.options.get('player') ? msg.options.get('player')?.user :
                 msg.options.getUser('user') ? msg.options.getUser('user') :
-                    msg.options.getMessage('message') ? msg.options.getMessage('message')?.author :
+                    msg.options.get('message') ? msg.options.get('message')?.message?.author :
                         msg.user;
         if (target instanceof User) target = await msg.guild.members.fetch(target.id);
         if (!target || !(target instanceof GuildMember)) return;
