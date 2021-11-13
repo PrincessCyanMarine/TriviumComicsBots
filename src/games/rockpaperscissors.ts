@@ -10,7 +10,7 @@ import { get_rps_interactible, reply, update } from "./common";
 
 Object.values(clients).forEach(bot => {
     bot.on('interactionCreate', async (interaction) => {
-        if (!((interaction instanceof SelectMenuInteraction) || (interaction instanceof ButtonInteraction))) return;
+        if (!(interaction.isButton() || interaction.isSelectMenu())) return;
         if (testing && interaction.channelId != '892800588469911663') return;
         else if (!testing && interaction.channelId == '892800588469911663') return;
 
@@ -128,7 +128,7 @@ export const rockpaperscissors_messages: { [key: string]: { [key: string]: strin
 
     }
 }
-async function handleSelectMenu(interaction: SelectMenuInteraction<any> | ButtonInteraction<any>) {
+async function handleSelectMenu(interaction: SelectMenuInteraction | ButtonInteraction) {
     if (!(interaction.message instanceof Message)) return;
     if (interaction.customId.includes('rpssp')) {
         let playerId = interaction.customId.split('rpssp-')[1].split('/')[0];
