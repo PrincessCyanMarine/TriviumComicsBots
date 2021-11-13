@@ -277,7 +277,6 @@ export function nonowords(msg: Message) {
     if (!nono) return;
     let res: string[] = [];
     nono.forEach(a => {
-        console.log(nono);
         if (!randomchance(15)) res.push(a.toUpperCase());
     });
     if (res.length > 0) say(krystal, msg.channel, res.join(" ")).then(() => {
