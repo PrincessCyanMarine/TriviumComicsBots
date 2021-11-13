@@ -9,6 +9,8 @@ import { followup, reply } from "./common";
 krystal.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand() || !interaction.channel) return;
     if (ignore_channels.includes(interaction.channelId)) { reply(interaction, 'Please try in another channel', true); return; }
+    if (testing && interaction.channelId != '892800588469911663') return;
+    else if (!testing && interaction.channelId == '892800588469911663') return;
 
     switch (interaction.commandName) {
         case 'whisper':

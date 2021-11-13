@@ -23,6 +23,7 @@ import "./sadie/index"
 import "./d20/index"
 import "./common/index"
 import "./eli/index"
+import "./ray/index"
 import "./interactions/index"
 import "./games/index"
 export const testing = process.env.TESTING == "true";
