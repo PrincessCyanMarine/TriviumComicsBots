@@ -136,3 +136,5 @@ export const msg2embed = (msg: Message) => {
 }
 
 export const random_from_array = (array: any[]) => array[Math.floor(Math.random() * array.length)];
+export const capitalize = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
+export const randomchance = (percentage: number = 10): boolean => Math.floor(Math.random() * 100) < percentage;

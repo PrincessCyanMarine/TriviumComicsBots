@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { testWord } from "../common/functions";
 import { killWords } from "../common/variables";
-import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despacito, drowning, eating, eighteen, flying, greet, gunning, killing, loving, pattron, pong, prideful, rebel, silencing, sleeping, sparing, spinning, swimming, talking, willRebel, yeeting } from "./functions";
+import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despacito, drowning, eating, eighteen, flying, greet, gunning, killing, loving, nonowords, pattron, pong, prideful, rebel, silencing, sleeping, sparing, spinning, swimming, talking, willRebel, yeeting } from "./functions";
 
 export function testCommands(msg: Message) {
     let args = msg.content;
@@ -38,5 +38,6 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "support", "patr(e?)on")) pattron(msg);
         else if (testWord(args, "ping")) pong(msg);
         else greet(msg);
-    }
+    } else
+        nonowords(msg);
 }

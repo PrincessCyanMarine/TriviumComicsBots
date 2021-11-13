@@ -1,12 +1,13 @@
+import { userMention } from "@discordjs/builders";
 import { createCanvas, loadImage } from "canvas";
 import { GuildMember, Message, MessageAttachment, User } from "discord.js";
 import { writeFileSync } from "fs";
 import got from "got/dist/source";
 import { database } from "..";
 import assets from "../assetsIndexes";
-import { absorb, box, drown, fire, fireball, fly, glitch, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
-import { krystal } from "../clients";
-import { edit, getMember, getTarget, notificationCult, say, testWord } from "../common/functions";
+import { absorb, box, drown, fire, fireball, fly, glitch, inhale, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
+import { krystal, sadie } from "../clients";
+import { capitalize, edit, getMember, getTarget, notificationCult, randomchance, say, testWord } from "../common/functions";
 import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
@@ -264,4 +265,22 @@ export async function testWebtoonEpisode() {
 
     say(krystal, announcementChannelId, `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]} asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`, 1).catch(console.error);
     notificationCult('562429294090125330');
+}
+
+export function nonowords(msg: Message) {
+    const sadieAngry = async () => {
+        await say(sadie, msg.channel, `God f\\*\\*\\*\\*\\*\\* d\\*\\*\\*\\*\\*, ${userMention(msg.author.id)}. You f\\*\\*\\*\\*\\*\\* dumb piece of r\\*\\*\\*\\*\\*\\*\\* s\\*\\*\\*`);
+        await say(krystal, msg.channel, { files: [inhale] });
+        await say(sadie, msg.channel, "KRYSTAL, NO!!", 300);
+    }
+    let nono = msg.content.match(/[fdm]uck((ing)|(ed)|(ers?)?)|ass|shit|dam[mn]((it)|(ed))?|cock|cunt|simp|boomer|hell/gi);
+    if (!nono) return;
+    let res: string[] = [];
+    nono.forEach(a => {
+        if (!randomchance(30)) res.push(a.toUpperCase());
+    });
+    if (res.length > 0) say(krystal, msg.channel, res.join(" ")).then(() => {
+        if (res.length > 2) sadieAngry();
+        else if (randomchance()) sadieAngry();
+    });
 }
