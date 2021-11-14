@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added "Dodo online" command
 - Added Roleplay
-- !rank command
+- Added !rank command
+- Krystal has a chance to repeat swears
 ### Changed
 - Mods can't be muted by using warnings
 
