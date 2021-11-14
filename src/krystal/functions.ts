@@ -273,7 +273,7 @@ export function nonowords(msg: Message) {
         await say(krystal, msg.channel, { files: [inhale] });
         await say(sadie, msg.channel, "KRYSTAL, NO!!", 300);
     }
-    let nono = msg.content.match(/(?<![A-Z0-9])([fdm][ua]((ck)|c|k)((ing)|(ed)|(ers?)?)|ass|dumbass|asshole|shit|dam[mn]((it)|(ed))?|cock|cunt|simp|boomer|hell)(?![A-Z0-9])/gi);
+    let nono = msg.content.match(/(?<![A-Z0-9])(([fdm]u)|c?k((ing)|(ed)|(ers?)?)|ass|dumbass|asshole|shit|dam[mn]((it)|(ed))?|cock|cunt|simp|boomer|hell)(?![A-Z0-9])/gi);
     if (!nono) return;
     let res: string[] = [];
     nono.forEach(a => {
