@@ -7,7 +7,7 @@ import { database } from "..";
 import assets from "../assetsIndexes";
 import { absorb, box, drown, fire, fireball, fly, glitch, inhale, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
 import { krystal, sadie } from "../clients";
-import { capitalize, edit, getMember, getTarget, notificationCult, randomchance, say, testWord } from "../common/functions";
+import { argClean, capitalize, edit, getMember, getTarget, notificationCult, randomchance, say, testWord } from "../common/functions";
 import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
@@ -273,7 +273,7 @@ export function nonowords(msg: Message) {
         await say(krystal, msg.channel, { files: [inhale] });
         await say(sadie, msg.channel, "KRYSTAL, NO!!", 300);
     }
-    let nono = msg.content.match(/(?<![A-Z0-9])(((([fdm]u)c?k)|(fack))((ing)|(ed)|(ers?)?)|ass|dumbass|asshole|shit((face)|(ing))?|dam[mn]((it)|(ed))?|cock|cunt|simp|boomer|hell)(?![A-Z0-9])/gi);
+    let nono = argClean(msg.content).match(/(?<![A-Z0-9])(((([fdm]u)c?k)|(fack))((ing)|(ed)|(ers?)?)|ass|dumbass|asshole|shit((face)|(ing))?|dam[mn]((it)|(ed))?|cock|cunt|simp|boomer|hell|f(a|u)(k|c))(?![A-Z0-9])/gi);
     if (!nono) return;
     let res: string[] = [];
     nono.forEach(a => {
