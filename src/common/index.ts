@@ -1,12 +1,12 @@
 import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
-import { d20, eli, krystal, ray } from "../clients";
+import { d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { say } from "./functions";
+import { random_from_array, say } from "./functions";
 import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, memberNicknameMention } from "@discordjs/builders"
-import { lamp, sleep } from "../attachments";
+import { glitch, lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 
 
@@ -166,6 +166,29 @@ d20.on('messageCreate', async (msg) => {
                 if (!ray_channel?.isText()) return;
                 ray_channel.sendTyping();
                 say(ray, ray_channel, await get_rank_message(msg.guild, msg.author.id, await (await database.child('lvl/' + msg.guild.id).once('value')).val(), 0));
+                break;
+            case "summon":
+                let summoned_creature = Math.floor(Math.random() * 20) + 1;
+                if (options[1] && !isNaN(parseInt(options[1]))) summoned_creature = parseInt(options[1]);
+                await say(sadie, msg.channel, { content: "*You draw a magic circle on the ground…*", files: [new MessageAttachment(`./assets/ray/roll/${summoned_creature}.gif`, 'Roll.gif')] }, 500);
+                if (summoned_creature == 1)
+                    say(sadie, msg.channel, "A telephone appears! It starts ringing…\nYou answer the phone. \"We\'ve been trying to reach you about your vehicle’s extended warranty. Press one—\"\nYou hang up the phone.", 450);
+                else if (summoned_creature <= 5)
+                    say(sadie, msg.channel, "You fail!", 250);
+                else if (summoned_creature <= 10)
+                    say(sadie, msg.channel, "*Crickets.*", 250);
+                else if (summoned_creature <= 15)
+                    say(sadie, msg.channel, "Your cryptic chanting echoes unheard.", 250);
+                else if (summoned_creature < 20)
+                    say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
+                else if (summoned_creature == 20)
+                    random_from_array([
+                        async () => { await say(sadie, msg.channel, "You step on a poisoned lego and die before seeing what you summoned!"); },
+                        async () => { await say(sadie, msg.channel, "A wild Ray appears!"); },
+                        async () => { await say(sadie, msg.channel, "A wild Krystal appears!"); await say(krystal, msg.channel, { content: "W̸̡̡̺̠̝̎̆ě̶̲́̒͒l̴̮̰̝͑́͛c̶̼̔́̿̆o̷̜̠̙̭͛͗̀͗ͅm̶̭͚̌e̵̤͕͗̒ ̸͉̺̻̔͐̉̂͐̉t̸̹͖̘̻̞́o̴̗̽͆ ̵̢̛͓̻̩̩̮̅t̴̬̯̲̍̏͗h̷̝̎͛é̷̯̤̤͗̑ ̷̡͉̙̱̲̿̓g̴͕͍͔̣̊́̀̾͝a̴̱̭͒͝m̷̢͕̜͗ȩ̶̹̈́̾̈͌ ̵̤̩̹̍͝o̷̺̎f̵̯̌͑̈́̚ ̸̡͓̞̯̩̃̏̿̚l̵̰̮̱̿́i̷͙̫̩͙̔́̀̄̕f̵̖͔̜́̾͋͘͝e̵͉͓̾̕͜!̵̛̥̓̀́͐̈́", files: [glitch] }, 250); },
+                        async () => { await say(sadie, msg.channel, "A wild Sadie appears!\n\nWait that\'s me"); },
+                        async () => { await say(sadie, msg.channel, "A wild Eli appears!"); },
+                    ])();
                 break;
         };
     };
