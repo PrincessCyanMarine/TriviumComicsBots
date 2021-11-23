@@ -5,7 +5,7 @@ import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { random_from_array, say } from "./functions";
 import { ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
-import { channelMention, memberNicknameMention } from "@discordjs/builders"
+import { channelMention, memberNicknameMention, userMention } from "@discordjs/builders"
 import { glitch, lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 
@@ -179,7 +179,9 @@ d20.on('messageCreate', async (msg) => {
                     say(sadie, msg.channel, "*Crickets.*", 250);
                 else if (summoned_creature <= 15)
                     say(sadie, msg.channel, "Your cryptic chanting echoes unheard.", 250);
-                else if (summoned_creature < 20)
+                else if (summoned_creature < 19)
+                    say(sadie, msg.channel, "You summoned a bird. It's not a dodo", 300);
+                else if (summoned_creature == 19)
                     say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
                 else if (summoned_creature == 20)
                     random_from_array([
@@ -188,6 +190,7 @@ d20.on('messageCreate', async (msg) => {
                         async () => { await say(sadie, msg.channel, "A wild Krystal appears!"); await say(krystal, msg.channel, { content: "W̸̡̡̺̠̝̎̆ě̶̲́̒͒l̴̮̰̝͑́͛c̶̼̔́̿̆o̷̜̠̙̭͛͗̀͗ͅm̶̭͚̌e̵̤͕͗̒ ̸͉̺̻̔͐̉̂͐̉t̸̹͖̘̻̞́o̴̗̽͆ ̵̢̛͓̻̩̩̮̅t̴̬̯̲̍̏͗h̷̝̎͛é̷̯̤̤͗̑ ̷̡͉̙̱̲̿̓g̴͕͍͔̣̊́̀̾͝a̴̱̭͒͝m̷̢͕̜͗ȩ̶̹̈́̾̈͌ ̵̤̩̹̍͝o̷̺̎f̵̯̌͑̈́̚ ̸̡͓̞̯̩̃̏̿̚l̵̰̮̱̿́i̷͙̫̩͙̔́̀̄̕f̵̖͔̜́̾͋͘͝e̵͉͓̾̕͜!̵̛̥̓̀́͐̈́", files: [glitch] }, 250); },
                         async () => { await say(sadie, msg.channel, "A wild Sadie appears!\n\nWait that\'s me"); },
                         async () => { await say(sadie, msg.channel, "A wild Eli appears!"); },
+                        async () => { await say(sadie, msg.channel, "You summoned " + userMention("297531251081084941") + '!'); },
                     ])();
                 break;
         };
