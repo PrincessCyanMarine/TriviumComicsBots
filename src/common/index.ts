@@ -15,7 +15,7 @@ d20.on('messageCreate', async (msg) => {
     if (ignore_channels.includes(msg.channel.id)) return;
     if (testing && msg.channelId != testChannelId) return;
     else if (!testing && msg.channelId == testChannelId) return;
-    let args = msg.content;
+    let args = msg.content.toLowerCase();
     let options = args.split(' ');
     if (args.startsWith('!')) {
         args = args.replace(/!/, '');
