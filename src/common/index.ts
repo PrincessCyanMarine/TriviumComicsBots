@@ -1,7 +1,7 @@
 import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
 import { d20, eli, krystal, ray, sadie } from "../clients";
-import { generatecard, get_rank_message, prestige } from "../d20/functions";
+import { createCard, generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { random_from_array, say } from "./functions";
 import { ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
@@ -171,27 +171,58 @@ d20.on('messageCreate', async (msg) => {
                 let summoned_creature = Math.floor(Math.random() * 20) + 1;
                 if (msg.author.id == marineId && options[1] && !isNaN(parseInt(options[1]))) summoned_creature = parseInt(options[1]);
                 await say(sadie, msg.channel, { content: "*You draw a magic circle on the ground…*", files: [new MessageAttachment(`./assets/ray/roll/${summoned_creature}.gif`, 'Roll.gif')] }, 500);
-                if (summoned_creature == 1)
-                    say(sadie, msg.channel, "A telephone appears! It starts ringing…\nYou answer the phone. \"We\'ve been trying to reach you about your vehicle’s extended warranty. Press one—\"\nYou hang up the phone.", 450);
-                else if (summoned_creature <= 5)
-                    say(sadie, msg.channel, "You fail!", 250);
-                else if (summoned_creature <= 10)
-                    say(sadie, msg.channel, "*Crickets.*", 250);
-                else if (summoned_creature <= 15)
-                    say(sadie, msg.channel, "Your cryptic chanting echoes unheard.", 250);
-                else if (summoned_creature < 19)
-                    say(sadie, msg.channel, "You summoned a bird. It's not a dodo", 300);
-                else if (summoned_creature == 19)
-                    say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
-                else if (summoned_creature == 20)
-                    random_from_array([
-                        async () => { await say(sadie, msg.channel, "You step on a poisoned lego and die before seeing what you summoned!"); },
-                        async () => { await say(sadie, msg.channel, "A wild Ray appears!"); },
-                        async () => { await say(sadie, msg.channel, "A wild Krystal appears!"); await say(krystal, msg.channel, { content: "W̸̡̡̺̠̝̎̆ě̶̲́̒͒l̴̮̰̝͑́͛c̶̼̔́̿̆o̷̜̠̙̭͛͗̀͗ͅm̶̭͚̌e̵̤͕͗̒ ̸͉̺̻̔͐̉̂͐̉t̸̹͖̘̻̞́o̴̗̽͆ ̵̢̛͓̻̩̩̮̅t̴̬̯̲̍̏͗h̷̝̎͛é̷̯̤̤͗̑ ̷̡͉̙̱̲̿̓g̴͕͍͔̣̊́̀̾͝a̴̱̭͒͝m̷̢͕̜͗ȩ̶̹̈́̾̈͌ ̵̤̩̹̍͝o̷̺̎f̵̯̌͑̈́̚ ̸̡͓̞̯̩̃̏̿̚l̵̰̮̱̿́i̷͙̫̩͙̔́̀̄̕f̵̖͔̜́̾͋͘͝e̵͉͓̾̕͜!̵̛̥̓̀́͐̈́", files: [glitch] }, 250); },
-                        async () => { await say(sadie, msg.channel, "A wild Sadie appears!\n\nWait that\'s me"); },
-                        async () => { await say(sadie, msg.channel, "A wild Eli appears!"); },
-                        async () => { await say(sadie, msg.channel, "You summoned " + userMention("297531251081084941") + '!'); },
-                    ])();
+                switch (summoned_creature) {
+                    case 1:
+                        say(sadie, msg.channel, "A telephone appears! It starts ringing…\nYou answer the phone. \"We\'ve been trying to reach you about your vehicle’s extended warranty. Press one—\"\nYou hang up the phone.", 450);
+                        break;
+                    case 2:
+                        say(sadie, msg.channel, "You call that a ritual?", 250);
+                        break;
+                    case 3:
+                    case 4:
+                        say(sadie, msg.channel, "Denied.", 250);
+                        break;
+                    case 5:
+                    case 6:
+                    case 7:
+                        say(sadie, msg.channel, "You fail!", 250);
+                        break;
+                    case 8:
+                    case 9:
+                        say(sadie, msg.channel, "*Crickets.*", 250);
+                        break;
+                    case 10:
+                    case 11:
+                    case 12:
+                        say(sadie, msg.channel, "Your cryptic chanting echoes unheard.", 250);
+                        break;
+                    case 13:
+                    case 14:
+                    case 15:
+                        say(sadie, msg.channel, { content: "It\'s a bird! It\'s a plane! It\'s—no it\'s just a plane." }, 250);
+                        break;
+                    case 16:
+                        await say(sadie, msg.channel, { content: "A wild " + userMention("491029828955537418") + " appears" }, 250);
+                        await say(krystal, msg.channel, { files: [await killing(undefined, msg.author, undefined, undefined)], content: "We don\'t have permission to use Merry\'s art" })
+                        break;
+                    case 17:
+                    case 18:
+                        say(sadie, msg.channel, "You summoned a bird. It's not a dodo", 300);
+                        break;
+                    case 19:
+                        say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
+                        break;
+                    case 20:
+                        random_from_array([
+                            async () => { await say(sadie, msg.channel, "You step on a poisoned lego and die before seeing what you summoned!"); },
+                            async () => { await say(sadie, msg.channel, "A wild Ray appears!"); },
+                            async () => { await say(sadie, msg.channel, "A wild Krystal appears!"); await say(krystal, msg.channel, { content: "W̸̡̡̺̠̝̎̆ě̶̲́̒͒l̴̮̰̝͑́͛c̶̼̔́̿̆o̷̜̠̙̭͛͗̀͗ͅm̶̭͚̌e̵̤͕͗̒ ̸͉̺̻̔͐̉̂͐̉t̸̹͖̘̻̞́o̴̗̽͆ ̵̢̛͓̻̩̩̮̅t̴̬̯̲̍̏͗h̷̝̎͛é̷̯̤̤͗̑ ̷̡͉̙̱̲̿̓g̴͕͍͔̣̊́̀̾͝a̴̱̭͒͝m̷̢͕̜͗ȩ̶̹̈́̾̈͌ ̵̤̩̹̍͝o̷̺̎f̵̯̌͑̈́̚ ̸̡͓̞̯̩̃̏̿̚l̵̰̮̱̿́i̷͙̫̩͙̔́̀̄̕f̵̖͔̜́̾͋͘͝e̵͉͓̾̕͜!̵̛̥̓̀́͐̈́", files: [glitch] }, 250); },
+                            async () => { await say(sadie, msg.channel, "A wild Sadie appears!\n\nWait that\'s me"); },
+                            async () => { await say(sadie, msg.channel, "A wild Eli appears!"); },
+                            async () => { await say(sadie, msg.channel, "You summoned " + userMention("297531251081084941") + '!'); },
+                        ])();
+                        break;
+                }
                 break;
         };
     };
