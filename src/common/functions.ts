@@ -1,10 +1,15 @@
 import { hyperlink } from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { ActivityType, Client, GuildMember, Message, MessageEmbed, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
+import { ActivityType, Client, Guild, GuildMember, Message, MessageEmbed, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database } from "..";
-import { eli, krystal, ray, sadie } from "../clients";
+import assets from "../assetsIndexes";
+import { clients, CustomActivity, eli, krystal, ray, sadie } from "../clients";
+import { eli_activities } from "../eli/activities";
+import { krystal_activities } from "../krystal/activities";
+import { ray_activities } from "../ray/activities";
+import { sadie_activities } from "../sadie/activities";
 import emojis from "./emojis";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '');
@@ -114,9 +119,16 @@ export function notificationCult(channel_id: string) {
     [krystal, sadie, ray, eli].forEach(bot => { say(bot, channel_id, ':GMBelleNotificationNew:').catch(console.error); });
 }
 
-export function changeActivity(bot: Client, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = type) {
+export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = text, nickname?: string) {
+    let bot = clients[bot_name];
     bot.user?.setActivity(text, { type: type, name: name });
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
+    bot.guilds.cache.forEach(guild => {
+        if (nickname)
+            guild.me?.setNickname(nickname);
+        else
+            guild.me?.setNickname(null);
+    });
     database.child('activities/' + bot.user?.username).set(name);
 };
 
@@ -138,3 +150,61 @@ export const msg2embed = (msg: Message) => {
 export const random_from_array = (array: any[]) => array[Math.floor(Math.random() * array.length)];
 export const capitalize = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 export const randomchance = (percentage: number = 10): boolean => Math.floor(Math.random() * 100) < percentage;
+
+
+export function changeActivities() {
+    if (!(ray.isReady() && krystal.isReady() && sadie.isReady() && eli.isReady())) return;
+
+    let test_padoru = () => {
+        let padoru_chance: number;
+        if (new Date().getMonth() == 10) padoru_chance = 50;
+        else if (new Date().getMonth() == 11) padoru_chance = 85;
+        else return false;
+        if (randomchance(padoru_chance))
+            return true;
+        else
+            return false;
+    }
+
+    let change_to_padoru = (a: CustomActivity[]) => {
+        let bot: string;
+        let avatar: string;
+        let nickname: string;
+
+        switch (a) {
+            case eli_activities:
+                bot = "eli";
+                avatar = assets.eli.avatars.padoru;
+                nickname = "Padoru Eli";
+                break;
+            case krystal_activities:
+                bot = "krystal";
+                avatar = assets.krystal.avatars.padoru;
+                nickname = "Padoru Krystal";
+                break;
+            case ray_activities:
+                bot = "ray";
+                avatar = assets.ray.avatars.padoru;
+                nickname = "Padoru Ray";
+                break;
+            case sadie_activities:
+                bot = "sadie";
+                avatar = assets.sadie.avatars.padoru;
+                nickname = "Padoru Sadie";
+                break;
+            default:
+                return;
+                break;
+        }
+
+        changeActivity(bot, "LISTENING", "padoru", avatar, undefined, nickname);
+    }
+
+    [eli_activities, ray_activities, sadie_activities, krystal_activities].forEach(a => {
+        let ac: CustomActivity = random_from_array(a);
+        if (test_padoru()) { change_to_padoru(a); return; };
+        changeActivity(...a[Math.floor(Math.random() * a.length)]);
+    })
+
+    setTimeout(changeActivities, (1000 * 60 * 30));
+}

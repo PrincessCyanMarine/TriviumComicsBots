@@ -1,9 +1,6 @@
-import { Client, Intents, WebhookClient } from "discord.js";
+import { ActivityType, Client, Intents, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { eli_activities } from "./eli/activities";
-import { krystal_activities } from "./krystal/activities";
-import { ray_activities } from "./ray/activities";
-import { sadie_activities } from "./sadie/activities";
+import { changeActivities } from "./common/functions";
 config();
 
 
@@ -13,8 +10,7 @@ export const krystal = new Client({
 krystal.login(process.env.BOT_KRYSTAL_TOKEN);
 krystal.on('ready', () => {
     console.log(`${krystal.user ? krystal.user.tag : "Sadie"} is ready!!!`);
-    krystal_activities[Math.floor(Math.random() * krystal_activities.length)]();
-    setInterval(() => { krystal_activities[Math.floor(Math.random() * krystal_activities.length)](); }, 1800000);
+    changeActivities();
 });
 
 export const sadie = new Client({
@@ -23,8 +19,7 @@ export const sadie = new Client({
 sadie.login(process.env.BOT_SADIE_TOKEN);
 sadie.on('ready', () => {
     console.log(`${sadie.user ? sadie.user.tag : "Sadie"} is ready!!!`);
-    sadie_activities[Math.floor(Math.random() * sadie_activities.length)]();
-    setInterval(() => { sadie_activities[Math.floor(Math.random() * sadie_activities.length)](); }, 1800000);
+    changeActivities();
 });
 
 export const d20 = new Client({
@@ -40,8 +35,7 @@ export const ray = new Client({
 ray.login(process.env.BOT_RAY_TOKEN);
 ray.on('ready', () => {
     console.log(`${ray.user ? ray.user.tag : "Ray"} is ready!!!`);
-    ray_activities[Math.floor(Math.random() * ray_activities.length)]();
-    setInterval(() => { ray_activities[Math.floor(Math.random() * ray_activities.length)](); }, 1800000);
+    changeActivities();
 });
 
 
@@ -51,8 +45,7 @@ export const eli = new Client({
 eli.login(process.env.BOT_ELI_TOKEN);
 eli.on('ready', () => {
     console.log(`${eli.user ? eli.user.tag : "Eli"} is ready!!!`);
-    eli_activities[Math.floor(Math.random() * eli_activities.length)]();
-    setInterval(() => { eli_activities[Math.floor(Math.random() * eli_activities.length)](); }, 1800000);
+    changeActivities();
 });
 
 export const mod_alert_webhook = (testing: boolean) => testing ?
@@ -79,3 +72,5 @@ export const id2bot: { [bot: string]: string } = {
     "666872683530813441": 'eli',
     "666795899879424020": 'ray',
 }
+
+export type CustomActivity = [string, Exclude<ActivityType, "CUSTOM">, string, (string | Buffer)?, string?, string?];

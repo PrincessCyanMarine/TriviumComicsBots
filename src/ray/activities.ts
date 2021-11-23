@@ -1,11 +1,12 @@
-import { ray } from "../clients";
+import assets from "../assetsIndexes";
+import { CustomActivity, ray } from "../clients";
 import { changeActivity } from "../common/functions";
 
-export const ray_activities = [
-    () => { changeActivity(ray, "PLAYING", "Dungeons & Dragons"); },
-    () => { changeActivity(ray, "PLAYING", "Sonic Adventure 1"); },
-    () => { changeActivity(ray, "PLAYING", "Sonic Adventure 2"); },
-    () => { changeActivity(ray, "PLAYING", "Sonic Adventure 3"); },
-    () => { changeActivity(ray, "WATCHING", "anime"); },
-    () => { changeActivity(ray, "LISTENING", "weeb music"); },
+export const ray_activities: CustomActivity[] = [
+    ["ray", "PLAYING", "Dungeons & Dragons", assets.ray.avatars.normal, undefined, "Ray"],
+    ["ray", "PLAYING", "Sonic Adventure 1", assets.ray.avatars.normal, undefined, "Ray"],
+    ["ray", "PLAYING", "Sonic Adventure 2", assets.ray.avatars.normal, undefined, "Ray"],
+    ["ray", "PLAYING", "Sonic Adventure 3", assets.ray.avatars.normal, undefined, "Ray"],
+    ["ray", "WATCHING", "anime", assets.ray.avatars.normal, undefined, "Weeb"],
+    ["ray", "LISTENING", "weeb music", assets.ray.avatars.normal, undefined, "Weeb"],
 ];

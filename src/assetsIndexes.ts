@@ -9,7 +9,12 @@ const assets = {
         door: {
             open: './assets/sadie/door/openDoor.png',
             closed: './assets/sadie/door/closedDoor.png'
-        }
+        },
+        avatars: {
+            normal: './assets/sadie/avatars/normal.png',
+            padoru: './assets/sadie/avatars/padoru.png',
+            punch: './assets/sadie/avatars/punch.png',
+        },
     },
     krystal: {
         avatars: {
@@ -38,7 +43,21 @@ const assets = {
                 notosans: './assets/d20/card/fonts/NotoSansJP-Regular.otf',
             }
         }
-    }
+    },
+    ray: {
+        avatars: {
+            normal: './assets/ray/avatars/normal.png',
+            padoru: './assets/ray/avatars/padoru.png',
+        },
+
+    },
+    eli: {
+        avatars: {
+            normal: './assets/eli/avatars/normal.png',
+            padoru: './assets/eli/avatars/padoru.png',
+        },
+
+    },
 }
 
 export default assets;
