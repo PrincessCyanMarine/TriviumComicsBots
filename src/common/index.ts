@@ -4,7 +4,7 @@ import { d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { random_from_array, say } from "./functions";
-import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./variables";
+import { ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, memberNicknameMention } from "@discordjs/builders"
 import { glitch, lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
@@ -169,7 +169,7 @@ d20.on('messageCreate', async (msg) => {
                 break;
             case "summon":
                 let summoned_creature = Math.floor(Math.random() * 20) + 1;
-                if (options[1] && !isNaN(parseInt(options[1]))) summoned_creature = parseInt(options[1]);
+                if (msg.author.id == marineId && options[1] && !isNaN(parseInt(options[1]))) summoned_creature = parseInt(options[1]);
                 await say(sadie, msg.channel, { content: "*You draw a magic circle on the ground…*", files: [new MessageAttachment(`./assets/ray/roll/${summoned_creature}.gif`, 'Roll.gif')] }, 500);
                 if (summoned_creature == 1)
                     say(sadie, msg.channel, "A telephone appears! It starts ringing…\nYou answer the phone. \"We\'ve been trying to reach you about your vehicle’s extended warranty. Press one—\"\nYou hang up the phone.", 450);
