@@ -47,8 +47,14 @@ export async function summon(msg: Message, options: string[]) {
             say(sadie, msg.channel, "It\'s a bird! It\'s a plane! It\'s—no it\'s just a plane.", 250);
             break;
         case 14:
-            await say(sadie, msg.channel, { content: "A wild " + userMention("491029828955537418") + " appears" }, 250);
-            await say(krystal, msg.channel, { files: [await killing(undefined, msg.author, undefined, undefined)], content: "We don\'t have permission to use Merry\'s art" })
+            let mentioned = msg.mentions.members?.first()?.id;
+            if (!mentioned) mentioned = "491029828955537418";
+            await say(sadie, msg.channel, "A wild " + userMention(mentioned) + " appears!", 250);
+            if (mentioned == "491029828955537418")
+                await say(krystal, msg.channel, {
+                    files: [await killing(undefined, msg.author, undefined, undefined)],
+                    content: "We don\'t have permission to use Merry\'s art"
+                });
             break;
         case 15:
             say(sadie, msg.channel, "You summoned a bird. It's not a dodo", 300);
