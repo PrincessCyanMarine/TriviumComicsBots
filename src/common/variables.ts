@@ -10,7 +10,8 @@ export const RayId: string = '666795899879424020';
 export const EliId: string = '666872683530813441';
 export const CerbyId: string = '711241945149734914';
 export const D20Id: string = '743606862578057277';
-export const botIds = [sadieId, krystalId, RayId, EliId, CerbyId, D20Id];
+export const siegId: string = '723938416139567154';
+export const botIds: string[] = [sadieId, krystalId, RayId, EliId, CerbyId, D20Id, siegId];
 
 export const killWords: string[] = ["kill", "beat", "punch", "heal", "shoot", "attack", "unalive", "protect", "exterminate", "end.+?suffering"];
 export const protectedFromKills: string[] = [sadieId, krystalId, EliId, CerbyId];
