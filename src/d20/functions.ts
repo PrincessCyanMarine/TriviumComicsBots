@@ -488,7 +488,7 @@ export function get_rank_message(guild: Guild, authorId: string, all_messages?: 
         }
         saved_messages[guild.id] = ranking;
 
-        let text = '```';
+        let text = '';
         let start = page * 10;
         let end = start + 10;
         let members = await guild.members.fetch({ user: ranking.slice(start, end).map(u => u[0]) });
@@ -499,8 +499,6 @@ export function get_rank_message(guild: Guild, authorId: string, all_messages?: 
             if (!ranking_member_name) ranking_member_name = "Unknown";
             text += `${(i + 1).toString().padStart(zeros, '0')}: ${ranking_member_name} (${ranking[i][1]} messages)\n`;
         }
-
-        text += '```';
 
         let buttons = {
             previous:
