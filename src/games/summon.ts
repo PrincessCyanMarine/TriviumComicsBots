@@ -8,7 +8,6 @@ import { random_from_array, say } from "../common/functions";
 import { marineId } from "../common/variables";
 import { killing } from "../krystal/functions";
 
-const bird_list: string[] = readFileSync("./birdlist.txt", "utf-8").split('\n');
 
 export async function summon(msg: Message, options: string[]) {
     let summoned_creature = Math.floor(Math.random() * 21);
@@ -57,8 +56,9 @@ export async function summon(msg: Message, options: string[]) {
             break;
         case 17:
         case 18:
+            let bird_list: string[] = readFileSync("./birdlist.txt", "utf-8").split('\n');
             let bird = random_from_array(bird_list);
-            say(sadie, msg.channel, "You summoned a " + bird + "!", 300);
+            say(sadie, msg.channel, "You summoned " + (bird.match(/^[aeiou]/i) ? "an " : "a ") + bird + "!", 300);
             break;
         case 19:
             say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
