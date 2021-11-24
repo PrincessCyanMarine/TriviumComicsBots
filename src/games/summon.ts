@@ -1,10 +1,14 @@
 import { userMention } from "@discordjs/builders";
 import { Message, MessageAttachment } from "discord.js";
+import { readFileSync, writeFileSync } from "fs";
+import got from "got/dist/source";
 import { glitch } from "../attachments";
 import { krystal, sadie } from "../clients";
 import { random_from_array, say } from "../common/functions";
 import { marineId } from "../common/variables";
 import { killing } from "../krystal/functions";
+
+const bird_list: string[] = readFileSync("./birdlist.txt", "utf-8").split('\n');
 
 export async function summon(msg: Message, options: string[]) {
     let summoned_creature = Math.floor(Math.random() * 21);
@@ -42,16 +46,18 @@ export async function summon(msg: Message, options: string[]) {
             say(sadie, msg.channel, "The fabric of the universe peels away for just a brief moment, summoning...\n\nA voidfish.\n\nIt hisses angrily at you, before blinking out of existence.", 250);
             break;
         case 14:
-        case 15:
             say(sadie, msg.channel, "It\'s a bird! It\'s a plane! It\'s—no it\'s just a plane.", 250);
             break;
-        case 16:
+        case 15:
             await say(sadie, msg.channel, { content: "A wild " + userMention("491029828955537418") + " appears" }, 250);
             await say(krystal, msg.channel, { files: [await killing(undefined, msg.author, undefined, undefined)], content: "We don\'t have permission to use Merry\'s art" })
             break;
+        case 16:
         case 17:
-        case 18:
             say(sadie, msg.channel, "You summoned a bird. It's not a dodo", 300);
+        case 18:
+            let bird = random_from_array(bird_list);
+            say(sadie, msg.channel, "You summoned a " + bird + "!", 300);
             break;
         case 19:
             say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
