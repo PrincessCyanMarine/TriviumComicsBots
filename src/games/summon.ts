@@ -40,6 +40,7 @@ export async function summon(msg: Message, options: string[]) {
             break;
         case 13:
             say(sadie, msg.channel, "The fabric of the universe peels away for just a brief moment, summoning...\n\nA voidfish.\n\nIt hisses angrily at you, before blinking out of existence.", 250);
+            break;
         case 14:
         case 15:
             say(sadie, msg.channel, "It\'s a bird! It\'s a plane! It\'s—no it\'s just a plane.", 250);
