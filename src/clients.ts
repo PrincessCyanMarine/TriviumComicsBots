@@ -3,9 +3,10 @@ import { config } from "dotenv";
 import { changeActivities } from "./common/functions";
 config();
 
+const INTENTS = [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES];
 
 export const krystal = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_MEMBERS]
+    intents: INTENTS
 });
 krystal.login(process.env.BOT_KRYSTAL_TOKEN);
 krystal.on('ready', () => {
@@ -14,7 +15,7 @@ krystal.on('ready', () => {
 });
 
 export const sadie = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+    intents: INTENTS
 });
 sadie.login(process.env.BOT_SADIE_TOKEN);
 sadie.on('ready', () => {
@@ -23,14 +24,14 @@ sadie.on('ready', () => {
 });
 
 export const d20 = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
+    intents: INTENTS
 });
 d20.login(process.env.BOT_D20_TOKEN);
 d20.on('ready', () => { console.log(`${d20.user ? d20.user.tag : "D20"} is ready!!!`) });
 
 
 export const ray = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS]
+    intents: INTENTS
 });
 ray.login(process.env.BOT_RAY_TOKEN);
 ray.on('ready', () => {
@@ -40,7 +41,7 @@ ray.on('ready', () => {
 
 
 export const eli = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES]
+    intents: INTENTS
 });
 eli.login(process.env.BOT_ELI_TOKEN);
 eli.on('ready', () => {

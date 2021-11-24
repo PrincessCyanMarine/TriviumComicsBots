@@ -1,5 +1,5 @@
 import { userMention } from "@discordjs/builders";
-import { Message, MessageAttachment } from "discord.js";
+import { GuildMember, Message, MessageAttachment, Role } from "discord.js";
 import { readFileSync, writeFileSync } from "fs";
 import got from "got/dist/source";
 import { glitch } from "../attachments";
@@ -38,30 +38,37 @@ export async function summon(msg: Message, options: string[]) {
             break;
         case 10:
         case 11:
-        case 12:
             say(sadie, msg.channel, "Your cryptic chanting echoes unheard.", 250);
             break;
-        case 13:
+        case 12:
             say(sadie, msg.channel, "The fabric of the universe peels away for just a brief moment, summoning...\n\nA voidfish.\n\nIt hisses angrily at you, before blinking out of existence.", 250);
             break;
-        case 14:
+        case 13:
             say(sadie, msg.channel, "It\'s a bird! It\'s a plane! It\'s—no it\'s just a plane.", 250);
             break;
-        case 15:
+        case 14:
             await say(sadie, msg.channel, { content: "A wild " + userMention("491029828955537418") + " appears" }, 250);
             await say(krystal, msg.channel, { files: [await killing(undefined, msg.author, undefined, undefined)], content: "We don\'t have permission to use Merry\'s art" })
             break;
-        case 16:
+        case 15:
             say(sadie, msg.channel, "You summoned a bird. It's not a dodo", 300);
             break;
+        case 16:
         case 17:
-        case 18:
             let bird_list: string[] = readFileSync("./birdlist.txt", "utf-8").split('\n');
             let bird = random_from_array(bird_list);
             say(sadie, msg.channel, "You summoned " + (bird.match(/^[aeiou]/i) ? "an " : "a ") + bird + "!", 300);
             break;
-        case 19:
+        case 18:
             say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
+            break;
+        case 19:
+            let moderators: string[] | undefined =
+                (await msg.guild?.members.fetch())
+                    ?.filter(m => !(m.user.bot) && m.permissions.has('KICK_MEMBERS') && !(["297531251081084941", "238481145329745920"].includes(m.id)))
+                    .map(m => userMention(m.id));
+            if (!moderators) moderators = ["[INSERT QUEENSBLADE]"]
+            say(sadie, msg.channel, "You summoned a servant of Dodo!\nA wild " + random_from_array(moderators) + " appears!");
             break;
         case 20:
             random_from_array([

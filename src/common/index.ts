@@ -1,10 +1,10 @@
 import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
-import { d20, eli, krystal, ray, } from "../clients";
+import { d20, eli, krystal, ray, sadie, } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { say } from "./functions";
-import { ignore_channels, testChannelId, testGuildId, triviumGuildId } from "./variables";
+import { random_from_array, say } from "./functions";
+import { ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, memberNicknameMention, } from "@discordjs/builders"
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
