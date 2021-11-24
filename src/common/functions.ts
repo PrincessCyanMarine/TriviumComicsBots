@@ -129,7 +129,6 @@ export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CU
         else
             guild.me?.setNickname(null);
     });
-    bot.user?.setStatus(random_from_array(['dnd', 'online', 'idle', 'invisible']));
     database.child('activities/' + bot.user?.username).set(name);
 };
 
