@@ -53,9 +53,9 @@ export async function summon(msg: Message, options: string[]) {
             await say(krystal, msg.channel, { files: [await killing(undefined, msg.author, undefined, undefined)], content: "We don\'t have permission to use Merry\'s art" })
             break;
         case 16:
-        case 17:
             say(sadie, msg.channel, "You summoned a bird. It's not a dodo", 300);
             break;
+        case 17:
         case 18:
             let bird = random_from_array(bird_list);
             say(sadie, msg.channel, "You summoned a " + bird + "!", 300);
