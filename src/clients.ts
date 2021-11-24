@@ -13,13 +13,14 @@ export var krystal = new Client({ intents }),
     cerby = new Client({ intents }),
     sieg = new Client({ intents });
 
-krystal.login(process.env.BOT_KRYSTAL_TOKEN)
-sadie.login(process.env.BOT_SADIE_TOKEN)
-ray.login(process.env.BOT_RAY_TOKEN)
-eli.login(process.env.BOT_ELI_TOKEN)
-d20.login(process.env.BOT_D20_TOKEN)
-cerby.login(process.env.BOT_CERBY_TOKEN)
-sieg.login(process.env.BOT_SIEG_TOKEN)
+krystal.login(process.env.BOT_KRYSTAL_TOKEN);
+sadie.login(process.env.BOT_SADIE_TOKEN);
+ray.login(process.env.BOT_RAY_TOKEN);
+eli.login(process.env.BOT_ELI_TOKEN);
+d20.login(process.env.BOT_D20_TOKEN);
+cerby.login(process.env.BOT_CERBY_TOKEN);
+sieg.login(process.env.BOT_SIEG_TOKEN);
+
 
 var client_list = [krystal, sadie, ray, eli, cerby, sieg];
 client_list.forEach(client => {

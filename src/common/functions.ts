@@ -5,7 +5,7 @@ import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database } from "..";
 import assets from "../assetsIndexes";
-import { clients, CustomActivity, eli, krystal, ray, sadie } from "../clients";
+import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie, sieg } from "../clients";
 import { eli_activities } from "../eli/activities";
 import { krystal_activities } from "../krystal/activities";
 import { ray_activities } from "../ray/activities";
@@ -129,6 +129,7 @@ export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CU
         else
             guild.me?.setNickname(null);
     });
+    bot.user?.setStatus(random_from_array(['dnd', 'online', 'idle', 'invisible']));
     database.child('activities/' + bot.user?.username).set(name);
 };
 
@@ -153,7 +154,8 @@ export const randomchance = (percentage: number = 10): boolean => Math.floor(Mat
 
 
 export function changeActivities() {
-    if (!(ray.isReady() && krystal.isReady() && sadie.isReady() && eli.isReady())) return;
+    if (!(ray.isReady() && krystal.isReady() && sadie.isReady() && eli.isReady() && cerby.isReady() && sieg.isReady() && d20.isReady())) return;
+    sieg.user?.setStatus('invisible');
 
     let test_padoru = () => {
         let padoru_chance: number;
