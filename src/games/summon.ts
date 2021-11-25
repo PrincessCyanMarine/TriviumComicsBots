@@ -65,7 +65,6 @@ export async function summon(msg: Message, options: string[]) {
             let bird = random_from_array(bird_list)
                 .match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/);
             if (!(bird?.groups && bird.groups.bird && bird.groups.url)) return;
-            console.log(hyperlink(bird.groups.bird, bird.groups.url));
             say(sadie, msg.channel, {
                 content: ("You summoned " + (bird.groups.bird.match(/^[aeiou]/i) ? "an " : "a ") + bird.groups.bird + " !"),
                 components: [new MessageActionRow()
