@@ -1,6 +1,5 @@
 import assets from "../assetsIndexes";
-import { CustomActivity, krystal } from "../clients";
-import { changeActivity } from "../common/functions";
+import { CustomActivity } from "../clients";
 
 export const krystal_activities: CustomActivity[] = [
     ["krystal", "PLAYING", "Dungeons & Dragons", assets.krystal.avatars.dnd, 'dnd'],

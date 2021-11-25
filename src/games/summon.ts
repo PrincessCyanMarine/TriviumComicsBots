@@ -1,5 +1,5 @@
-import { userMention } from "@discordjs/builders";
-import { GuildMember, Message, MessageAttachment, Role } from "discord.js";
+import { hyperlink, userMention } from "@discordjs/builders";
+import { ButtonInteraction, GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, Role } from "discord.js";
 import { readFileSync, writeFileSync } from "fs";
 import got from "got/dist/source";
 import { glitch } from "../attachments";
@@ -62,8 +62,21 @@ export async function summon(msg: Message, options: string[]) {
         case 16:
         case 17:
             let bird_list: string[] = readFileSync("./birdlist.txt", "utf-8").split('\n');
-            let bird = random_from_array(bird_list);
-            say(sadie, msg.channel, "You summoned " + (bird.match(/^[aeiou]/i) ? "an " : "a ") + bird + "!", 300);
+            let bird = random_from_array(bird_list)
+                .match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/);
+            if (!(bird?.groups && bird.groups.bird && bird.groups.url)) return;
+            console.log(hyperlink(bird.groups.bird, bird.groups.url));
+            say(sadie, msg.channel, {
+                content: ("You summoned " + (bird.groups.bird.match(/^[aeiou]/i) ? "an " : "a ") + bird.groups.bird + " !"),
+                components: [new MessageActionRow()
+                    .addComponents(new MessageButton()
+                        .setLabel(bird.groups.bird)
+                        .setStyle('LINK')
+                        .setURL(bird.groups.url)
+                        .setEmoji('🐦')
+                    )
+                ]
+            }, 300);
             break;
         case 18:
             say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);

@@ -147,7 +147,7 @@ export const msg2embed = (msg: Message) => {
     return embeds;
 }
 
-export const random_from_array = (array: any[]) => array[Math.floor(Math.random() * array.length)];
+export const random_from_array = <Item>(array: Item[]): Item => array[Math.floor(Math.random() * array.length)];
 export const capitalize = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 export const randomchance = (percentage: number = 10): boolean => Math.floor(Math.random() * 100) < percentage;
 
@@ -204,8 +204,8 @@ export function changeActivities() {
     [eli_activities, ray_activities, sadie_activities, krystal_activities].forEach(a => {
         let ac: CustomActivity = random_from_array(a);
         if (test_padoru()) { change_to_padoru(a); return; };
-        changeActivity(...a[Math.floor(Math.random() * a.length)]);
-    })
+        changeActivity(...random_from_array(a));
+    });
 
     setTimeout(changeActivities, (1000 * 60 * 30));
 }

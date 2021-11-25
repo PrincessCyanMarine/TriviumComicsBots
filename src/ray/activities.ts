@@ -1,6 +1,5 @@
 import assets from "../assetsIndexes";
-import { CustomActivity, ray } from "../clients";
-import { changeActivity } from "../common/functions";
+import { CustomActivity } from "../clients";
 
 export const ray_activities: CustomActivity[] = [
     ["ray", "PLAYING", "Dungeons & Dragons", assets.ray.avatars.normal, undefined, "Ray"],

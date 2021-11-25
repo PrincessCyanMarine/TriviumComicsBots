@@ -1,6 +1,5 @@
 import assets from "../assetsIndexes";
-import { CustomActivity, eli } from "../clients";
-import { changeActivity } from "../common/functions";
+import { CustomActivity } from "../clients";
 
 export const eli_activities: CustomActivity[] = [
     ["eli", "PLAYING", "Dungeons & Dragons", assets.eli.avatars.normal, undefined, "Eli"],
