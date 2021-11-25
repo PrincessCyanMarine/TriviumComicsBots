@@ -13,7 +13,7 @@ export const D20Id: string = '743606862578057277';
 export const siegId: string = '723938416139567154';
 export const botIds: string[] = [sadieId, krystalId, RayId, EliId, CerbyId, D20Id, siegId];
 
-export const killWords: string[] = ["kill", "beat", "punch", "heal", "shoot", "attack", "unalive", "protect", "exterminate", "end.+?suffering"];
+export const killWords: string[] = ["kill", "beat", "punch", "heal", "shoot", "attack", "unalive", "protect", "exterminate", "end.+?suffering", "silence"];
 export const protectedFromKills: string[] = [sadieId, krystalId, EliId, CerbyId];
 export const not_count_in_channel_ids: string[] = ["728081841139220552", "725932268891406368", "745069948510142487", "624774782180917278", "690361467475984605"];
 export const ignore_channels: string[] = ["728081841139220552", "725932268891406368", "745069948510142487", "624774782180917278"];
