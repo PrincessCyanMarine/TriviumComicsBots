@@ -3,7 +3,7 @@ import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
 import { ActivityType, Client, Guild, GuildMember, Message, MessageEmbed, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
-import { database } from "..";
+import { database, testing } from "..";
 import assets from "../assetsIndexes";
 import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie, sieg } from "../clients";
 import { eli_activities } from "../eli/activities";
@@ -11,6 +11,7 @@ import { krystal_activities } from "../krystal/activities";
 import { ray_activities } from "../ray/activities";
 import { sadie_activities } from "../sadie/activities";
 import emojis from "./emojis";
+import { disturb_channels, ignore_channels, testChannelId } from "./variables";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'/g, '');
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join('|')})(?![A-Z0-9])`, 'gi');
@@ -121,6 +122,7 @@ export function notificationCult(channel_id: string) {
 
 export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = text, nickname?: string) {
     let bot = clients[bot_name];
+    // bot.user?.setStatus('dnd');
     bot.user?.setActivity(text, { type: type, name: name });
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
     bot.guilds.cache.forEach(guild => {
@@ -129,6 +131,7 @@ export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CU
         else
             guild.me?.setNickname(null);
     });
+    // console.log(bot.user?.presence.status);
     database.child('activities/' + bot.user?.username).set(name);
 };
 
@@ -208,4 +211,16 @@ export function changeActivities() {
     });
 
     setTimeout(changeActivities, (1000 * 60 * 30));
+}
+
+export function ignore_message(msg: Message, bot: Client): boolean {
+    if (!msg || !msg.member || !msg.author || msg.author.bot) return true;
+    if (msg.content.startsWith('!')) return true;
+    if (ignore_channels.includes(msg.channel.id)) return true;
+    if (testing) {
+        if (msg.channelId != testChannelId) return true;
+    } else
+        if (msg.channelId == testChannelId) return true;
+    // if ((!(disturb_channels.includes(msg.channel.id))) && bot.user?.presence.status == 'dnd') return true;
+    return false;
 }

@@ -1,14 +1,18 @@
 import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
 import { database, testing } from "..";
-import { d20, eli, krystal, ray, sadie, } from "../clients";
+import { clients, CustomActivity, d20, eli, krystal, ray, sadie, } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { random_from_array, say } from "./functions";
+import { changeActivity, random_from_array, say } from "./functions";
 import { ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, memberNicknameMention, } from "@discordjs/builders"
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 import { summon } from "../games/summon";
+import { krystal_activities } from "../krystal/activities";
+import { sadie_activities } from "../sadie/activities";
+import { eli_activities } from "../eli/activities";
+import { ray_activities } from "../ray/activities";
 
 
 d20.on('messageCreate', async (msg) => {
@@ -170,6 +174,18 @@ d20.on('messageCreate', async (msg) => {
                 break;
             case "summon":
                 summon(msg, options);
+                break;
+            case "activity":
+                if (msg.author.id != marineId) return;
+                let acts: { [bot: string]: CustomActivity[] } = {
+                    "krystal": krystal_activities,
+                    "sadie": sadie_activities,
+                    "eli": eli_activities,
+                    "ray": ray_activities,
+                }
+                if (!acts[options[1]]) return;
+                let act = options[2] && (parseInt(options[2]) < acts[options[1]].length) ? acts[options[1]][parseInt(options[2])] : random_from_array(acts[options[1]]);
+                changeActivity(...act);
                 break;
         };
     };

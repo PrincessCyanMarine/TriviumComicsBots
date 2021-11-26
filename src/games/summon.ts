@@ -66,7 +66,7 @@ export async function summon(msg: Message, options: string[]) {
                 .match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/);
             if (!(bird?.groups && bird.groups.bird && bird.groups.url)) return;
             say(sadie, msg.channel, {
-                content: ("You summoned " + (bird.groups.bird.match(/^[aeiou]/i) ? "an " : "a ") + bird.groups.bird + " !"),
+                content: ("You summoned " + (bird.groups.bird.match(/^[aeiou]/i) ? "an " : "a ") + bird.groups.bird + "!"),
                 components: [new MessageActionRow()
                     .addComponents(new MessageButton()
                         .setLabel(bird.groups.bird)

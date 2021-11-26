@@ -21,5 +21,6 @@ export const patron_role_id = '611539466670309386';
 // export const announcementChannelId: string = '674781280423903264'; // TestChannel
 export const announcementChannelId: string = '613507549085302796'; // Announcement Channel
 export const alert_role_id: string = "900363259188772865";
+export const disturb_channels: string[] = ["892800588469911663", "562431692703531018", "620088019868844044"];
 
 export const marineId = "305883924310261760";
