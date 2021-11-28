@@ -22,5 +22,5 @@ export async function roleplay(msg: Message) {
     let message: MessageOptions = {};
     if (msg.content) message.content = msg.content;
     if (msg.attachments) message.files = msg.attachments.map(a => a);
-    say(clients[id2bot[bot]], rc.output, message);
+    say(clients[id2bot[bot]], rc.output, message).catch(console.error);
 }

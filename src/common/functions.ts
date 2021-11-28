@@ -1,6 +1,6 @@
 import { hyperlink } from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { ActivityType, Client, Guild, GuildMember, Message, MessageEmbed, MessageOptions, TextBasedChannels, TextChannel, User } from "discord.js";
+import { ActivityType, Client, Guild, GuildMember, Message, MessageEmbed, MessageOptions, PresenceStatusData, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database, testing } from "..";
@@ -26,8 +26,8 @@ export function testAllWords(args: string, ...test: string[]): boolean {
 }
 
 
-export function say(bot: Client, channel: TextBasedChannels | string, content: string | MessageOptions, delay = 1000): Promise<Message> {
-    return new Promise((resolve, reject) => {
+export const say = (bot: Client, channel: TextBasedChannels | string, content: string | MessageOptions, delay = 1000): Promise<Message> =>
+    new Promise((resolve, reject) => {
         delay = Math.max(1, delay);
         if (typeof content == 'string')
             content = detectEmoji(content);
@@ -49,7 +49,6 @@ export function say(bot: Client, channel: TextBasedChannels | string, content: s
             }
         }).catch(reject);
     })
-};
 
 export function edit(msg: Message, content: string | MessageOptions, delay = 1000) {
     return new Promise((resolve, reject) => {
@@ -120,18 +119,20 @@ export function notificationCult(channel_id: string) {
     [krystal, sadie, ray, eli].forEach(bot => { say(bot, channel_id, ':GMBelleNotificationNew:').catch(console.error); });
 }
 
-export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = text, nickname?: string) {
+export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = text, nickname: string | null = null) {
     let bot = clients[bot_name];
-    // bot.user?.setStatus('dnd');
-    bot.user?.setActivity(text, { type: type, name: name });
+    let status: "dnd" | "online" = random_from_array(["online", "dnd"]);
+    bot.user?.setPresence({ status, activities: [{ type: type, name: name }] });
+    setTimeout(() => { bot.user?.setActivity(); console.log('A') }, 5000)
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
     bot.guilds.cache.forEach(guild => {
         if (nickname)
-            guild.me?.setNickname(nickname);
-        else
-            guild.me?.setNickname(null);
+            guild.me?.setNickname(nickname).then(() => {
+                if (status == 'dnd')
+                    guild.me?.setNickname(guild.me.displayName + ' [DND]');
+            });
     });
-    // console.log(bot.user?.presence.status);
+    console.log(bot.user?.presence.status);
     database.child('activities/' + bot.user?.username).set(name);
 };
 
@@ -221,6 +222,6 @@ export function ignore_message(msg: Message, bot: Client): boolean {
         if (msg.channelId != testChannelId) return true;
     } else
         if (msg.channelId == testChannelId) return true;
-    // if ((!(disturb_channels.includes(msg.channel.id))) && bot.user?.presence.status == 'dnd') return true;
+    if ((!(disturb_channels.includes(msg.channel.id))) && bot.user?.presence.status == 'dnd') return true;
     return false;
 }
