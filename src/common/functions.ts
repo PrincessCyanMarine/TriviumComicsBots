@@ -123,7 +123,6 @@ export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CU
     let bot = clients[bot_name];
     let status: "dnd" | "online" = random_from_array(["online", "dnd"]);
     bot.user?.setPresence({ status, activities: [{ type: type, name: name }] });
-    setTimeout(() => { bot.user?.setActivity(); console.log('A') }, 5000)
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
     bot.guilds.cache.forEach(guild => {
         if (nickname)
@@ -132,7 +131,7 @@ export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CU
                     guild.me?.setNickname(guild.me.displayName + ' [DND]');
             });
     });
-    console.log(bot.user?.presence.status);
+    console.log(bot.user?.username + ': ' + bot.user?.presence.status);
     database.child('activities/' + bot.user?.username).set(name);
 };
 
