@@ -2,7 +2,7 @@ import { userMention } from "@discordjs/builders";
 import { createCanvas, loadImage } from "canvas";
 import { GuildMember, Message, MessageAttachment, User } from "discord.js";
 import { writeFileSync } from "fs";
-import got from "got/dist/source";
+// import got from "got/dist/source";
 import { database } from "..";
 import assets from "../assetsIndexes";
 import { absorb, box, drown, fire, fireball, fly, glitch, inhale, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
@@ -244,7 +244,7 @@ export function sparing(msg: Message, target: User | undefined = getTarget(msg))
     database.child('dontattack').set(target.id);
 };
 
-export async function testWebtoonEpisode() {
+/* export async function testWebtoonEpisode() {
     let mostRecentEpisode = await (await database.child('mostRecentEpisode').once('value')).val();
     let response = await got('https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252');
     let webtoonEpisode: RegExpMatchArray | null | string = response.body.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
@@ -265,7 +265,7 @@ export async function testWebtoonEpisode() {
 
     say(krystal, announcementChannelId, `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]} asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`, 1).catch(console.error);
     notificationCult('562429294090125330');
-}
+} */
 
 export function nonowords(msg: Message) {
     const sadieAngry = async () => {

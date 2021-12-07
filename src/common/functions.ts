@@ -131,7 +131,7 @@ export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CU
                     guild.me?.setNickname(guild.me.displayName + ' [DND]');
             });
     });
-    console.log(bot.user?.username + ': ' + bot.user?.presence.status);
+    // console.log(bot.user?.username + ': ' + bot.user?.presence.status);
     database.child('activities/' + bot.user?.username).set(name);
 };
 
