@@ -22,7 +22,7 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "popcorn", "feed", "hungry", "eat")) eating(msg);
         else if (testWord(args, "swim")) swimming(msg);
         else if (testWord(args, "fire", "burn", "this is fine")) burning(msg);
-        else if (testWord(args, "(divide by |\/ ?)(0|zero)", "crash", "meaning of life")) crashing(msg);
+        else if (testWord(args, "(divide by |\S*\/ ?)(0|zero)", "crash", "meaning of life")) crashing(msg);
         else if (testWord(args, "spin", "beyblade")) spinning(msg);
         else if (testWord(args, "pride", "gay", "gae", "gæ", "rainbow", "lgbt")) prideful(msg);
         else if (testWord(args, "fly")) flying(msg);
