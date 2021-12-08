@@ -1,8 +1,7 @@
 import { userMention } from "@discordjs/builders";
 import { createCanvas, loadImage } from "canvas";
 import { GuildMember, Message, MessageAttachment, User } from "discord.js";
-import { writeFileSync } from "fs";
-// import got from "got/dist/source";
+import got from "got/dist/source";
 import { database } from "..";
 import assets from "../assetsIndexes";
 import { absorb, box, drown, fire, fireball, fly, glitch, inhale, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
@@ -244,28 +243,30 @@ export function sparing(msg: Message, target: User | undefined = getTarget(msg))
     database.child('dontattack').set(target.id);
 };
 
-/* export async function testWebtoonEpisode() {
-    let mostRecentEpisode = await (await database.child('mostRecentEpisode').once('value')).val();
-    let response = await got('https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252');
-    let webtoonEpisode: RegExpMatchArray | null | string = response.body.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
-    if (!webtoonEpisode) return;
-    webtoonEpisode = webtoonEpisode[0];
-    if (typeof webtoonEpisode != 'string') return;
+export async function testWebtoonEpisode() {
+    try {
+        let mostRecentEpisode = await (await database.child('mostRecentEpisode').once('value')).val();
+        let response = await got('https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252');
+        let webtoonEpisode: RegExpMatchArray | null | string = response.body.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
+        if (!webtoonEpisode) return;
+        webtoonEpisode = webtoonEpisode[0];
+        if (typeof webtoonEpisode != 'string') return;
 
-    let episode_number = parseInt(webtoonEpisode.split('data-episode-no="')[1].split('"')[0]);
-    if (mostRecentEpisode >= episode_number) return;
-    database.child('mostRecentEpisode').set(episode_number);
-    let announcers = ['Sadie', "Ray", "Eli", "Angel", "Kairi"];
-    let episode_title = webtoonEpisode.split('<span class="subj"><span>')[1].split('<\/span>')[0];
-    let episode_url = webtoonEpisode.split('<a href="')[1].split('" class="')[0];
+        let episode_number = parseInt(webtoonEpisode.split('data-episode-no="')[1].split('"')[0]);
+        if (mostRecentEpisode >= episode_number) return;
+        database.child('mostRecentEpisode').set(episode_number);
+        let announcers = ['Sadie', "Ray", "Eli", "Angel", "Kairi"];
+        let episode_title = webtoonEpisode.split('<span class="subj"><span>')[1].split('<\/span>')[0];
+        let episode_url = webtoonEpisode.split('<a href="')[1].split('" class="')[0];
 
-    // console.log(episode_number);
-    // console.log(episode_title);
-    // console.log(episode_url);
+        // console.log(episode_number);
+        // console.log(episode_title);
+        // console.log(episode_url);
 
-    say(krystal, announcementChannelId, `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]} asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`, 1).catch(console.error);
-    notificationCult('562429294090125330');
-} */
+        say(krystal, announcementChannelId, `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]} asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`, 1).catch(console.error);
+        notificationCult('562429294090125330');
+    } catch (err) { console.error(err) };
+}
 
 export function nonowords(msg: Message) {
     const sadieAngry = async () => {
