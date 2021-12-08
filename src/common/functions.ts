@@ -18,7 +18,7 @@ const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test
 
 const argMatch = (args: string, test: string[]): RegExpMatchArray | null => argClean(args).match(createRegex(test));
 
-export const testWord = (args: string, ...test: string[]): boolean => {res = !!(argMatch(args, test)); console.log(args, test, res); return res;};
+export const testWord = (args: string, ...test: string[]): boolean => {let res = !!(argMatch(args, test)); console.log(args, test, res); return res;};
 
 export function testAllWords(args: string, ...test: string[]): boolean {
     let res = argMatch(args, test);
