@@ -18,7 +18,7 @@ const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test
 
 const argMatch = (args: string, test: string[]): RegExpMatchArray | null => argClean(args).match(createRegex(test));
 
-export const testWord = (args: string, ...test: string[]): boolean => {let res = !!(argMatch(args, test)); console.log(args, test, res); return res;};
+export const testWord = (args: string, ...test: string[]): boolean => !!(argMatch(args, test));
 
 export function testAllWords(args: string, ...test: string[]): boolean {
     let res = argMatch(args, test);
@@ -156,6 +156,7 @@ export const randomchance = (percentage: number = 10): boolean => Math.floor(Mat
 
 
 export function changeActivities() {
+    if (testing) return;
     if (!(ray.isReady() && krystal.isReady() && sadie.isReady() && eli.isReady() && cerby.isReady() && sieg.isReady() && d20.isReady())) return;
     sieg.user?.setStatus('invisible');
 
