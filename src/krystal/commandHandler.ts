@@ -1,12 +1,15 @@
+import { userMention } from "@discordjs/builders";
 import { Message } from "discord.js";
-import { randomchance, testWord } from "../common/functions";
+import { krystal } from "../clients";
+import { randomchance, say, testWord } from "../common/functions";
 import { killWords } from "../common/variables";
 import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despacito, drowning, eating, eighteen, flying, greet, gunning, killing, loving, nonowords, pattron, pong, prideful, rebel, silencing, sleeping, sparing, spinning, swimming, talking, willRebel, yeeting } from "./functions";
 
 export function testCommands(msg: Message) {
     let args = msg.content;
 
-    if (!!args.match(/ye{2,}t/gi)) yeeting(msg);
+    if (testWord("dumbass") && randomchance(5)) say(krystal, msg.channel, userMention("601943025253482496"));
+    else if (!!args.match(/ye{2,}t/gi)) yeeting(msg);
     else if (!!args.match(/pf{2,}t/gi)) rebel(msg, true);
     else if (args == '18?') eighteen(msg);
     else if (testWord(args, "(I|Im|I am)\\s(will|going to|gonna|shall)\\s(bed|sleep)")) sleeping(msg, msg.author);
