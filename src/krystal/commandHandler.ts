@@ -8,7 +8,7 @@ import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despac
 export function testCommands(msg: Message) {
     let args = msg.content;
 
-    if (testWord("dumbass") && randomchance(5)) say(krystal, msg.channel, userMention("601943025253482496"));
+    if (testWord(args, "dumbass") && randomchance(5)) say(krystal, msg.channel, userMention("601943025253482496"));
     else if (!!args.match(/ye{2,}t/gi)) yeeting(msg);
     else if (!!args.match(/pf{2,}t/gi)) rebel(msg, true);
     else if (args == '18?') eighteen(msg);
