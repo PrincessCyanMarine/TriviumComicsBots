@@ -122,8 +122,8 @@ export function notificationCult(channel_id: string) {
 export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = text, nickname: string | null = null) {
     let bot = clients[bot_name];
     // let status: "dnd" | "online" = random_from_array(["online", "online", "online", "dnd"]);
-    let status: "online" = "online";
-    bot.user?.setPresence({ status, activities: [{ type: type, name: name }] });
+    // let status: "online" = "online";
+    bot.user?.setPresence({ activities: [{ type: type, name: name }] });
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
     bot.guilds.cache.forEach(guild => {
         if (nickname)
