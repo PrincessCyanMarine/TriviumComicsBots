@@ -30,6 +30,8 @@ export async function roleplay(msg: Message) {
 
 export async function beating(msg: Message, target: User | GuildMember | undefined = getTarget(msg)) {
     return new Promise((resolve, reject) => {
+        if (msg) msg.channel.sendTyping();
+        let start_time = new Date().valueOf();
         if (target instanceof GuildMember) target = target.user;
         if (!target)
             if (msg)
@@ -46,7 +48,7 @@ export async function beating(msg: Message, target: User | GuildMember | undefin
                 ctx.drawImage(avatar, 530, 144, 419, 419);
                 ctx.drawImage(top, 0, 0);
                 if (msg)
-                    say(ray, msg.channel, { files: [canvas.toBuffer()] });
+                    say(ray, msg.channel, { files: [canvas.toBuffer()] }, new Date().valueOf() - start_time);
                 else
                     resolve(canvas.toBuffer());
             })
