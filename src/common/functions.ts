@@ -121,15 +121,13 @@ export function notificationCult(channel_id: string) {
 
 export function changeActivity(bot_name: string, type: Exclude<ActivityType, "CUSTOM">, text: string, avatar?: string | Buffer, name: string = text, nickname: string | null = null) {
     let bot = clients[bot_name];
-    let status: "dnd" | "online" = random_from_array(["online", "online", "online", "dnd"]);
+    // let status: "dnd" | "online" = random_from_array(["online", "online", "online", "dnd"]);
+    let status: "online" = "online";
     bot.user?.setPresence({ status, activities: [{ type: type, name: name }] });
     if (avatar) bot.user?.setAvatar(avatar).catch(() => { console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`) });
     bot.guilds.cache.forEach(guild => {
         if (nickname)
-            guild.me?.setNickname(nickname).then(() => {
-                if (status == 'dnd')
-                    guild.me?.setNickname(guild.me.displayName + ' [DND]');
-            });
+            guild.me?.setNickname(nickname)
     });
     // console.log(bot.user?.username + ': ' + bot.user?.presence.status);
     database.child('activities/' + bot.user?.username).set(name);
@@ -222,6 +220,6 @@ export function ignore_message(msg: Message, bot: Client): boolean {
         if (msg.channelId != testChannelId) return true;
     } else
         if (msg.channelId == testChannelId) return true;
-    if ((!(disturb_channels.includes(msg.channel.id))) && bot.user?.presence.status == 'dnd') return true;
+    // if ((!(disturb_channels.includes(msg.channel.id))) && bot.user?.presence.status == 'dnd') return true;
     return false;
 }
