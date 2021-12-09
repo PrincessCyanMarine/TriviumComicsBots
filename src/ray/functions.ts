@@ -45,12 +45,12 @@ export async function beating(msg: Message, target: User | GuildMember | undefin
             loadImage(assets.ray.beat).then(top => {
                 ctx.drawImage(avatar, 530, 144, 419, 419);
                 ctx.drawImage(top, 0, 0);
-                say(ray, msg.channel, { files: [canvas.toBuffer()] });
+                if (msg)
+                    say(ray, msg.channel, { files: [canvas.toBuffer()] });
+                else
+                    resolve(canvas.toBuffer());
             })
         })
-        // avatar.resize(419, 419);
-        // base.composite(avatar, 530, 144).composite(top, 0, 0).write('./Media/Ray/meat/final.png');
-
     })
 
 }
