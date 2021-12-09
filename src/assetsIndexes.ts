@@ -49,7 +49,7 @@ const assets = {
             normal: './assets/ray/avatars/normal.png',
             padoru: './assets/ray/avatars/padoru.png',
         },
-
+        beat: './assets/ray/beat/top.png'
     },
     eli: {
         avatars: {

@@ -1,7 +1,10 @@
-import { Message, MessageOptions } from "discord.js";
+import { createCanvas, loadImage } from "canvas";
+import { GuildMember, Message, MessageOptions, User } from "discord.js";
 import { database, testing } from "..";
+import assets from "../assetsIndexes";
+import { beat } from "../attachments";
 import { clients, id2bot, ray } from "../clients";
-import { say } from "../common/functions";
+import { getTarget, say } from "../common/functions";
 
 const roleplay_channels = () => {
     if (testing) return {
@@ -23,4 +26,31 @@ export async function roleplay(msg: Message) {
     if (msg.content) message.content = msg.content;
     if (msg.attachments) message.files = msg.attachments.map(a => a);
     say(clients[id2bot[bot]], rc.output, message).catch(console.error);
+}
+
+export async function beating(msg: Message, target: User | GuildMember | undefined = getTarget(msg)) {
+    return new Promise((resolve, reject) => {
+        if (target instanceof GuildMember) target = target.user;
+        if (!target)
+            if (msg)
+                return say(ray, msg.channel, { files: [beat] })
+            else
+                return resolve(beat);
+
+        let width = 1000, height = 708
+        let canvas = createCanvas(width, height);
+        let ctx = canvas.getContext('2d');
+        let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
+        loadImage(avatarURL).then(avatar => {
+            loadImage(assets.ray.beat).then(top => {
+                ctx.drawImage(avatar, 530, 144, 419, 419);
+                ctx.drawImage(top, 0, 0);
+                say(ray, msg.channel, { files: [canvas.toBuffer()] });
+            })
+        })
+        // avatar.resize(419, 419);
+        // base.composite(avatar, 530, 144).composite(top, 0, 0).write('./Media/Ray/meat/final.png');
+
+    })
+
 }
