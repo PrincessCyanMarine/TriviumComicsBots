@@ -157,7 +157,6 @@ export const randomchance = (percentage: number = 10): boolean => Math.floor(Mat
 export function changeActivities() {
     if (testing) return;
     if (!(ray.isReady() && krystal.isReady() && sadie.isReady() && eli.isReady() && cerby.isReady() && sieg.isReady() && d20.isReady())) return;
-    sieg.user?.setStatus('invisible');
 
     let test_padoru = () => {
         let padoru_chance: number;

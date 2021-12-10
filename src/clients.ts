@@ -21,6 +21,9 @@ d20.login(process.env.BOT_D20_TOKEN);
 cerby.login(process.env.BOT_CERBY_TOKEN);
 sieg.login(process.env.BOT_SIEG_TOKEN);
 
+sieg.on('ready', () => {
+    sieg.user?.setStatus('invisible');
+});
 
 var client_list = [krystal, sadie, ray, eli, cerby, sieg];
 client_list.forEach(client => {
