@@ -1,9 +1,9 @@
 import { userMention } from "@discordjs/builders";
 import { Message } from "discord.js";
 import { krystal } from "../clients";
-import { randomchance, say, testWord } from "../common/functions";
+import { getTarget, randomchance, say, testWord } from "../common/functions";
 import { killWords } from "../common/variables";
-import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despacito, drowning, eating, eighteen, flying, greet, gunning, killing, loving, nonowords, pattron, pong, prideful, rebel, silencing, sleeping, sparing, spinning, swimming, talking, willRebel, yeeting } from "./functions";
+import { absorbing, boxxing, bullshit, burning, crashing, creeping, dead, despacito, drowning, eating, eighteen, flying, greet, gunning, killing, loving, nonowords, pattron, pong, prideful, rebel, silencedbox, silencing, sleeping, sparing, spinning, swimming, talking, willRebel, yeeting } from "./functions";
 
 export function testCommands(msg: Message) {
     let args = msg.content;
@@ -30,9 +30,10 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "pride", "gay", "gae", "gæ", "rainbow", "lgbt")) prideful(msg);
         else if (testWord(args, "fly")) flying(msg);
         else if (testWord(args, "silence") && msg.mentions.members?.first()) { if (randomchance(50)) killing(msg); else silencing(msg); }
+        else if (testWord(args, "box") && testWord(args, "shut up", "dont (speak|talk)", "silence", "lamp")) silencedbox(msg);
         else if (testWord(args, "shut up", "dont (speak|talk)", "silence", "lamp")) silencing(msg);
-        else if (testWord(args, ...killWords)) killing(msg);
         else if (testWord(args, "box")) boxxing(msg);
+        else if (testWord(args, ...killWords)) killing(msg);
         else if (testWord(args, "mannequin", "moe")) creeping(msg);
         else if (testWord(args, "speak", "talk")) talking(msg);
         else if (testWord(args, "drown", "sink")) drowning(msg);

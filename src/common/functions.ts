@@ -1,6 +1,6 @@
 import { hyperlink } from "@discordjs/builders";
-import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { ActivityType, Client, Guild, GuildMember, Message, MessageEmbed, MessageOptions, PresenceStatusData, TextBasedChannels, TextChannel, User } from "discord.js";
+import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
+import { ActivityType, Client, Guild, GuildMember, Message, MessageAttachment, MessageComponent, MessageEmbed, MessageOptions, PresenceStatusData, TextBasedChannels, TextChannel, User } from "discord.js";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database, testing } from "..";
@@ -8,6 +8,7 @@ import assets from "../assetsIndexes";
 import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie, sieg } from "../clients";
 import { eli_activities } from "../eli/activities";
 import { krystal_activities } from "../krystal/activities";
+import { greet } from "../krystal/functions";
 import { ray_activities } from "../ray/activities";
 import { sadie_activities } from "../sadie/activities";
 import emojis from "./emojis";
@@ -223,3 +224,60 @@ export function ignore_message(msg: Message, bot: Client): boolean {
     // if ((!(disturb_channels.includes(msg.channel.id))) && bot.user?.presence.status == 'dnd') return true;
     return false;
 }
+
+export type imageComponent = {
+    path: string | Buffer,
+    x?: number,
+    y?: number,
+    width?: number,
+    height?: number,
+} | string | Buffer
+
+export async function makeimage(
+    width: number, height: number,
+    avatar: imageComponent,
+    background?: imageComponent,
+    foreground?: imageComponent
+): Promise<Canvas> {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let canvas = createCanvas(width, height);
+            let ctx = canvas.getContext('2d');
+            const composite = async (cmp: imageComponent) => {
+                if (typeof cmp == 'string' || cmp instanceof Buffer) cmp = { path: cmp };
+                ctx.drawImage(await loadImage(cmp.path), cmp.x || 0, cmp.y || 0, cmp.width || width, cmp.height || height);
+            }
+
+            if (background) await composite(background);
+            await composite(avatar);
+            if (foreground) await composite(foreground);
+
+            resolve(canvas);
+        } catch (err) { console.error(err); reject(err); };
+    });
+};
+
+export const imageCommand = (bot: Client, msg: Message | undefined, target: User | undefined, width: number, height: number, avatar?: Omit<Exclude<imageComponent, string | Buffer>, "path">, background?: imageComponent, foreground?: imageComponent, default_image?: Buffer | MessageAttachment) => new Promise<Buffer | MessageAttachment>(
+    async (resolve, reject) => {
+        if (!(target || default_image)) target = bot.user || msg?.author;
+        msg?.channel.sendTyping();
+        let start_time = new Date().valueOf();
+
+        let avt: imageComponent | undefined;
+        if (avatar && target) {
+            avt = {
+                path: target?.displayAvatarURL({ format: 'png', size: 1024 }),
+                x: avatar.x, y: avatar.y,
+                width: avatar.width, height: avatar.height,
+            };
+        }
+
+        let img: Buffer | MessageAttachment | undefined;
+        if (target && avt) img = await (await makeimage(width, height, avt, background, foreground)).toBuffer();
+        else img = default_image;
+
+        if (!img) return reject();
+
+        if (msg) await say(bot, msg.channel, { files: [img] }, new Date().valueOf() - start_time);
+        return resolve(img);
+    })

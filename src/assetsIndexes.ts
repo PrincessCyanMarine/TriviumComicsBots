@@ -27,6 +27,7 @@ const assets = {
             sleep: './assets/krystal/avatars/sleep.png',
         },
         absorb: './assets/krystal/absorb/absorb.png',
+        boxlamp: ['./assets/krystal/boxlamp/top1.png', './assets/krystal/boxlamp/top2.png',],
         box: './assets/krystal/box/top.png',
         lamp: './assets/krystal/lamp/top.png',
         sleep: './assets/krystal/sleep/top.png',

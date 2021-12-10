@@ -6,7 +6,7 @@ import { database } from "..";
 import assets from "../assetsIndexes";
 import { absorb, box, drown, fire, fireball, fly, glitch, inhale, kill, lamp, moe, patreon, pfft, popcorn, pride, run, sleep, speak, spin, swim, swimsadie, vanquishFly, yeet } from "../attachments";
 import { krystal, sadie } from "../clients";
-import { argClean, capitalize, edit, getMember, getTarget, notificationCult, randomchance, random_from_array, say, testWord } from "../common/functions";
+import { argClean, capitalize, edit, getMember, getTarget, imageCommand, imageComponent, makeimage, notificationCult, randomchance, random_from_array, say, testWord } from "../common/functions";
 import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
@@ -76,95 +76,74 @@ export function killing(msg?: Message, target: User | undefined = msg ? getTarge
 export async function rebel(msg: Message, canRebel: boolean = false) {
     let img: Buffer | MessageAttachment;
     if (canRebel && randomchance(30))
-        img = await random_from_array([killing, drowning])(undefined, msg.author);
+        img = await random_from_array([
+            killing,
+            drowning,
+            boxxing,
+            silencing,
+            silencedbox,
+            sleeping,
+            eating,
+            absorbing,
+            // swimming
+            // yeeting,
+            // burning,
+            // crashing,
+            // spinning,
+            // prideful,
+            // flying,
+            // talking,
+            // gunning,
+            // creeping,
+            //TODO rockpaperscissors
+        ])(undefined, msg.author);
     else img = pfft;
 
     say(krystal, msg.channel, { content: 'Pfft', files: [img] });
 };
-export function sleeping(msg: Message, target: User | undefined = getTarget(msg)) {
-    if (!target) return say(krystal, msg.channel, { files: [sleep] });
-    let startTime = new Date().valueOf();
-
-
-    let canvas = createCanvas(361, 303);
-    let ctx = canvas.getContext('2d');
-
-    let avatarURL = target.displayAvatarURL({ format: 'jpeg', size: 1024 });
-    loadImage(assets.krystal.sleep).then(top => {
-        loadImage(avatarURL).then(avatar => {
-            ctx.drawImage(avatar, 95, 38, 121, 121);
-            ctx.drawImage(top, 0, 0);
-            say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
-        })
+export function sleeping(msg: Message | undefined, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
+    return new Promise((resolve, reject) => {
+        imageCommand(krystal, msg, target, 361, 303, {
+            x: 95, y: 38,
+            width: 121, height: 121
+        }, undefined, assets.krystal.sleep, sleep).then(resolve).catch(reject);
     })
 };
-export function absorbing(msg: Message, target: User | undefined = getTarget(msg)) {
-    if (!target) return say(krystal, msg.channel, { files: [absorb] });
-
-    let startTime = new Date().valueOf();
-
-
-    let canvas = createCanvas(1297, 707);
-    let ctx = canvas.getContext('2d');
-
-    let avatarURL = target.displayAvatarURL({ format: 'png', size: 1024 });
-    loadImage(assets.krystal.absorb).then(bg => {
-        loadImage(avatarURL).then(avatar => {
-            ctx.drawImage(bg, 0, 0);
-            ctx.drawImage(avatar, 82, 98, 512, 512);
-            say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
-        })
+export function absorbing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<MessageAttachment | Buffer> {
+    return new Promise((resolve, reject) => {
+        imageCommand(krystal, msg, target, 1297, 707, { x: 82, y: 98, width: 512, height: 512 }, assets.krystal.absorb, undefined, absorb)
+            .then(resolve).catch(reject);
     })
+
 };
 export function eating(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<MessageAttachment | Buffer> {
     return new Promise((resolve, reject) => {
-        if (!target)
-            if (msg) return say(krystal, msg.channel, { files: [popcorn] });
-            else return resolve(popcorn);
-        let startTime = new Date().valueOf();
-        let canvas = createCanvas(1200, 713);
-        let ctx = canvas.getContext('2d');
-        let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
-        loadImage(assets.krystal.popcorn.base).then(bg => {
-            loadImage(assets.krystal.popcorn.top).then(top => {
-                loadImage(avatarURL).then(avatar => {
-                    ctx.drawImage(bg, 0, 0);
-                    ctx.drawImage(avatar, 125, 200, 500, 500);
-                    ctx.drawImage(top, 0, 0);
-                    if (msg)
-                        say(krystal, msg.channel, { files: [canvas.toBuffer()] }, 1000 - (new Date().valueOf() - startTime));
-                    else resolve(canvas.toBuffer());
-                });
-            });
-        });
+        imageCommand(krystal, msg, target, 1200, 713, { x: 125, y: 200, width: 500, height: 500 }, assets.krystal.popcorn.base, assets.krystal.popcorn.top, popcorn).then(resolve).catch(reject);
     });
 };
+
 export async function drowning(msg: Message | undefined, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
     return new Promise(async (resolve, reject) => {
-        if (!target)
-            if (msg)
-                return say(krystal, msg.channel, { files: [drown] });
-            else
-                return resolve(drown);
-        let canvas = createCanvas(833, 762);
-        let ctx = canvas.getContext('2d');
-        let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
-        loadImage(avatarURL).then(avatar => {
-            loadImage(assets.krystal.drown.base).then(bg => {
-                loadImage(assets.krystal.drown.top).then(top => {
-                    ctx.drawImage(bg, 0, 0)
-                    ctx.rotate(36 * Math.PI / 180);
-                    ctx.drawImage(avatar, 442, -306, 200, 200);
-                    ctx.rotate(-36 * Math.PI / 180);
-                    ctx.drawImage(top, 0, 0);
-                    if (msg)
-                        say(krystal, msg.channel, { files: [canvas.toBuffer()] });
-                    else resolve(canvas.toBuffer());
-                });
-            });
-        });
+        let img: Buffer | MessageAttachment;
+        if (target) {
+            let canvas = createCanvas(833, 762);
+            let ctx = canvas.getContext('2d');
+            let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
+            let avatar = await loadImage(avatarURL)
+            let bg = await loadImage(assets.krystal.drown.base)
+            let top = await loadImage(assets.krystal.drown.top)
+            ctx.drawImage(bg, 0, 0);
+            ctx.rotate(36 * Math.PI / 180);
+            ctx.drawImage(avatar, 442, -306, 200, 200);
+            ctx.rotate(-36 * Math.PI / 180);
+            ctx.drawImage(top, 0, 0);
+            img = canvas.toBuffer();
+        } else img = drown
+        if (msg) await say(krystal, msg.channel, { files: [img] });
+        resolve(img);
     });
 };
+
 export function swimming(msg: Message) {
     if (msg.member?.displayName.toLowerCase() == 'sadie')
         say(krystal, msg.channel, { files: [swimsadie] });
@@ -202,35 +181,38 @@ export function flying(msg: Message) {
     else
         say(krystal, msg.channel, { files: [fly] });
 };
+
+export function silencedbox(msg: Message | undefined, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
+    return new Promise(async (resolve, reject) => {
+        imageCommand(krystal, msg, target, 1754, 1573, {
+            x: 621, y: 494,
+            width: 465,
+            height: 465
+        }, undefined, random_from_array(assets.krystal.boxlamp)).then(resolve).catch(reject);
+    });
+};
+
 /**
  * TODO silence
  */
-export function silencing(msg: Message, target: User | undefined = getTarget(msg)) {
-    if (!target) return say(krystal, msg.channel, { files: [lamp] });
-    let canvas = createCanvas(273, 369);
-    let ctx = canvas.getContext('2d');
-    let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
-    loadImage(avatarURL).then(avatar => {
-        loadImage(assets.krystal.lamp).then(top => {
-            ctx.drawImage(avatar, 17, 129, 240, 240);
-            ctx.clearRect(17, 129, 240, 102);
-            ctx.drawImage(top, 0, 0);
-            say(krystal, msg.channel, { files: [canvas.toBuffer()] });
-        });
+export function silencing(msg: Message | undefined, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
+    return new Promise(async (resolve, reject) => {
+        imageCommand(krystal, msg, target, 273, 369, {
+            x: 17, y: 129,
+            width: 240,
+            height: 240
+        }, undefined, assets.krystal.lamp, lamp).then(resolve).catch(reject);
     });
 };
-export function boxxing(msg: Message, target: User | undefined = getTarget(msg)) {
-    if (!target) return say(krystal, msg.channel, { files: [box] });
-    let canvas = createCanvas(1754, 1240);
-    let ctx = canvas.getContext('2d');
-    let avatarURL = target.displayAvatarURL({ size: 1024, format: 'png' });
-    loadImage(avatarURL).then(avatar => {
-        loadImage(assets.krystal.box).then(top => {
-            ctx.drawImage(avatar, 621, 161, 465, 465);
-            ctx.drawImage(top, 0, 0);
-            say(krystal, msg.channel, { files: [canvas.toBuffer()] });
-        })
-    })
+
+export function boxxing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
+    return new Promise(async (resolve, reject) => {
+        imageCommand(krystal, msg, target, 1754, 1240, {
+            x: 621, y: 161,
+            width: 465,
+            height: 465
+        }, undefined, assets.krystal.box, box).then(resolve).catch(reject);
+    });
 };
 /**
  * TODO silence

@@ -14,6 +14,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
  -->
+## [5.9.0] - 2021-12-10
+### Added
+- Krystal can rebel against rebellions
+- Added "box lamp" command
+- Added "meat beat" command
+
+## [5.8.0] - 2021-11-23
+### Added
+- Padoru avatars are back
+- Added !summon command
+
 ## [5.7.0] - 2021-11-13
 ### Added
 - Added "Dodo online" command
