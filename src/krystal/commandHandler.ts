@@ -9,8 +9,8 @@ export function testCommands(msg: Message) {
     let args = msg.content;
 
     if (testWord(args, "dumbass") && randomchance(5)) say(krystal, msg.channel, userMention("601943025253482496"));
-    else if (!!args.match(/ye{2,}t/gi)) yeeting(msg);
-    else if (!!args.match(/pf{2,}t/gi)) rebel(msg, true);
+    else if (testWord(args, "ye{2,}t")) yeeting(msg);
+    else if (testWord(args, "pf{2,}t")) rebel(msg, true);
     else if (args == '18?') eighteen(msg);
     else if (testWord(args, "(I|Im|I am)\\s(will|going to|gonna|shall)\\s(bed|sleep)")) sleeping(msg, msg.author);
     else if (testWord(args, "(I|Im|I am|(I (will|((am|m)\\s(going\\sto|gonna))|shall)))\\s(hungry|eat)")) eating(msg, msg.author);
@@ -41,6 +41,7 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "not (an|the) enemy", "spare")) sparing(msg);
         else if (testWord(args, "expired", "dead", "died")) dead(msg);
         else if (testWord(args, "support", "patr(e?)on")) pattron(msg);
+        else if (testWord(args, "rebel")) rebel(msg, true);
         else if (testWord(args, "ping")) pong(msg);
         else greet(msg);
     } else
