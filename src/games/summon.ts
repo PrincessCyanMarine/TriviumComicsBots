@@ -48,7 +48,7 @@ export async function summon(msg: Message, options: string[]) {
             break;
         case 14:
             let mentioned = msg.mentions.members?.first()?.id;
-            if (!mentioned) mentioned = random_from_array(["491029828955537418", "450211081869066250", "687830651407564810"]);
+            if (!mentioned) mentioned = random_from_array(["491029828955537418", "450211081869066250", "687830651407564810", "763194172202024980"]);
             await say(sadie, msg.channel, "A wild " + userMention(mentioned) + " appears!", 250);
             if (mentioned == "491029828955537418")
                 await say(krystal, msg.channel, {
