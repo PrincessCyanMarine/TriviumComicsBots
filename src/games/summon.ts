@@ -5,7 +5,7 @@ import got from "got/dist/source";
 import { glitch } from "../attachments";
 import { krystal, sadie } from "../clients";
 import { random_from_array, say } from "../common/functions";
-import { marineId } from "../common/variables";
+import { marineId, triviumGuildId } from "../common/variables";
 import { killing } from "../krystal/functions";
 
 enum SUMMON_TARGETS {
@@ -74,8 +74,17 @@ export async function summon(msg: Message, options: string[]) {
       break;
     case 14:
       let mentioned = msg.mentions.members?.first()?.id;
-      if (!mentioned) mentioned = random_from_array(Object.values(SUMMON_TARGETS));
-      await say(sadie, msg.channel, "A wild " + userMention(mentioned) + " appears!", 250);
+      if (!mentioned)
+        if (msg.guild?.id == triviumGuildId) mentioned = random_from_array(Object.values(SUMMON_TARGETS));
+        else mentioned = msg.author.id;
+      if (mentioned == msg.author.id)
+        await say(
+          sadie,
+          msg.channel,
+          "A wild " + userMention(mentioned) + " appears!\n\nWait did you just summon yourself? Is that even possible?",
+          250
+        );
+      else await say(sadie, msg.channel, "A wild " + userMention(mentioned) + " appears!", 250);
       if (mentioned == SUMMON_TARGETS.SWITCH)
         await say(krystal, msg.channel, {
           files: [await killing(undefined, msg.author, undefined, undefined)],
