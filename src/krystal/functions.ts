@@ -49,7 +49,7 @@ import {
 import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
-var spared_player_id: string;
+export var spared_player_id: string;
 (async () => {
   spared_player_id = await (await database.child("dontattack").once("value")).val();
 })();
@@ -114,8 +114,7 @@ export function killing(
       if (type != "revenge" && msg.author.id == target.id && Math.floor(Math.random() * 10) == 0)
         return say(krystal, msg.channel, ":GMKrystalDevious: I do not condone suicide");
       if (protectedFromKills.includes(target.id)) return killing(msg, msg.author, "revenge");
-
-      if (target.id == spared_player_id) return say(krystal, msg.channel, `Sorry, <@${msg.author}>, I was asked to spare that unattractive weeb`);
+      if (target.id == spared_player_id) return say(krystal, msg.channel, `Sorry, <@${msg.author.id}>, I was asked to spare that unattractive weeb`);
       avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });
       if (avatarURL == null) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
     } else if (target) avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });

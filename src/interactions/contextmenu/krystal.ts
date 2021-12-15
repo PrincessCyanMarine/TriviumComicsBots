@@ -1,28 +1,45 @@
 import { userMention } from "@discordjs/builders";
 import { User } from "discord.js";
-import { testing } from "../..";
+import { database, testing } from "../..";
 import { krystal } from "../../clients";
 import emojis from "../../common/emojis";
 import { protectedFromKills, testChannelId } from "../../common/variables";
-import { killing } from "../../krystal/functions";
+import { killing, spared_player_id } from "../../krystal/functions";
 
-krystal.on('interactionCreate', async (interaction) => {
-    if (!interaction.isContextMenu()) return;
-    if (testing && interaction.channelId != testChannelId) return;
-    else if (!testing && interaction.channelId == testChannelId) return;
+krystal.on("interactionCreate", async (interaction) => {
+  if (!interaction.isContextMenu()) return;
+  if (testing && interaction.channelId != testChannelId) return;
+  else if (!testing && interaction.channelId == testChannelId) return;
 
-    switch (interaction.commandName) {
-        case "unalive":
-            let user;
+  let user;
 
-            if (interaction.targetType == "USER")
-                user = interaction.options.getUser("user");
-            else
-                user = interaction.options.getMessage("message")?.author;
+  await interaction.deferReply();
 
-            if (!(user instanceof User)) return;
-            if (protectedFromKills.includes(user.id)) user = interaction.user;
-            interaction.reply({ content: `***I will unalive ${userMention(user.id)} now ${emojis[":GMKrystalDevious:"]}!!!***`, files: [await killing(undefined, user)] });
-            break;
-    };
+  if (interaction.targetType == "USER") user = interaction.options.getUser("user");
+  else user = interaction.options.getMessage("message")?.author;
+
+  if (!(user instanceof User)) {
+    interaction.editReply(`Something went wrong...`);
+    return;
+  }
+
+  switch (interaction.commandName) {
+    case "unalive": {
+      if (protectedFromKills.includes(user.id)) user = interaction.user;
+      if (user.id == spared_player_id) {
+        interaction.editReply(`Sorry, <@${interaction.user.id}>, I was asked to spare that unattractive weeb`);
+        return;
+      }
+      interaction.editReply({
+        content: `***I will unalive ${userMention(user.id)} now ${emojis[":GMKrystalDevious:"]}!!!***`,
+        files: [await killing(undefined, user)],
+      });
+      break;
+    }
+    case "spare": {
+      await database.child("dontattack").set(user.id);
+      interaction.editReply("Understood, I will spare the unattractive weeb!");
+      break;
+    }
+  }
 });
