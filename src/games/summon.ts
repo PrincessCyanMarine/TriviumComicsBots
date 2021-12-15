@@ -20,7 +20,7 @@ enum SUMMON_TARGETS {
 
 export async function summon(msg: Message, options: string[]) {
   let summoned_creature = Math.floor(Math.random() * 21);
-  if (msg.author.id == marineId && options[1] && !isNaN(parseInt(options[1]))) summoned_creature = parseInt(options[1]);
+  if (options[1] && !isNaN(parseInt(options[1]))) summoned_creature = msg.author.id == marineId ? parseInt(options[1]) : 0;
   if (summoned_creature == 0) {
     say(sadie, msg.channel, "no");
     return;
