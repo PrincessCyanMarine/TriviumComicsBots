@@ -333,3 +333,9 @@ export const imageCommand = (
     if (msg) await say(bot, msg.channel, { files: [img] }, new Date().valueOf() - start_time);
     return resolve(img);
   });
+export const wait = (millis: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, millis);
+  });
