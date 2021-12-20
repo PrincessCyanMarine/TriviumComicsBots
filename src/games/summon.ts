@@ -2,11 +2,12 @@ import { hyperlink, userMention } from "@discordjs/builders";
 import { ButtonInteraction, GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, Role } from "discord.js";
 import { readFileSync, writeFileSync } from "fs";
 import got from "got/dist/source";
+import { database } from "..";
 import { glitch } from "../attachments";
 import { krystal, sadie } from "../clients";
 import { random_from_array, say } from "../common/functions";
 import { marineId, triviumGuildId } from "../common/variables";
-import { killing } from "../krystal/functions";
+import { burning, killing } from "../krystal/functions";
 
 enum SUMMON_TARGETS {
   SWITCH = "491029828955537418",
@@ -50,16 +51,23 @@ export async function summon(msg: Message, options: string[]) {
       say(sadie, msg.channel, "Denied.", 250);
       break;
     case 5:
+      await say(sadie, msg.channel, "🪑\nYou summoned... A chair?", 250);
+      await say(krystal, msg.channel, { files: [await burning(undefined)] }, 250);
+      await say(sadie, msg.channel, "And there it goes...", 250);
+      break;
     case 6:
     case 7:
+      summoned_creature = 6;
       say(sadie, msg.channel, "You fail!", 250);
       break;
     case 8:
     case 9:
+      summoned_creature = 8;
       say(sadie, msg.channel, "*Crickets.*", 250);
       break;
     case 10:
     case 11:
+      summoned_creature = 10;
       say(sadie, msg.channel, "Your cryptic chanting echoes unheard.", 250);
       break;
     case 12:
@@ -97,8 +105,10 @@ export async function summon(msg: Message, options: string[]) {
       break;
     case 16:
     case 17:
+      summoned_creature = 16;
       let bird_list: string[] = readFileSync("./birdlist.txt", "utf-8").split("\n");
-      let bird = random_from_array(bird_list).match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/);
+      let b = Math.floor(Math.random() * bird_list.length);
+      let bird = bird_list[b].match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/);
       if (!(bird?.groups && bird.groups.bird && bird.groups.url)) return;
       say(
         sadie,
@@ -113,6 +123,9 @@ export async function summon(msg: Message, options: string[]) {
         },
         300
       );
+      let birdpedia = database.child("birdpedia/" + msg.author.id + "/" + b);
+      let bd = parseInt((await birdpedia.once("value")).val()) || 0;
+      birdpedia.set(bd + 1);
       break;
     case 18:
       say(sadie, msg.channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
@@ -148,4 +161,7 @@ export async function summon(msg: Message, options: string[]) {
       ])();
       break;
   }
+  let db = database.child("summons/" + msg.guild?.id + "/" + msg.author.id + "/" + summoned_creature);
+  let a = parseInt((await db.once("value")).val()) || 0;
+  db.set(a + 1);
 }

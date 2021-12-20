@@ -15,6 +15,7 @@ import {
   TextChannel,
   User,
 } from "discord.js";
+import { readFileSync } from "fs";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database, testing } from "..";
@@ -339,3 +340,8 @@ export const wait = (millis: number): Promise<void> =>
       resolve();
     }, millis);
   });
+
+export const get_birds = () =>
+  readFileSync("./birdlist.txt", "utf-8")
+    .split("\n")
+    .map((b) => b.match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/)!.groups!);
