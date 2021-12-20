@@ -108,6 +108,7 @@ export async function summon(msg: Message, options: string[]) {
       summoned_creature = 16;
       let bird_list: string[] = readFileSync("./birdlist.txt", "utf-8").split("\n");
       let b = Math.floor(Math.random() * bird_list.length);
+      if (msg.author.id == marineId && !isNaN(parseInt(options[2]))) b = parseInt(options[2]);
       let bird = bird_list[b].match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/);
       if (!(bird?.groups && bird.groups.bird && bird.groups.url)) return;
       say(
