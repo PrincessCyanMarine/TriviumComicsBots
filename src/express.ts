@@ -277,15 +277,14 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
     try {
       user_nick = (await guild.members.fetch(id)).displayName;
     } catch (err) {
+      let c = {
+        url: "https://cyanmarine.net",
+        bird: "Princess CyanMarine",
+        img: "https://cdn.discordapp.com/avatars/305883924310261760/c9c990b93fe013c6599d26d96258916f.png?size=1024",
+      };
       user_nick = "Ư̷̡̛̙̯͋͒̿̃̆͐͠N̶̨̢̛̯̖̮̲̳̬̖̣͙̂̿͘͜D̸̯̈͆͗͛̋̀̍̑ͅͅĒ̷̡̢͙̦̦̙̭̝̿̈́̅̇́͊̐͐͂̕F̸̢̛̜̳̲͖͈͍͙̞̭̗͎͒͗͐̉͛̍̆̆̈́͝͠ͅI̵̧̲̤͈̠̠̠̣̭̿̄͜ͅͅN̴̨̛̤̤̪͍̬̳͇̤͔͙͍̺̥͙̄̅̄̂̉̐̅̕̚͠͝E̸̖̠̞̯̪͚͙͇͓̲̺͇̿́͗́̎̾̔̔̚͜D̶̢̢̟̞̹̯̘̄̑͋̈́̓̓͌̐̉͊̋͊͠";
-      user_birds = [];
-      bird_list = [
-        {
-          url: "https://cyanmarine.net",
-          bird: "Princess CyanMarine",
-          img: "https://cdn.discordapp.com/avatars/305883924310261760/c9c990b93fe013c6599d26d96258916f.png?size=1024",
-        },
-      ];
+      user_birds = [c];
+      bird_list = [c];
       console.error(err);
     }
   }
