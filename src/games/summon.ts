@@ -42,7 +42,7 @@ export enum SUMMON_NAMES {
 }
 
 export async function summon(msg: Message, options: string[]) {
-          console.log(SUMMON_NAMES);
+          // console.log(SUMMON_NAMES);
           let summoned_creature = Math.floor(Math.random() * 21);
   let summoned_name: number | string | undefined = undefined;
   if (options[1] && !isNaN(parseInt(options[1]))) summoned_creature = msg.author.id == marineId ? parseInt(options[1]) : 0;
@@ -182,7 +182,7 @@ export async function summon(msg: Message, options: string[]) {
         say(sadie, msg.channel, "You summoned a servant of Dodo!\nA wild " + mod + " appears!");
         break;
       case 20:
-        random_from_array([
+        await random_from_array([
           async () => {
             await say(sadie, msg.channel, "You step on a poisoned lego and die before seeing what you summoned! :GMSadieTheSadist:");
             summoned_name = SUMMON_NAMES.LEGO;
@@ -199,17 +199,17 @@ export async function summon(msg: Message, options: string[]) {
           async () => {
             await say(sadie, msg.channel, "A wild Sadie appears!\n\nWait that's me");
             summoned_name = SUMMON_NAMES.SADIE;
-            summoned_name = "sadie";
+            // summoned_name = "sadie";
           },
           async () => {
             await say(sadie, msg.channel, "A wild Eli appears!");
             summoned_name = SUMMON_NAMES.ELI;
-            summoned_name = "eli";
+            // summoned_name = "eli";
           },
           async () => {
             await say(sadie, msg.channel, "You summoned " + userMention("297531251081084941") + "!");
             summoned_name = SUMMON_NAMES.DODO;
-            summoned_name = "DODO!!!";
+            // summoned_name = "DODO!!!";
           },
         ])();
         break;
