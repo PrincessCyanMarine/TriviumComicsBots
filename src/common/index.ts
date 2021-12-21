@@ -231,7 +231,7 @@ d20.on("messageCreate", async (msg) => {
           return;
         }
         target = msg.mentions.members?.first() || msg.member;
-        let birds = Object.entries((await database.child("birdpedia/" + target.id).once("value")).val() || {});
+        let birds = Object.entries((await database.child("birdpedia/" + msg.guildId + "/" + target.id).once("value")).val() || {});
         let percentage = Math.floor((birds.length / bird_list.length) * 100);
         say(krystal, msg.channel, {
           content: `${target.displayName} found ${birds.length} out of the birddex's ${bird_list.length} birds (${percentage})% full\n`,
