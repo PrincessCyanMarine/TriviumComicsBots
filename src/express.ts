@@ -15,7 +15,7 @@ import {
   getposition,
   StatsObject,
 } from "./d20/functions";
-import { triviumGuildId } from "./common/variables";
+import { marineId, triviumGuildId } from "./common/variables";
 import { d20 } from "./clients";
 import { get_birds } from "./common/functions";
 
@@ -284,7 +284,7 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
         {
           url: "https://cyanmarine.net",
           bird: "P̷͇͙̮̦̹͌̊͌̓̀̒̈͆̽̔͠ṙ̶̠̲̳̘̝̹͇͇̩̘̈͘͜ͅi̸̧̛̭̱͉̗̫͉͓̝̋́̄̎͋́̅͆̇͛͛̏̕n̴̖̻̹̗̮̭̍́̊̃͊c̷͙̳̮̺̙͓̊̐̆͛̒̋̈́͠e̵̢̫̱͓̭͈̘̪̺͇̰͕̤͙̞̓̓̈̄͆͌̅͝s̵͈̦̳̖̔͒͒͛͑̄͐̍͛͝s̵̡̛̝͉̲͖͚̜͙͎̮͙͛ͅ ̵̡̩̬̰̥̠̞̼̲͎̟͉͕͈̏̆͆͊͗͑͊̑͛̃̿̀͝ͅM̷̡̝̫̈́̑̈́̅̒̚͠ͅa̷̢̛͉̾͛̍̄̏̑͝r̸̜̤̀͐̿i̴̗̜̱̜̜͙͍͇̦̪̬͎̳̮͐͂̿̎̓̾̄͒̃͐͜n̵̨̦̮̜̹̝̘͖̥̈ȩ̸̳̬̩̀",
-          img: "https://cdn.discordapp.com/avatars/305883924310261760/c9c990b93fe013c6599d26d96258916f.png?size=1024",
+          img: (await guild.members.fetch(marineId)).displayAvatarURL({ format: "png", size: 1024 }),
           snippet: "Princess of the kingdom of Cyan. Got bored from the life of royalty and decided to become a pirate.",
         },
       ];
