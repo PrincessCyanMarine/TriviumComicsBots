@@ -199,17 +199,17 @@ export async function summon(msg: Message, options: string[]) {
           async () => {
             await say(sadie, msg.channel, "A wild Sadie appears!\n\nWait that's me");
             summoned_name = SUMMON_NAMES.SADIE;
-            summoned_name = "sadie";
+            // summoned_name = "sadie";
           },
           async () => {
             await say(sadie, msg.channel, "A wild Eli appears!");
             summoned_name = SUMMON_NAMES.ELI;
-            summoned_name = "eli";
+            // summoned_name = "eli";
           },
           async () => {
             await say(sadie, msg.channel, "You summoned " + userMention("297531251081084941") + "!");
             summoned_name = SUMMON_NAMES.DODO;
-            summoned_name = "DODO!!!";
+            // summoned_name = "DODO!!!";
           },
         ])();
         break;
