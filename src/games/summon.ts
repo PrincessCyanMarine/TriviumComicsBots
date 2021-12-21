@@ -182,7 +182,7 @@ export async function summon(msg: Message, options: string[]) {
         say(sadie, msg.channel, "You summoned a servant of Dodo!\nA wild " + mod + " appears!");
         break;
       case 20:
-        random_from_array([
+        await random_from_array([
           async () => {
             await say(sadie, msg.channel, "You step on a poisoned lego and die before seeing what you summoned! :GMSadieTheSadist:");
             summoned_name = SUMMON_NAMES.LEGO;
