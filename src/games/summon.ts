@@ -42,7 +42,8 @@ export enum SUMMON_NAMES {
 }
 
 export async function summon(msg: Message, options: string[]) {
-  let summoned_creature = Math.floor(Math.random() * 21);
+          console.log(SUMMON_NAMES);
+          let summoned_creature = Math.floor(Math.random() * 21);
   let summoned_name: number | string | undefined = undefined;
   if (options[1] && !isNaN(parseInt(options[1]))) summoned_creature = msg.author.id == marineId ? parseInt(options[1]) : 0;
   if (summoned_creature == 0) {
