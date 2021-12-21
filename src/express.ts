@@ -253,13 +253,14 @@ express_app.get("/profile/:tokentype/:token", async (req, res) => {
   res.send(profile);
 });
 
-express_app.get("/birddex/:id?", async (req, res) => {
+express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
   let id = req.params.id;
+  let guild_id = req.params.guild_id || "562429293364248587";
   let bird_list = get_birds();
   let user_birds;
   let user_nick;
   if (id) {
-    user_birds = Object.entries((await database.child("birdpedia/" + id).once("value")).val() || {});
+    user_birds = Object.entries((await database.child("birdpedia/" + guild_id + "/" + id).once("value")).val() || {});
     user_nick = (await (await d20.guilds.fetch(triviumGuildId)).members.fetch(id)).displayName;
   }
   res.send({ bird_list, user_birds, user_nick });
