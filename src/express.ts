@@ -277,15 +277,17 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
     try {
       user_nick = (await guild.members.fetch(id)).displayName;
     } catch (err) {
-      let c = {
-        url: "https://cyanmarine.net",
-        bird: "Princess CyanMarine",
-        img: "https://cdn.discordapp.com/avatars/305883924310261760/c9c990b93fe013c6599d26d96258916f.png?size=1024",
-        snippet: "Princess of the kingdom of Cyan. Got bored from the life of royalty and decided to become a pirate.",
-      };
       user_nick = "Ư̶̢̨̧͖̻͕̰̘̦̫̦͖̲̯̤̯̭͕̹̲̙͙͚̺͇̳̣͔̮̥͕̝̣̰̱͈̭̘̏̓̀̊̆͑̉̽͐̈̽̍͜͜͠͝ͅͅN̵̨̡̡͇̤͓̞̖̰̲̳̙͇̯͎̱̹̰̟̪̳̩̙̤̗͈̥̱̝͕̳̘̥̼͉̫͓̺͎̜̟͙̮̳̩̟̜̯̂̍̇͒̈́̽̓̈́͋̋̈͗͌̋̈́̄̓̿̇̒̑̉̈́̆͐͆̋̾̃͒̿͛̀͘͘͘͘̚̚̕͜͝D̸̢̨̨̨͖̣̘̳̙̭̹̤̹̜̼̖̹͍̩͈̹̠̫͙̫͐Ę̷̢̨͇͇͈͖̗̙͇̻̪̼̙̤͔̱͖̝̞̱̖̖̱̪̰͓̪̰̰̥̱̘͉̭̖̯͙͚̫̣̳̮̖̮͉̀̔̂̅̓͗̌̏̎̊̓̚͝ͅͅF̴̢̡̞̠̲̰̞͍͓̮͎̺̖̘͓̫͉̗̝̜̣̪͚̲̤͉̫̤̜̝̮̼̰̍̄̀̕͜͜͝Í̷̡̨̤̝̞͉̟̺̲͉̘̼̬̩͎̜̱̲̹̘̰̜͔̠͎̟̻̪̙̮̲̩̟̬̰̳̹̈́̂̈͗́̓͌̅̔̈̇̓͛̅̕̚͜͜͠N̵̡̢̢̢͓̬̳̟̰̭͈͉̯̩̮̹̣̪͎̭͖̥̫̠̜̲̯̹̹̟͔̦͈̪̼͓̼̱͓̹͙̩̗̖̱͓͂͂̓̓͑͊̃̀͜͝ͅȨ̶̛̯̼͙͓͉̟̦̮̺̤͕̪̤͚͕̩̗̻̥̞̺̱̙̫̮͉̘͕̦̎̅͑̃̃́̂̀͒͆͗̑͋̈́̈́͒͛̀̔̇̔͊̈́͘͜͝͝ͅͅḐ̴̡̨̢̧͔̣̱͕͓̙̠̻̱͎͍̦̭͔̞̲͓̩̭͍̘͎̩͖̳̜͚̖̥̞̖̰͚̬̫̜̦̙̩̟͖͕̃̓̄̔̾͑̑̇̈́̏̀͊̈́͐̉̒̆͊̆̈́̈́̎̓̌̒̽̈́͗̀̂́̔̎̓̉̄̊̎̓̚͘̕͘͜͝͠͠͠͝͝ͅͅ";
-      user_birds = [c];
-      bird_list = [c];
+
+      user_birds = [[0, -Infinity]];
+      bird_list = [
+        {
+          url: "https://cyanmarine.net",
+          bird: "Princess CyanMarine",
+          img: "https://cdn.discordapp.com/avatars/305883924310261760/c9c990b93fe013c6599d26d96258916f.png?size=1024",
+          snippet: "Princess of the kingdom of Cyan. Got bored from the life of royalty and decided to become a pirate.",
+        },
+      ];
     }
   }
   res.send({ bird_list, user_birds, user_nick, guild_name });
