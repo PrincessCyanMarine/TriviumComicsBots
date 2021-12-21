@@ -259,7 +259,18 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
   let bird_list = get_birds();
   let user_birds;
   let user_nick;
-  let guild = await d20.guilds.fetch(guild_id);
+  let guild;
+  try {
+    guild = await d20.guilds.fetch(guild_id);
+  } catch (err) {
+    guild_id = "562429293364248587";
+    try {
+      guild = await d20.guilds.fetch(guild_id);
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+  }
   let guild_name = guild.name;
   if (id) {
     user_birds = Object.entries((await database.child("birdpedia/" + guild_id + "/" + id).once("value")).val() || {});
