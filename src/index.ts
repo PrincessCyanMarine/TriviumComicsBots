@@ -29,17 +29,5 @@ import "./eli/index";
 import "./ray/index";
 import "./interactions/index";
 import "./games/index";
-import { writeFileSync } from "fs";
-import { random_from_array } from "./common/functions";
 export const testing = process.env.TESTING == "true";
 console.log("Testing: " + testing);
-
-let bird_powers = [];
-for (let i = 0; i < 10911; i++) {
-  let element = random_from_array(["fire", "water", "ice"]);
-  let power = Math.floor(Math.random() * 11) + 2;
-  let color = random_from_array(["red", "blue", "yellow", "green", "orange", "purple"]);
-  let info = { element, power, color };
-  bird_powers.push(JSON.stringify(info));
-}
-writeFileSync("bird_powers.txt", bird_powers.join("\n"));
