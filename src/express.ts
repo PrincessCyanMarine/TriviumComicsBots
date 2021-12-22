@@ -277,7 +277,7 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
   let guild_name = guild.name;
   if (id) {
     user_birds = Object.entries((await database.child("birdpedia/" + guild_id + "/" + id).once("value")).val() || {});
-    card_jitsu = (await database.child(`card_dojo/cards/${guild_id}/${id}`).once("value")).val().map((c: number) => [c.toString(), 0]);
+    card_jitsu = ((await database.child(`card_dojo/cards/${guild_id}/${id}`).once("value")).val() || []).map((c: number) => [c.toString(), 0]);
     try {
       user_nick = (await guild.members.fetch(id)).displayName;
     } catch (err) {
