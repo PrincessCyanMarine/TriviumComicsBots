@@ -249,10 +249,10 @@ d20.on("messageCreate", async (msg) => {
       case "summoned":
       case "summons":
         {
-          let target = msg.mentions.members?.first()?.id || msg.author.id;
+          let target = msg.mentions.members?.first() || msg.member;
           let text = "";
-          let summoned = (await database.child("summons/" + msg.guild?.id + "/" + target).once("value")).val() || {};
-          let summoned_birds: { bird_id: number } = (await database.child("birdpedia/" + msg.guild?.id + "/" + target).once("value")).val() || {};
+          let summoned = (await database.child("summons/" + msg.guild?.id + "/" + target.id).once("value")).val() || {};
+          let summoned_birds: { bird_id: number } = (await database.child("birdpedia/" + msg.guild?.id + "/" + target.id).once("value")).val() || {};
           let summoned_players: number[] = summoned && "player" in summoned ? Object.values(summoned["player"]) || [] : [];
           let summoned_mods: number[] = summoned && "mod" in summoned ? Object.values(summoned["mod"]) || [] : [];
           let birds = 0;
@@ -281,11 +281,32 @@ d20.on("messageCreate", async (msg) => {
           text += get_summon_message("Summoned Dodo", summoned[SUMMON_NAMES.DODO], "time");
           text += get_summon_message("Summoned", players, "player");
           text += get_summon_message("Summoned", mods, "moderator");
-          say(
-            ray,
-            msg.channel,
-            text == "" ? `${userMention(target)} hasn't summoned anything yet` : `${userMention(target)}\n\`\`\`\n` + text + "```"
+          say(ray, msg.channel, text == "" ? `${target.displayName} hasn't summoned anything yet` : `${target.displayName}\n\`\`\`\n` + text + "```");
+        }
+        break;
+      case "claim":
+        {
+          let level = (await database.child(`level/${msg.guildId}/${msg.author.id}`).once("value")).val();
+          let summoned_birds = Object.keys((await database.child(`birdpedia/${msg.guildId}/${msg.author.id}`).once("value")).val() || {}).map((a) =>
+            parseInt(a)
           );
+          let prestige = (await database.child(`prestige/${msg.guildId}/${msg.author.id}`).once("value")).val();
+          let supposed_to_have = 10 + 5 * prestige + prestige * level;
+          let card_db = database.child(`card_dojo/cards/${msg.guildId}/${msg.author.id}`);
+          let cards = (await card_db.once("value")).val() || [];
+          if (cards.length >= supposed_to_have) {
+            say(ray, msg.channel, "You have no birds to claim");
+            return;
+          }
+          let birds = get_birds().length;
+          let claimed = supposed_to_have - cards.length;
+          while (cards.length < supposed_to_have) {
+            let card = Math.floor(Math.random() * birds);
+            if (cards.includes(card) || summoned_birds.includes(card)) continue;
+            cards.push(card);
+          }
+          card_db.set(cards);
+          say(ray, msg.channel, `Claimed ${claimed} birds`);
         }
         break;
     }

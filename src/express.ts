@@ -18,6 +18,7 @@ import {
 import { marineId, triviumGuildId } from "./common/variables";
 import { d20 } from "./clients";
 import { get_birds } from "./common/functions";
+import { readFileSync } from "fs";
 
 const express_app = express();
 const server = createServer(express_app);
@@ -257,7 +258,9 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
   let id = req.params.id;
   let guild_id = req.params.guild_id || "562429293364248587";
   let bird_list = get_birds();
+  let power_list = readFileSync("./bird_powers.txt", "utf-8").split("\n");
   let user_birds;
+  let card_jitsu;
   let user_nick;
   let guild;
   try {
@@ -274,6 +277,7 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
   let guild_name = guild.name;
   if (id) {
     user_birds = Object.entries((await database.child("birdpedia/" + guild_id + "/" + id).once("value")).val() || {});
+    card_jitsu = (await database.child(`card_dojo/cards/${guild_id}/${id}`).once("value")).val().map((c: number) => [c.toString(), 0]);
     try {
       user_nick = (await guild.members.fetch(id)).displayName;
     } catch (err) {
@@ -290,7 +294,7 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
       ];
     }
   }
-  res.send({ bird_list, user_birds, user_nick, guild_name });
+  res.send({ bird_list, user_birds, user_nick, guild_name, power_list, card_jitsu });
 });
 
 server.listen(port);
