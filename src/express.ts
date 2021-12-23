@@ -55,8 +55,33 @@ type getUserStuff = {
   user: User;
 };
 
-function getUser(tokenType: string, accessToken: string): Promise<getUserStuff> {
+function getGuilds(tokenType: string, accessToken: string): Promise<{ id: string }[]> {
   return new Promise((resolve, reject) => {
+    get(
+      "https://discord.com/api/users/@me/guilds",
+      {
+        headers: {
+          authorization: `${tokenType} ${accessToken}`,
+        },
+      },
+      (response) => {
+        response.setEncoding("utf8");
+        let rawData = "";
+        response.on("data", (chunk) => {
+          rawData += chunk;
+        });
+        response.on("end", () => {
+          let guilds: { id: string }[] = JSON.parse(rawData);
+          resolve(guilds);
+        });
+      }
+    );
+  });
+}
+
+function getUser(tokenType: string, accessToken: string): Promise<getUserStuff> {
+  return new Promise(async (resolve, reject) => {
+    let guilds: { id: string }[] = await getGuilds(tokenType, accessToken);
     get(
       "https://discord.com/api/users/@me",
       {
@@ -72,6 +97,7 @@ function getUser(tokenType: string, accessToken: string): Promise<getUserStuff> 
         });
         response.on("end", () => {
           let user = JSON.parse(rawData);
+          user["guilds"] = guilds;
           resolve({
             user: user,
             statusCode: response.statusCode,
@@ -259,42 +285,84 @@ express_app.get("/birddex/:id?/:guild_id?", async (req, res) => {
   let guild_id = req.params.guild_id || "562429293364248587";
   let bird_list = get_birds();
   let power_list = readFileSync("./bird_powers.txt", "utf-8").split("\n");
+  let undef = "Ư̶̢̨̧͖̻͕̰̘̦̫̦͖̲̯̤̯̭͕̹̲̙͙͚̺͇̳̣͔̮̥͕̝̣̰̱͈̭̘̏̓̀̊̆͑̉̽͐̈̽̍͜͜͠͝ͅͅN̵̨̡̡͇̤͓̞̖̰̲̳̙͇̯͎̱̹̰̟̪̳̩̙̤̗͈̥̱̝͕̳̘̥̼͉̫͓̺͎̜̟͙̮̳̩̟̜̯̂̍̇͒̈́̽̓̈́͋̋̈͗͌̋̈́̄̓̿̇̒̑̉̈́̆͐͆̋̾̃͒̿͛̀͘͘͘͘̚̚̕͜͝D̸̢̨̨̨͖̣̘̳̙̭̹̤̹̜̼̖̹͍̩͈̹̠̫͙̫͐Ę̷̢̨͇͇͈͖̗̙͇̻̪̼̙̤͔̱͖̝̞̱̖̖̱̪̰͓̪̰̰̥̱̘͉̭̖̯͙͚̫̣̳̮̖̮͉̀̔̂̅̓͗̌̏̎̊̓̚͝ͅͅF̴̢̡̞̠̲̰̞͍͓̮͎̺̖̘͓̫͉̗̝̜̣̪͚̲̤͉̫̤̜̝̮̼̰̍̄̀̕͜͜͝Í̷̡̨̤̝̞͉̟̺̲͉̘̼̬̩͎̜̱̲̹̘̰̜͔̠͎̟̻̪̙̮̲̩̟̬̰̳̹̈́̂̈͗́̓͌̅̔̈̇̓͛̅̕̚͜͜͠N̵̡̢̢̢͓̬̳̟̰̭͈͉̯̩̮̹̣̪͎̭͖̥̫̠̜̲̯̹̹̟͔̦͈̪̼͓̼̱͓̹͙̩̗̖̱͓͂͂̓̓͑͊̃̀͜͝ͅȨ̶̛̯̼͙͓͉̟̦̮̺̤͕̪̤͚͕̩̗̻̥̞̺̱̙̫̮͉̘͕̦̎̅͑̃̃́̂̀͒͆͗̑͋̈́̈́͒͛̀̔̇̔͊̈́͘͜͝͝ͅͅḐ̴̡̨̢̧͔̣̱͕͓̙̠̻̱͎͍̦̭͔̞̲͓̩̭͍̘͎̩͖̳̜͚̖̥̞̖̰͚̬̫̜̦̙̩̟͖͕̃̓̄̔̾͑̑̇̈́̏̀͊̈́͐̉̒̆͊̆̈́̈́̎̓̌̒̽̈́͗̀̂́̔̎̓̉̄̊̎̓̚͘̕͘͜͝͠͠͠͝͝ͅͅ";
   let user_birds;
   let card_jitsu;
-  let user_nick;
   let guild;
+  let deck;
+  let user_nick = undef;
+  let guild_name = undef;
+
   try {
     guild = await d20.guilds.fetch(guild_id);
-  } catch (err) {
-    guild_id = "562429293364248587";
-    try {
-      guild = await d20.guilds.fetch(guild_id);
-    } catch (err) {
-      console.error(err);
-      return;
-    }
-  }
-  let guild_name = guild.name;
-  if (id) {
+  } catch (err) {}
+  if (id && guild) {
+    guild_name = guild.name;
     user_birds = Object.entries((await database.child("birdpedia/" + guild_id + "/" + id).once("value")).val() || {});
     card_jitsu = ((await database.child(`card_dojo/cards/${guild_id}/${id}`).once("value")).val() || []).map((c: number) => [c.toString(), 0]);
+    deck = ((await database.child(`card_dojo/decks/${guild_id}/${id}`).once("value")).val() || []).map((c: number) => c.toString());
     try {
       user_nick = (await guild.members.fetch(id)).displayName;
     } catch (err) {
-      user_nick = "Ư̶̢̨̧͖̻͕̰̘̦̫̦͖̲̯̤̯̭͕̹̲̙͙͚̺͇̳̣͔̮̥͕̝̣̰̱͈̭̘̏̓̀̊̆͑̉̽͐̈̽̍͜͜͠͝ͅͅN̵̨̡̡͇̤͓̞̖̰̲̳̙͇̯͎̱̹̰̟̪̳̩̙̤̗͈̥̱̝͕̳̘̥̼͉̫͓̺͎̜̟͙̮̳̩̟̜̯̂̍̇͒̈́̽̓̈́͋̋̈͗͌̋̈́̄̓̿̇̒̑̉̈́̆͐͆̋̾̃͒̿͛̀͘͘͘͘̚̚̕͜͝D̸̢̨̨̨͖̣̘̳̙̭̹̤̹̜̼̖̹͍̩͈̹̠̫͙̫͐Ę̷̢̨͇͇͈͖̗̙͇̻̪̼̙̤͔̱͖̝̞̱̖̖̱̪̰͓̪̰̰̥̱̘͉̭̖̯͙͚̫̣̳̮̖̮͉̀̔̂̅̓͗̌̏̎̊̓̚͝ͅͅF̴̢̡̞̠̲̰̞͍͓̮͎̺̖̘͓̫͉̗̝̜̣̪͚̲̤͉̫̤̜̝̮̼̰̍̄̀̕͜͜͝Í̷̡̨̤̝̞͉̟̺̲͉̘̼̬̩͎̜̱̲̹̘̰̜͔̠͎̟̻̪̙̮̲̩̟̬̰̳̹̈́̂̈͗́̓͌̅̔̈̇̓͛̅̕̚͜͜͠N̵̡̢̢̢͓̬̳̟̰̭͈͉̯̩̮̹̣̪͎̭͖̥̫̠̜̲̯̹̹̟͔̦͈̪̼͓̼̱͓̹͙̩̗̖̱͓͂͂̓̓͑͊̃̀͜͝ͅȨ̶̛̯̼͙͓͉̟̦̮̺̤͕̪̤͚͕̩̗̻̥̞̺̱̙̫̮͉̘͕̦̎̅͑̃̃́̂̀͒͆͗̑͋̈́̈́͒͛̀̔̇̔͊̈́͘͜͝͝ͅͅḐ̴̡̨̢̧͔̣̱͕͓̙̠̻̱͎͍̦̭͔̞̲͓̩̭͍̘͎̩͖̳̜͚̖̥̞̖̰͚̬̫̜̦̙̩̟͖͕̃̓̄̔̾͑̑̇̈́̏̀͊̈́͐̉̒̆͊̆̈́̈́̎̓̌̒̽̈́͗̀̂́̔̎̓̉̄̊̎̓̚͘̕͘͜͝͠͠͠͝͝ͅͅ";
-
       user_birds = [[0, -Infinity]];
-      bird_list = [
-        {
-          url: "https://cyanmarine.net",
-          bird: "P̷͇͙̮̦̹͌̊͌̓̀̒̈͆̽̔͠ṙ̶̠̲̳̘̝̹͇͇̩̘̈͘͜ͅi̸̧̛̭̱͉̗̫͉͓̝̋́̄̎͋́̅͆̇͛͛̏̕n̴̖̻̹̗̮̭̍́̊̃͊c̷͙̳̮̺̙͓̊̐̆͛̒̋̈́͠e̵̢̫̱͓̭͈̘̪̺͇̰͕̤͙̞̓̓̈̄͆͌̅͝s̵͈̦̳̖̔͒͒͛͑̄͐̍͛͝s̵̡̛̝͉̲͖͚̜͙͎̮͙͛ͅ ̵̡̩̬̰̥̠̞̼̲͎̟͉͕͈̏̆͆͊͗͑͊̑͛̃̿̀͝ͅM̷̡̝̫̈́̑̈́̅̒̚͠ͅa̷̢̛͉̾͛̍̄̏̑͝r̸̜̤̀͐̿i̴̗̜̱̜̜͙͍͇̦̪̬͎̳̮͐͂̿̎̓̾̄͒̃͐͜n̵̨̦̮̜̹̝̘͖̥̈ȩ̸̳̬̩̀",
-          img: (await guild.members.fetch(marineId)).displayAvatarURL({ format: "png", size: 1024 }),
-          snippet: "Princess of the kingdom of Cyan. Got bored from the life of royalty and decided to become a pirate.",
-        },
-      ];
+      bird_list = [];
     }
   }
-  res.send({ bird_list, user_birds, user_nick, guild_name, power_list, card_jitsu });
+  res.send({ bird_list, user_birds, user_nick, guild_name, power_list, card_jitsu, deck });
 });
 
-server.listen(port);
+express_app.post("/deck/:guild_id/:tokentype/:token", async (req, res) => {
+  try {
+    let { user } = await getUser(req.params.tokentype, req.params.token);
+    let guild_id = req.params.guild_id;
+    let deck: string[] | string = req.body["deck[]"];
+    let owned_cards = Object.keys((await database.child("birdpedia/" + guild_id + "/" + user.id).once("value")).val() || {}).concat(
+      ((await database.child(`card_dojo/cards/${guild_id}/${user.id}`).once("value")).val() || []).map((c: number) => c.toString())
+    );
+
+    console.log(owned_cards);
+
+    if (typeof deck == "string") deck = [deck];
+    if (
+      !deck ||
+      !Array.isArray(deck) ||
+      deck.length == 0 ||
+      deck.length > 20 ||
+      (await has_repeated(deck)) ||
+      (await player_doesnt_own_card(deck, owned_cards))
+    )
+      return res.sendStatus(400);
+
+    await database.child("card_dojo/decks/" + guild_id + "/" + user.id).set(deck);
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+function player_doesnt_own_card(deck: string[], owned: string[]): Promise<boolean> {
+  return new Promise((resolve) => {
+    deck.forEach((card) => {
+      if (!owned.includes(card)) return resolve(true);
+    });
+    resolve(false);
+  });
+}
+
+function has_repeated(deck: string[]): Promise<boolean> {
+  return new Promise((resolve) => {
+    let power_list = readFileSync("./bird_powers.txt", "utf-8").split("\n");
+    let a: number[] = [];
+    for (let i = 0; i <= 12; i++) a[i] = 0;
+    deck.forEach((c) => a[JSON.parse(power_list[parseInt(c)]).power]++);
+    a.forEach((n) => {
+      if (n > 2) return resolve(true);
+    });
+    resolve(false);
+  });
+}
+
+server.listen(port, () => {
+  console.log("Server is listening on http://localhost:" + port);
+});
