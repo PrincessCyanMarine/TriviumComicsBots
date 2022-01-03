@@ -227,6 +227,14 @@ class BirdJitsu {
     let i;
     for (i = 0; i <= this._players.length; i++) {
       if (i == this._players.length) return -1;
+      let elements: { [element: string]: { [color: string]: number } } = {};
+      this.points[i].forEach((point) => {
+        if (!(point.element in elements)) elements[point.element] = {};
+        if (!(point.color in elements[point.element])) elements[point.element][point.color] = 0;
+        elements[point.element][point.color]++;
+      });
+
+      console.log(elements);
     }
   }
 
@@ -237,8 +245,8 @@ class BirdJitsu {
 
 ray.on("interactionCreate", async (interaction) => {
   if (!(interaction.isButton() || interaction.isSelectMenu())) return;
-  // if (testing && interaction.channelId != testChannelId) return;
-  // else if (!testing && interaction.channelId == testChannelId) return;
+  if (testing && interaction.channelId != testChannelId) return;
+  else if (!testing && interaction.channelId == testChannelId) return;
 
   if (!interaction.customId.startsWith("bj-")) return;
   interaction.customId = interaction.customId.slice(3);
