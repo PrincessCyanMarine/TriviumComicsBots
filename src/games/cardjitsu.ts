@@ -245,8 +245,8 @@ class BirdJitsu {
 
 ray.on("interactionCreate", async (interaction) => {
   if (!(interaction.isButton() || interaction.isSelectMenu())) return;
-  if (testing && interaction.channelId != testChannelId) return;
-  else if (!testing && interaction.channelId == testChannelId) return;
+  // if (testing && interaction.channelId != testChannelId) return;
+  /* else  */ if (!testing /* && interaction.channelId == testChannelId */) return;
 
   if (!interaction.customId.startsWith("bj-")) return;
   interaction.customId = interaction.customId.slice(3);
@@ -262,6 +262,7 @@ ray.on("interactionCreate", async (interaction) => {
 
   // console.log(command, params);
 
+  console.log(BirdJitsu.games);
   switch (command) {
     case "start":
       if (!(interaction.message instanceof Message) || !interaction.guild || !interaction.message.member || !interaction.member) return;
