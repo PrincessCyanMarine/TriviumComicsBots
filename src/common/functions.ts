@@ -11,7 +11,7 @@ import {
   MessageEmbed,
   MessageOptions,
   PresenceStatusData,
-  TextBasedChannels,
+  TextBasedChannel,
   TextChannel,
   User,
 } from "discord.js";
@@ -41,7 +41,7 @@ export function testAllWords(args: string, ...test: string[]): boolean {
   return !!res && res.length == test.length;
 }
 
-export const say = (bot: Client, channel: TextBasedChannels | string, content: string | MessageOptions, delay = 1000): Promise<Message> =>
+export const say = (bot: Client, channel: TextBasedChannel | string, content: string | MessageOptions, delay = 1000): Promise<Message> =>
   new Promise((resolve, reject) => {
     delay = Math.max(1, delay);
     if (typeof content == "string") content = detectEmoji(content);
@@ -345,3 +345,8 @@ export const get_birds = () =>
   readFileSync("./birdlist.txt", "utf-8")
     .split("\n")
     .map((b) => b.match(/(?<bird>.+?) \(url: (?<url>https:\/\/en.wikipedia.org\/wiki\/.+?)\)/)!.groups!);
+
+export const get_powers = () =>
+  readFileSync("./bird_powers.txt", "utf-8")
+    .split("\n")
+    .map((a) => JSON.parse(a));

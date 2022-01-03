@@ -1,1 +1,2 @@
-require('./rockpaperscissors');
+require("./rockpaperscissors");
+require("./cardjitsu");

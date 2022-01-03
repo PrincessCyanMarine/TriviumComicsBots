@@ -309,6 +309,19 @@ d20.on("messageCreate", async (msg) => {
           say(ray, msg.channel, `Claimed ${claimed} birds`);
         }
         break;
+      case "ninja":
+        say(ray, msg.channel, {
+          content: `${msg.member.displayName} wants to play bird-jitsu`,
+          components: [
+            new MessageActionRow().addComponents(
+              new MessageButton()
+                .setLabel("Accept")
+                .setStyle("SUCCESS")
+                .setCustomId("bj-start?id=" + msg.author.id)
+            ),
+          ],
+        });
+        break;
     }
   }
 });
