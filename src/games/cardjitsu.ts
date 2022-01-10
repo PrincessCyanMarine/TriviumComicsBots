@@ -221,6 +221,8 @@ class BirdJitsu {
     this._played.forEach((p, i) => {
       if (p) this.hands[i].splice(p, 1);
     });
+
+    this.win();
   }
 
   private win() {
@@ -234,6 +236,8 @@ class BirdJitsu {
         elements[point.element][point.color]++;
       });
 
+      // if (Object.keys(elements["fire"]).length == 3)
+
       console.log(elements);
     }
   }
@@ -246,7 +250,8 @@ class BirdJitsu {
 ray.on("interactionCreate", async (interaction) => {
   if (!(interaction.isButton() || interaction.isSelectMenu())) return;
   // if (testing && interaction.channelId != testChannelId) return;
-  /* else  */ if (!testing /* && interaction.channelId == testChannelId */) return;
+  /* else  */
+  if (!testing /* && interaction.channelId == testChannelId */) return;
 
   if (!interaction.customId.startsWith("bj-")) return;
   interaction.customId = interaction.customId.slice(3);
@@ -262,7 +267,6 @@ ray.on("interactionCreate", async (interaction) => {
 
   // console.log(command, params);
 
-  console.log(BirdJitsu.games);
   switch (command) {
     case "start":
       if (!(interaction.message instanceof Message) || !interaction.guild || !interaction.message.member || !interaction.member) return;

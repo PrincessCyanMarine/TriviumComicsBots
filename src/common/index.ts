@@ -223,28 +223,30 @@ d20.on("messageCreate", async (msg) => {
       case "birdex":
       case "bp":
       case "birdwiki":
-        let selected_bird = parseInt(options[1]) || -1;
-        let bird_list = get_birds();
-        if (selected_bird > -1 && selected_bird < bird_list.length) {
-          let bird = bird_list[selected_bird];
-          say(krystal, msg.channel, bird.bird + "\n" + bird.url);
-          return;
+        {
+          let selected_bird = parseInt(options[1]) || -1;
+          let bird_list = get_birds();
+          if (selected_bird > -1 && selected_bird < bird_list.length) {
+            let bird = bird_list[selected_bird];
+            say(krystal, msg.channel, bird.bird + "\n" + bird.url);
+            return;
+          }
+          let target = msg.mentions.members?.first() || msg.member;
+          let birds = Object.entries((await database.child("birdpedia/" + msg.guild!.id + "/" + target.id).once("value")).val() || {});
+          let percentage = Math.floor((birds.length / bird_list.length) * 100);
+          say(krystal, msg.channel, {
+            content: `${target.displayName} found ${birds.length} out of the birddex's ${bird_list.length} birds (${percentage})% full\n`,
+            components: [
+              new MessageActionRow().addComponents(
+                new MessageButton()
+                  .setStyle("LINK")
+                  .setLabel(`See ${target.displayName}'s birddex`)
+                  .setURL(`https://cyanmarine.net/tc/birddex?id=${target.id}&guild_id=${msg.guildId}`)
+                  .setEmoji("🐦")
+              ),
+            ],
+          });
         }
-        target = msg.mentions.members?.first() || msg.member;
-        let birds = Object.entries((await database.child("birdpedia/" + msg.guild!.id + "/" + target.id).once("value")).val() || {});
-        let percentage = Math.floor((birds.length / bird_list.length) * 100);
-        say(krystal, msg.channel, {
-          content: `${target.displayName} found ${birds.length} out of the birddex's ${bird_list.length} birds (${percentage})% full\n`,
-          components: [
-            new MessageActionRow().addComponents(
-              new MessageButton()
-                .setStyle("LINK")
-                .setLabel(`See ${target.displayName}'s birddex`)
-                .setURL(`https://cyanmarine.net/tc/birddex?id=${target.id}&guild_id=${msg.guildId}`)
-                .setEmoji("🐦")
-            ),
-          ],
-        });
         break;
       case "summoned":
       case "summons":

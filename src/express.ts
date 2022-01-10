@@ -81,7 +81,7 @@ function getGuilds(tokenType: string, accessToken: string): Promise<{ id: string
 
 function getUser(tokenType: string, accessToken: string): Promise<getUserStuff> {
   return new Promise(async (resolve, reject) => {
-    let guilds: { id: string }[] = await getGuilds(tokenType, accessToken);
+    // let guilds: { id: string }[] = await getGuilds(tokenType, accessToken);
     get(
       "https://discord.com/api/users/@me",
       {
@@ -97,7 +97,7 @@ function getUser(tokenType: string, accessToken: string): Promise<getUserStuff> 
         });
         response.on("end", () => {
           let user = JSON.parse(rawData);
-          user["guilds"] = guilds;
+          // user["guilds"] = guilds;
           resolve({
             user: user,
             statusCode: response.statusCode,
