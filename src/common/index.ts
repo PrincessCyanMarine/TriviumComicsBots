@@ -33,8 +33,8 @@ d20.on("messageCreate", async (msg) => {
         prestige(msg);
         break;
       case "c":
-        say(d20, msg.channel, "Currently unavailable");
-        return;
+        // say(d20, msg.channel, "Currently unavailable");
+        // return;
         say(d20, msg.channel, {
           content: "You can customize your card here",
           components: [
@@ -226,8 +226,8 @@ d20.on("messageCreate", async (msg) => {
       case "bp":
       case "birdwiki":
         {
-          say(d20, msg.channel, "Currently unavailable");
-          return;
+          // say(d20, msg.channel, "Currently unavailable");
+          // return;
           let selected_bird = parseInt(options[1]) || -1;
           let bird_list = get_birds();
           if (selected_bird > -1 && selected_bird < bird_list.length) {
