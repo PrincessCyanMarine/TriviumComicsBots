@@ -1,7 +1,9 @@
 import { userMention } from "@discordjs/builders";
-import { createCanvas, loadImage } from "canvas";
-import { GuildMember, Message, MessageAttachment, User } from "discord.js";
+import { createCanvas, Image, loadImage } from "canvas";
+import { GuildMember, Message, MessageAttachment, User, Widget } from "discord.js";
+import { readdirSync } from "fs";
 import got from "got/dist/source";
+
 import { database } from "..";
 import assets from "../assetsIndexes";
 import {
@@ -32,22 +34,34 @@ import {
 import { krystal, sadie } from "../clients";
 import {
   argClean,
-  capitalize,
-  edit,
   getMember,
   getTarget,
   imageCommand,
-  imageComponent,
-  makeimage,
   notificationCult,
-  randomchance,
   random_from_array,
+  randomchance,
   say,
   testWord,
   wait,
+  createEncoder,
+  getTargetMember,
 } from "../common/functions";
 import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
+
+const yeetFrames: Image[] = [];
+const yeetOverlays: { [overlay: string]: Image } = {};
+(async () => {
+  ["1", "6", "7"].forEach(async (i) => {
+    yeetOverlays[i] = await loadImage(assets.krystal.yeet.overlay + i + ".png");
+  });
+  for (let i = 0; i <= 7; i++) {
+    let path = assets.krystal.yeet.frames + i + ".png";
+    loadImage(path).then((frame) => {
+      yeetFrames[i] = frame;
+    });
+  }
+})();
 
 export var spared_player_id: string;
 (async () => {
@@ -60,8 +74,56 @@ database.child("dontattack").on("value", (s) => {
 export function greet(msg: Message, greeting = Math.floor(Math.random() * greetings.length)) {
   greetings[greeting](msg);
 }
-export function yeeting(msg: Message, target?: User) {
-  if (!target) say(krystal, msg.channel, { files: [yeet] });
+export async function yeeting(msg: Message, target: GuildMember | undefined = getTargetMember(msg)) {
+  let startTime = Date.now().valueOf();
+  msg.channel.sendTyping();
+  let [width, height] = [1000, 676];
+  let { ctx, canvas, encoder } = createEncoder(
+    width,
+    height,
+    (buffer) => say(krystal, msg.channel, { files: [new MessageAttachment(buffer, "yeet.gif")] }, startTime - Date.now().valueOf()),
+    { delay: 1000 }
+  );
+
+  let avatar = await loadImage(
+    msg.member ? msg.member.displayAvatarURL({ format: "png", size: 1024 }) : msg.author.displayAvatarURL({ format: "png", size: 1024 })
+  );
+
+  let target_avatar: Image;
+  if (target) target_avatar = await loadImage(target.displayAvatarURL({ format: "png", size: 1024 }));
+
+  const drawYeetFrame = async (i: number) => {
+    let frame = yeetFrames[i];
+    // console.time(i.toString());
+    ctx.drawImage(frame, 0, 0, width, height);
+    if (target && i == 1) {
+      ctx.drawImage(target_avatar, 147, 13, 159, 159);
+      ctx.drawImage(yeetOverlays["1"], 0, 0, width, height);
+    }
+    if (i >= 6) {
+      ctx.drawImage(avatar, 13, 17, 584, 584);
+      if (i == 7) {
+        // https://stackoverflow.com/a/53365073
+        let imgData = ctx.getImageData(13, 17, 584, 584);
+        let pixels = imgData.data;
+        for (let i = 0; i < pixels.length; i += 4) {
+          let lightness = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+
+          pixels[i] = lightness;
+          pixels[i + 1] = lightness;
+          pixels[i + 2] = lightness;
+        }
+        ctx.putImageData(imgData, 13, 17);
+      }
+      ctx.drawImage(yeetOverlays[i.toString()], 0, 0, width, height);
+    }
+    encoder.addFrame(ctx);
+    // console.timeEnd(i.toString());
+    if (i < 7) drawYeetFrame(i + 1);
+    else encoder.finish();
+  };
+
+  drawYeetFrame(0);
 }
 export function willRebel(): boolean {
   return Math.floor(Math.random() * 20) == 0;
@@ -107,8 +169,8 @@ export function killing(
           type == "revenge"
             ? `Sorry, <@${msg.author.id}>, Sadie asked me to spare that player`
             : target
-              ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***`
-              : `***I will unalive now :GMKrystalDevious:***`;
+            ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***`
+            : `***I will unalive now :GMKrystalDevious:***`;
 
       if (!target) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
       if (type != "revenge" && msg.author.id == target.id && Math.floor(Math.random() * 10) == 0)
@@ -402,7 +464,8 @@ export async function testWebtoonEpisode() {
     say(
       krystal,
       announcementChannelId,
-      `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]
+      `<@&774127564675481600>, ${
+        announcers[Math.floor(Math.random() * announcers.length)]
       } asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`,
       1
     ).catch(console.error);
