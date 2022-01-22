@@ -51,7 +51,9 @@ import { greetings } from "./greetings";
 
 const yeetFrames: Image[] = [];
 const yeetOverlays: { [overlay: string]: Image } = {};
+var altYeetFrame1: Image;
 (async () => {
+  altYeetFrame1 = await loadImage(assets.krystal.yeet.frames + "_1.png");
   ["1", "6", "7"].forEach(async (i) => {
     yeetOverlays[i] = await loadImage(assets.krystal.yeet.overlay + i + ".png");
   });
@@ -95,11 +97,12 @@ export async function yeeting(msg: Message, target: GuildMember | undefined = ge
   const drawYeetFrame = async (i: number) => {
     let frame = yeetFrames[i];
     // console.time(i.toString());
-    ctx.drawImage(frame, 0, 0, width, height);
     if (target && i == 1) {
-      ctx.drawImage(target_avatar, 147, 13, 159, 159);
+      ctx.drawImage(altYeetFrame1, 0, 0, width, height);
+      ctx.drawImage(target_avatar, 106, 17, 159, 159);
       ctx.drawImage(yeetOverlays["1"], 0, 0, width, height);
-    }
+    } else ctx.drawImage(frame, 0, 0, width, height);
+
     if (i >= 6) {
       ctx.drawImage(avatar, 13, 17, 584, 584);
       if (i == 7) {
