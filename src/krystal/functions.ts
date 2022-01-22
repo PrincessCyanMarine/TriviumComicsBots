@@ -99,7 +99,7 @@ export async function yeeting(msg: Message, target: GuildMember | undefined = ge
     // console.time(i.toString());
     if (target && i == 1) {
       ctx.drawImage(altYeetFrame1, 0, 0, width, height);
-      ctx.drawImage(target_avatar, 106, 17, 159, 159);
+      ctx.drawImage(target_avatar, 110, 18, 159, 159);
       ctx.drawImage(yeetOverlays["1"], 0, 0, width, height);
     } else ctx.drawImage(frame, 0, 0, width, height);
 
