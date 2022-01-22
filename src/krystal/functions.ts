@@ -105,10 +105,10 @@ export function killing(
       if (!text)
         text =
           type == "revenge"
-            ? `Sorry, <@${msg.author}>, Sadie asked me to spare that player`
+            ? `Sorry, <@${msg.author.id}>, Sadie asked me to spare that player`
             : target
-            ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***`
-            : `***I will unalive now :GMKrystalDevious:***`;
+              ? `***I will unalive <@${target.id}> now :GMKrystalDevious:!!!***`
+              : `***I will unalive now :GMKrystalDevious:***`;
 
       if (!target) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
       if (type != "revenge" && msg.author.id == target.id && Math.floor(Math.random() * 10) == 0)
@@ -402,8 +402,7 @@ export async function testWebtoonEpisode() {
     say(
       krystal,
       announcementChannelId,
-      `<@&774127564675481600>, ${
-        announcers[Math.floor(Math.random() * announcers.length)]
+      `<@&774127564675481600>, ${announcers[Math.floor(Math.random() * announcers.length)]
       } asked me to tell you that a new Game Masters episode called *${episode_title}* is now up \n\n You can read it at \n${episode_url} \n\n Feel free to discuss the episode here or on reddit \n https://www.reddit.com/r/TriviumComics/`,
       1
     ).catch(console.error);
