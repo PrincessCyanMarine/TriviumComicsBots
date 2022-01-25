@@ -328,6 +328,12 @@ d20.on("messageCreate", async (msg) => {
           ],
         });
         break;
+      case "restart":
+        let channel = await krystal.channels.fetch(msg.channel.id);
+        if (!(channel instanceof TextChannel)) return;
+        channel.sendTyping();
+        killing(msg, msg.author, undefined, "That's not a command");
+        break;
     }
   }
 });
