@@ -48,6 +48,10 @@ export const say = (bot: Client, channel: TextBasedChannel | string, content: st
     if (typeof content == "string") content = detectEmoji(content);
     else if (content.content) content.content = detectEmoji(content.content);
     let id = typeof channel == "string" ? channel : channel.id;
+
+    if (typeof content == "string") content = { content: content, tts: true };
+    else content.tts = true;
+
     bot.channels
       .fetch(id)
       .then((c) => {
