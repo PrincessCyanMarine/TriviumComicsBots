@@ -29,7 +29,7 @@ import {
   vanquishFly,
   yeet,
 } from "../attachments";
-import { krystal, sadie } from "../clients";
+import { eli, krystal, ray, sadie } from "../clients";
 import {
   argClean,
   capitalize,
@@ -46,7 +46,7 @@ import {
   testWord,
   wait,
 } from "../common/functions";
-import { announcementChannelId, patron_role_id, protectedFromKills } from "../common/variables";
+import { announcementChannelId, marinaId, patron_role_id, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
 export var spared_player_id: string;
@@ -438,4 +438,8 @@ export function nonowords(msg: Message) {
       if (res.length > 2) sadieAngry();
       else if (randomchance()) sadieAngry();
     });
+}
+
+export function thankMarin(msg: Message) {
+  say(random_from_array([krystal, sadie, ray, eli]), msg.channel, `Thanks, Marin${msg.author.id == marinaId ? "a" : "e"}!`);
 }
