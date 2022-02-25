@@ -36,5 +36,5 @@ export const greetings = [
                     .catch(console.error);
             })
             .catch(console.error);
-    },
+    }
 ]

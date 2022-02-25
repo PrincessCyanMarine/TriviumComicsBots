@@ -43,10 +43,15 @@ export function testAllWords(args: string, ...test: string[]): boolean {
 
 export const say = (bot: Client, channel: TextBasedChannel | string, content: string | MessageOptions, delay = 1000): Promise<Message> =>
   new Promise((resolve, reject) => {
+    // console.log(delay);
     delay = Math.max(1, delay);
     if (typeof content == "string") content = detectEmoji(content);
     else if (content.content) content.content = detectEmoji(content.content);
     let id = typeof channel == "string" ? channel : channel.id;
+
+    // if (typeof content == "string") content = { content: content, tts: true };
+    // else content.tts = true;
+
     bot.channels
       .fetch(id)
       .then((c) => {
@@ -132,6 +137,12 @@ export function detectEmoji(content: string): string {
 export function getTarget(msg: Message): User | undefined {
   if (msg.mentions.users.first()) return msg.mentions.users.first();
   if (testWord(msg.content, "me", "I", "Im", "my")) return msg.author;
+  return undefined;
+}
+
+export function getTargetMember(msg: Message): GuildMember | undefined {
+  if (msg.mentions.users.first()) return msg.mentions.members?.first();
+  if (testWord(msg.content, "me", "I", "Im", "my")) return msg.member || undefined;
   return undefined;
 }
 
