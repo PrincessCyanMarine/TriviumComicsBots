@@ -2,7 +2,7 @@ import { userMention } from "@discordjs/builders";
 import { Message } from "discord.js";
 import { testing } from "..";
 import { krystal } from "../clients";
-import { getTarget, randomchance, say, testAllWords, testWord } from "../common/functions";
+import { argClean, getTarget, randomchance, say, testAllWords, testWord } from "../common/functions";
 import { killWords, marinaId, marineId } from "../common/variables";
 import {
   absorbing,
@@ -41,7 +41,9 @@ import {
 export function testCommands(msg: Message) {
   let args = msg.content;
 
-  if (testAllWords(args, "tip", "day") && [marineId, marinaId].includes(msg.author.id)) thankMarin(msg);
+  let tip = argClean(args).match(/(.+)s tip of the day/);
+
+  if (tip) thankMarin(msg, tip);
   else if (testWord(args, "dumbass") && randomchance(5)) say(krystal, msg.channel, userMention("601943025253482496"));
   else if (testWord(args, "ye{2,}t")) yeeting(msg);
   else if (testWord(args, "pf{2,}t")) rebel(msg, true);

@@ -505,6 +505,6 @@ export function nonowords(msg: Message) {
     });
 }
 
-export function thankMarin(msg: Message) {
-  say(random_from_array([krystal, sadie, ray, eli]), msg.channel, `Thanks, Marin${msg.author.id == marinaId ? "a" : "e"}!`);
+export function thankMarin(msg: Message, reg: RegExpMatchArray) {
+  say(random_from_array([krystal, sadie, ray, eli]), msg.channel, `Thanks, ${reg[1]}!`);
 }
