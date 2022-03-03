@@ -1,0 +1,89 @@
+Krystal
+    Dumbass
+    Thanks Marina
+    Yeet
+    Pfft
+    18?
+    Sleep
+    Bullshit
+    Run and gun
+    Absorb
+    Love
+    Popcorn
+    Swim
+    Fire
+    Divide by 0
+    Spin
+    Pride
+    Fly
+    Silence
+    Box
+    Lamp
+    BoxLamp
+    Kill
+    Moe
+    Drown
+    Despacito
+    Spare
+    Expired
+    Patreon
+    Rebel
+    Ping
+    Rebel*
+    Greetings*
+    Swear*
+    /whisper
+    ~unalive
+    ~spare
+    !birddex
+    !restart
+
+Sadie
+    Waifu
+    Weeb
+    Kill
+    DM
+    Kick
+    Tsundere
+    Greetings*
+    !summon
+
+Ray
+    Kill
+    /roleplay
+    !rank
+    !summoned
+    .!claim
+
+Eli
+    Dodo is home
+    !calculator
+
+D20
+    Nitro scam*
+    ^/mute
+    ^/unmute
+    /card
+    ^/ban
+    ^/kick
+    /prestige
+    /help
+    /announce
+    ^/warn
+    ^/unwarn
+    /warnings
+    ~card
+    ~get profile picture
+    ^~mute
+    ^~unmute
+    !card
+    !prestige
+    !c
+    !profile
+    !roll
+    !guild
+    !guilds
+    !summon
+    !play
+    ^!activity
+    .!ninja
