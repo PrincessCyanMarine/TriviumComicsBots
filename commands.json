@@ -91,6 +91,7 @@
         "!summon": true,
         "!play": false,
         "^!activity": false,
-        ".!ninja": false
+        ".!ninja": false,
+        ".^!botchannel": false
     }
 }
