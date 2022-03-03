@@ -349,7 +349,17 @@ d20.on("messageCreate", async (msg) => {
                 break;
             }
             case "botchannel": {
-                if (msg.member.permissions.has("CREATE_PUBLIC_THREADS") && msg.channel instanceof TextChannel && options[1]) {
+                if (!msg.member.permissions.has("CREATE_PUBLIC_THREADS")) {
+                    say(d20, msg.channel, "You don't have the permission to use that command");
+                    return;
+                }
+
+                if (!options[1]) {
+                    say(d20, msg.channel, "The thread needs a name");
+                    return;
+                }
+
+                if (msg.channel instanceof TextChannel) {
                     msg.channel.threads
                         .create({
                             name: options[1],
