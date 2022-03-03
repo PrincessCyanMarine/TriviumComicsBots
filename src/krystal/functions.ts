@@ -446,7 +446,7 @@ export function sparing(msg: Message, target: User | undefined = getTarget(msg))
 }
 
 export async function testWebtoonEpisode() {
-    try {
+    /*try {
         let mostRecentEpisode = await (await database.child("mostRecentEpisode").once("value")).val();
         let response = await got("https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252");
         let webtoonEpisode: RegExpMatchArray | null | string = response.body.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
@@ -476,7 +476,7 @@ export async function testWebtoonEpisode() {
         notificationCult("562429294090125330");
     } catch (err) {
         console.error(err);
-    }
+    }*/
 }
 
 export function nonowords(msg: Message) {
