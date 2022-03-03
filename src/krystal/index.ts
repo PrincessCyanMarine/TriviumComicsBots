@@ -5,7 +5,7 @@ import { ignore_channels, testChannelId } from "../common/variables";
 import { testCommands } from "./commandHandler";
 import { testWebtoonEpisode } from "./functions";
 
-//testWebtoonEpisode();
+testWebtoonEpisode();
 //setInterval(testWebtoonEpisode, 1200000);
 
 krystal.on("messageCreate", (msg) => {

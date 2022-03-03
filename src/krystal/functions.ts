@@ -1,9 +1,7 @@
 import { userMention } from "@discordjs/builders";
+import axios from "axios";
 import { createCanvas, Image, loadImage } from "canvas";
 import { GuildMember, Message, MessageAttachment, User, Widget } from "discord.js";
-import { readdirSync } from "fs";
-import got from "got/dist/source";
-
 import { database } from "..";
 import assets from "../assetsIndexes";
 import {
@@ -446,10 +444,11 @@ export function sparing(msg: Message, target: User | undefined = getTarget(msg))
 }
 
 export async function testWebtoonEpisode() {
-    /*try {
+    try {
         let mostRecentEpisode = await (await database.child("mostRecentEpisode").once("value")).val();
-        let response = await got("https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252");
-        let webtoonEpisode: RegExpMatchArray | null | string = response.body.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
+        let response = await axios.get("https://www.webtoons.com/en/challenge/game-masters/list?title_no=237252");
+
+        let webtoonEpisode: RegExpMatchArray | null | string = response.data.match(/<ul id="_listUl">[\s\S]+?<\/ul>/);
         if (!webtoonEpisode) return;
         webtoonEpisode = webtoonEpisode[0];
         if (typeof webtoonEpisode != "string") return;
@@ -476,7 +475,7 @@ export async function testWebtoonEpisode() {
         notificationCult("562429294090125330");
     } catch (err) {
         console.error(err);
-    }*/
+    }
 }
 
 export function nonowords(msg: Message) {
