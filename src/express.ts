@@ -364,7 +364,7 @@ function has_repeated(deck: string[]): Promise<boolean> {
 }
 
 express_app.get("/commands", (req, res) => {
-    res.send(readFileSync("./commands.txt", "utf-8"));
+    res.send(JSON.parse(readFileSync("./commands.json", "utf-8")));
 });
 
 server.listen(port, () => {
