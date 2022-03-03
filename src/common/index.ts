@@ -345,7 +345,7 @@ d20.on("messageCreate", async (msg) => {
                 break;
             }
             case "calculator": {
-                new Calculator(msg);
+                new Calculator(msg, options[1] == "public");
                 break;
             }
         }

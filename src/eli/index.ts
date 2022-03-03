@@ -15,12 +15,12 @@ eli.on("interactionCreate", (interaction) => {
         if (testing && interaction.channelId != testChannelId) return;
         if (!testing && interaction.channelId == testChannelId) return;
 
-        let match = interaction.customId.match(/calculator_(?<id>[0-9]+?)_button_(?<button>.+)/);
+        let match = interaction.customId.match(/calculator_?(?<id>[0-9]+?)?_button_(?<button>.+)/);
         if (match?.groups) {
-            /*if (match.groups.id != interaction.member?.user.id) {
+            if (match.groups.id && match.groups.id != interaction.member?.user.id) {
                 interaction.reply({ ephemeral: true, content: 'To invoke a calculator, use the command "!calculator"' });
                 return;
-            }*/
+            }
 
             Calculator.processInteraction(interaction, match.groups.button);
         }
