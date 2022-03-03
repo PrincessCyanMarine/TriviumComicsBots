@@ -41,11 +41,11 @@ export function bestwaifu(msg: Message) {
                     ctx.rotate((16.25 * Math.PI) / 180);
                     ctx.drawImage(avatar, 425, 100, 100, 100);
                     ctx.rotate((-16.25 * Math.PI) / 180);
-                    encoder.addFrame(ctx);
+                    encoder.addFrame(ctx as CanvasRenderingContext2D);
 
                     ctx.drawImage(openDoor, 0, 0);
                     ctx.drawImage(avatar, 297, 55, 100, 100);
-                    encoder.addFrame(ctx);
+                    encoder.addFrame(ctx as CanvasRenderingContext2D);
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                     encoder.finish();
@@ -100,22 +100,22 @@ export function punching(msg: Message, target: User | undefined = getTarget(msg)
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(avatar, 2, 86, 177, 177);
                         ctx.drawImage(img0, 0, 0, width, height);
-                        encoder.addFrame(ctx);
+                        encoder.addFrame(ctx as CanvasRenderingContext2D);
 
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(avatar, 2, 86, 177, 177);
                         ctx.drawImage(img1, 0, 0, width, height);
-                        encoder.addFrame(ctx);
+                        encoder.addFrame(ctx as CanvasRenderingContext2D);
 
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(avatar, 2, 86, 177, 177);
                         ctx.drawImage(img2, 0, 0, width, height);
-                        encoder.addFrame(ctx);
+                        encoder.addFrame(ctx as CanvasRenderingContext2D);
 
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(avatar, 2, 86, 177, 177);
                         ctx.drawImage(img3, 0, 0, width, height);
-                        encoder.addFrame(ctx);
+                        encoder.addFrame(ctx as CanvasRenderingContext2D);
 
                         encoder.finish();
                     });

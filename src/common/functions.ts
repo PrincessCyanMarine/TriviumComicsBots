@@ -115,7 +115,7 @@ export function createEncoder(
     });
     let canvas = createCanvas(width, height);
     let ctx = canvas.getContext("2d");
-    return { encoder: encoder, stream: stream, canvas: createCanvas(width, height), ctx: canvas.getContext("2d") };
+    return { encoder, stream, canvas, ctx };
 }
 
 export function detectEmoji(content: string): string {
