@@ -2,8 +2,8 @@ import { userMention } from "@discordjs/builders";
 import { Message } from "discord.js";
 import { testing } from "..";
 import { krystal } from "../clients";
-import { argClean, getTarget, randomchance, say, testAllWords, testWord } from "../common/functions";
-import { killWords, marinaId, marineId } from "../common/variables";
+import { argClean, randomchance, say, testWord } from "../common/functions";
+import { killWords } from "../common/variables";
 import {
   absorbing,
   boxxing,
