@@ -348,6 +348,24 @@ d20.on("messageCreate", async (msg) => {
                 new Calculator(msg, options[1] == "public");
                 break;
             }
+            case "botchannel": {
+                if (msg.member.permissions.has("CREATE_PUBLIC_THREADS") && msg.channel instanceof TextChannel && options[1]) {
+                    msg.channel.threads
+                        .create({
+                            name: options[1],
+                        })
+                        .then((thread) => {
+                            [krystal, ray, eli, sadie].forEach((bot) => {
+                                bot.channels.fetch(msg.channel.id).then((channel) => {
+                                    if (channel instanceof TextChannel)
+                                        channel.threads.fetch(thread.id).then((t) => {
+                                            t?.join();
+                                        });
+                                });
+                            });
+                        });
+                }
+            }
         }
     }
 });
