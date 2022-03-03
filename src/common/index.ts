@@ -369,7 +369,9 @@ d20.on("messageCreate", async (msg) => {
                                 bot.channels.fetch(msg.channel.id).then((channel) => {
                                     if (channel instanceof TextChannel)
                                         channel.threads.fetch(thread.id).then((t) => {
-                                            t?.join();
+                                            t?.join().then((th) => {
+                                                th.send("Hello");
+                                            });
                                         });
                                 });
                             });
