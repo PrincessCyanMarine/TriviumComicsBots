@@ -14,28 +14,41 @@ export const siegId: string = "723938416139567154";
 export const botIds: string[] = [sadieId, krystalId, RayId, EliId, CerbyId, D20Id, siegId];
 
 export const killWords: string[] = [
-  "kill",
-  "beat",
-  "punch",
-  "heal",
-  "shoot",
-  "attack",
-  "unalive",
-  "protect",
-  "exterminate",
-  "end.+?suffering",
-  "silence",
+    "kill",
+    "beat",
+    "punch",
+    "heal",
+    "shoot",
+    "attack",
+    "unalive",
+    "protect",
+    "exterminate",
+    "end.+?suffering",
+    "silence",
 ];
 export const protectedFromKills: string[] = [sadieId, krystalId, EliId, CerbyId];
 export const not_count_in_channel_ids: string[] = [
-  "728081841139220552",
-  "725932268891406368",
-  "745069948510142487",
-  "624774782180917278",
-  "690361467475984605",
+    "728081841139220552",
+    "725932268891406368",
+    "745069948510142487",
+    "624774782180917278",
+    "690361467475984605",
 ];
-export const ignore_channels: string[] = ["728081841139220552", "725932268891406368", "745069948510142487", "624774782180917278"];
-export const patron_role_id = "611539466670309386";
+export const ignore_channels: string[] = [
+    "728081841139220552",
+    "725932268891406368",
+    "745069948510142487",
+    "624774782180917278",
+    "795927049670754304",
+];
+export const patreon_roles = [
+    "795920588463800320",
+    "715775653991153726",
+    "795921622862659585",
+    "795922644016824360",
+    "795925053689692200",
+    "795925478522617866",
+];
 // export const announcementChannelId: string = '674781280423903264'; // TestChannel
 export const announcementChannelId: string = "613507549085302796"; // Announcement Channel
 export const alert_role_id: string = "900363259188772865";
@@ -45,11 +58,11 @@ export const marineId = "305883924310261760";
 export const marinaId = "334997744265723905";
 
 export enum TIME {
-  SECONDS = 1000,
-  MINUTES = TIME.SECONDS * 60,
-  HOURS = TIME.MINUTES * 60,
-  DAYS = TIME.HOURS * 24,
-  WEEKS = TIME.DAYS * 7,
-  MONTHS = TIME.DAYS * 30,
-  YEARS = TIME.DAYS * 365 + TIME.HOURS * 6,
+    SECONDS = 1000,
+    MINUTES = TIME.SECONDS * 60,
+    HOURS = TIME.MINUTES * 60,
+    DAYS = TIME.HOURS * 24,
+    WEEKS = TIME.DAYS * 7,
+    MONTHS = TIME.DAYS * 30,
+    YEARS = TIME.DAYS * 365 + TIME.HOURS * 6,
 }

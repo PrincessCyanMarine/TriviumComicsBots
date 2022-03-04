@@ -44,7 +44,7 @@ import {
     createEncoder,
     getTargetMember,
 } from "../common/functions";
-import { announcementChannelId, marinaId, patron_role_id, protectedFromKills } from "../common/variables";
+import { announcementChannelId, marinaId, patreon_roles, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
 
 const yeetFrames: Image[] = [];
@@ -432,9 +432,11 @@ export function dead(msg: Message, target: GuildMember | undefined = getMember(m
     say(krystal, msg.channel, `${target.displayName} has expired!`);
 }
 export function pattron(msg: Message, target: GuildMember | undefined = getMember(msg)) {
-    if (!target || !target.roles.cache.has(patron_role_id))
-        return say(krystal, msg.channel, { content: "Support!\nSupport!\nSupport!\nSupport!", files: [patreon] });
-    say(krystal, msg.channel, `Thanks for being a supporter, <@${target.id}>`);
+    if (target)
+        patreon_roles.forEach((role) => {
+            if (target.roles.cache.has(role)) return say(krystal, msg.channel, `Thanks for being a supporter, <@${target.id}>`);
+        });
+    say(krystal, msg.channel, { content: "Support!\nSupport!\nSupport!\nSupport!", files: [patreon] });
 }
 
 export function sparing(msg: Message, target: User | undefined = getTarget(msg)) {
