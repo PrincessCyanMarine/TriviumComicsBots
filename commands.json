@@ -55,7 +55,8 @@
         "/roleplay": false,
         "!rank": true,
         "!summoned": false,
-        ".!claim": false
+        ".!claim": false,
+        "!roll": true
     },
 
     "Eli": {
@@ -85,7 +86,6 @@
         "!prestige": false,
         "!c": false,
         "!profile": false,
-        "!roll": true,
         "!guild": false,
         "!guilds": false,
         "!summon": true,
