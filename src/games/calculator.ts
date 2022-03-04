@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import {
     ButtonInteraction,
+    GuildMember,
     Interaction,
     Message,
     MessageActionRow,
@@ -10,7 +11,7 @@ import {
     User,
 } from "discord.js";
 import { eli } from "../clients";
-import { say } from "../common/functions";
+import { msg2embed, say } from "../common/functions";
 import { getOperationResult } from "../eli/functions";
 
 export class Calculator {
@@ -60,9 +61,9 @@ export class Calculator {
         say(eli, msg.channel, { components: this.calculator_component(msg.author.id, pub), content: "0" });
     }
 
-    static processInteraction(interaction: ButtonInteraction, button: string) {
+    static processInteraction(interaction: ButtonInteraction, button: string, pub: boolean) {
         //interaction.deferUpdate();
-        let operations = interaction.message.content.split(" ");
+        let operations = interaction.message.content.split("\n")[0].split(" ");
 
         let index = operations.length - 1;
 
@@ -138,6 +139,11 @@ export class Calculator {
             }
         }
 
-        interaction.update({ content: operations.join(" ") });
+        let content = operations.join(" ");
+
+        if (pub && interaction.member)
+            content += "\n" + (interaction.member instanceof GuildMember ? interaction.member.displayName : interaction.member.user.username);
+
+        interaction.update({ content });
     }
 }

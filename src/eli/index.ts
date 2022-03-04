@@ -22,7 +22,7 @@ eli.on("interactionCreate", (interaction) => {
                 return;
             }
 
-            Calculator.processInteraction(interaction, match.groups.button);
+            Calculator.processInteraction(interaction, match.groups.button, !match.groups.id);
         }
     }
 });
