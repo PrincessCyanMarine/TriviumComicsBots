@@ -6,7 +6,7 @@ import { testCommands } from "./commandHandler";
 import { testWebtoonEpisode } from "./functions";
 
 testWebtoonEpisode();
-//setInterval(testWebtoonEpisode, 1200000);
+setInterval(testWebtoonEpisode, 1200000);
 
 krystal.on("messageCreate", (msg) => {
     if (ignore_message(msg, krystal)) return;
