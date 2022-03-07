@@ -1,10 +1,20 @@
-import { GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, MessageSelectMenu, TextChannel } from "discord.js";
+import {
+    BaseMessageComponentOptions,
+    GuildMember,
+    Message,
+    MessageActionRow,
+    MessageActionRowOptions,
+    MessageAttachment,
+    MessageButton,
+    MessageSelectMenu,
+    TextChannel,
+} from "discord.js";
 import { database, testing } from "..";
 import { clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { changeActivity, get_birds, random_from_array, say } from "./functions";
-import { ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
+import { changeActivity, getCharacterEmoji, get_birds, random_from_array, say } from "./functions";
+import { command_list, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, hyperlink, memberNicknameMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
@@ -15,6 +25,9 @@ import { eli_activities } from "../eli/activities";
 import { ray_activities } from "../ray/activities";
 import { readFileSync } from "fs";
 import { Calculator } from "../games/calculator";
+import emojis from "./emojis";
+import { Help } from "./help";
+import { Harem } from "./harem";
 
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
@@ -376,6 +389,99 @@ d20.on("messageCreate", async (msg) => {
                                 });
                             });
                         });
+                }
+            }
+            case "help": {
+                new Help(msg);
+                break;
+            }
+
+            case "harem": {
+                let harem = await Harem.get(msg.guildId, msg.author.id);
+
+                try {
+                    switch (options[1]) {
+                        case "create": {
+                            if (harem?.ownsOne) throw "You already have a harem";
+                            harem.create();
+                            say(eli, msg.channel, `${msg.author} just created a harem!!!`, undefined, { messageReference: msg });
+                            break;
+                        }
+
+                        case "disband": {
+                            if (!harem?.ownsOne) throw "You don't have a harem to disband";
+                            harem.disband();
+                            say(eli, msg.channel, `${msg.author} disbanded their harem!!!`, undefined, { messageReference: msg });
+                            break;
+                        }
+
+                        case "invite":
+                            {
+                                if (!harem?.ownsOne) throw 'You don\'t have a harem yet\nCreate one by using "harem create"';
+                                if (!msg.mentions.members?.first()) throw "You need to mention someone";
+                                if (msg.mentions.members.first()?.id == msg.author.id) throw "You can't join your own harem";
+                                if (harem.includes(msg.mentions.members.first()!.id))
+                                    throw `${msg.mentions.members.first()?.displayName} is already in your harem`;
+
+                                say(
+                                    eli,
+                                    msg.channel,
+                                    {
+                                        content: `${userMention(msg.mentions.members.first()!.id)}, ${msg.author} invited you to their harem`,
+                                        components: [
+                                            new MessageActionRow().addComponents(
+                                                new MessageButton()
+                                                    .setCustomId(
+                                                        `harem?command=accept_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
+                                                            msg.author.id
+                                                        }`
+                                                    )
+                                                    .setLabel("ACCEPT")
+                                                    .setStyle("SUCCESS"),
+                                                new MessageButton()
+                                                    .setCustomId(
+                                                        `harem?command=reject_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
+                                                            msg.author.id
+                                                        }`
+                                                    )
+                                                    .setLabel("REJECT")
+                                                    .setStyle("DANGER")
+                                            ),
+                                        ],
+                                    },
+                                    undefined,
+                                    { messageReference: msg }
+                                );
+                            }
+                            break;
+
+                        case "leave": {
+                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem leave all", "harem leave @" or "harem leave <id>"';
+                            let id = msg.mentions.members?.first()?.id || options[2];
+                            if (id != "all" && !harem.isIn(id)) throw "You aren't in that player's harem";
+                            harem.leave(id);
+                            say(eli, msg.channel, `${msg.author} left ${id == "all" ? "all harems" : userMention(id) + "'s harem"}!!!`, undefined, {
+                                messageReference: msg,
+                            });
+                            break;
+                        }
+
+                        case "kick": {
+                            if (!msg.mentions.members?.first()) throw "";
+                            harem.kick(msg.mentions.members.first()?.id || "");
+                            break;
+                        }
+
+                        default:
+                            say(eli, msg.channel, await harem.getMembersMessage(msg), undefined, {
+                                messageReference: msg,
+                            });
+                            break;
+                    }
+                } catch (err) {
+                    if (typeof err == "string") say(eli, msg.channel, err, undefined, { messageReference: msg });
+                    else console.error(err);
+                    return;
                 }
             }
         }

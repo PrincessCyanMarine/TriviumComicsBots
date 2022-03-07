@@ -1,5 +1,7 @@
 // IDs are already public
 
+import { readFileSync } from "fs";
+
 export const testGuildId: string = "620635349173010465";
 export const triviumGuildId: string = "562429293364248587";
 export const testChannelId: string = "892800588469911663";
@@ -66,3 +68,7 @@ export enum TIME {
     MONTHS = TIME.DAYS * 30,
     YEARS = TIME.DAYS * 365 + TIME.HOURS * 6,
 }
+
+export const command_list: { [character: string]: { [command_name: string]: string | boolean } } = JSON.parse(
+    readFileSync("./commands.json", "utf-8")
+);

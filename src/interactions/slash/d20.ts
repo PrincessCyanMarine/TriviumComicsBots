@@ -1,24 +1,26 @@
 import { GuildMember, Message } from "discord.js";
 import { database, testing } from "../..";
 import { clients, d20 } from "../../clients";
-import { command_list, command_list_string } from "../../commandlist";
 import { say } from "../../common/functions";
 import { ignore_channels } from "../../common/variables";
 import { bankick, generatecard, mute_unmute, prestige, warn } from "../../d20/functions";
 import { followup, reply } from "./common";
 
-d20.on('ready', async () => {
+d20.on("ready", async () => {
     console.log("D20 is processing slash commands");
-})
-d20.on('interactionCreate', async (interaction) => {
+});
+d20.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
-    if (ignore_channels.includes(interaction.channelId)) { reply(interaction, 'Try another channel', true); return; }
-    if (testing && interaction.channelId != '892800588469911663') return;
-    else if (!testing && interaction.channelId == '892800588469911663') return;
+    if (ignore_channels.includes(interaction.channelId)) {
+        reply(interaction, "Try another channel", true);
+        return;
+    }
+    if (testing && interaction.channelId != "892800588469911663") return;
+    else if (!testing && interaction.channelId == "892800588469911663") return;
 
     switch (interaction.commandName) {
-        case 'mute':
-        case 'unmute':
+        case "mute":
+        case "unmute":
             mute_unmute(interaction);
             break;
         case "card":
@@ -27,7 +29,7 @@ d20.on('interactionCreate', async (interaction) => {
                 reply(interaction, { files: [card] });
             } catch (er) {
                 console.error(er);
-                reply(interaction, 'Something went wrong...');
+                reply(interaction, "Something went wrong...");
             }
             break;
         case "ban":
@@ -37,61 +39,78 @@ d20.on('interactionCreate', async (interaction) => {
         case "prestige":
             prestige(interaction);
             break;
-        case 'help':
-            let commandlisttext = `Commands\nKrystal:\n\`\`\`${command_list.Krystal.join(', ')}\`\`\`\nSadie:\n\`\`\`${command_list.sadie.join(', ')}\`\`\`\nD20:\n\`\`\`${command_list.d20.join(', ')}\`\`\`\nMultiple\n\`\`\`${command_list.multiple.join(', ')}\`\`\``;
-            let command = interaction.options.get('command')?.value;
-            console.log(command_list_string);
-            if (
-                !command ||
-                typeof command != 'string' ||
-                !(command.match(command_list_string))
-            ) { reply(interaction, commandlisttext, true); return; };
-            { reply(interaction, `Here's how that command works: https://github.com/PrincessCyanMarine/TriviumComicsBots/wiki/${command.replace(/\s/g, '_')}`); return; };
-        case 'announce':
-            let channel = interaction.options.get('target-channel')?.channel?.id;
-            if (!channel) channel = '624774782180917278';
-            let botName = interaction.options.get('bot')?.value;
-            if (typeof botName != 'string' || !interaction.channel) { reply(interaction, 'Something went wrong', true); return; };
+        case "help":
+        case "announce":
+            let channel = interaction.options.get("target-channel")?.channel?.id;
+            if (!channel) channel = "624774782180917278";
+            let botName = interaction.options.get("bot")?.value;
+            if (typeof botName != "string" || !interaction.channel) {
+                reply(interaction, "Something went wrong", true);
+                return;
+            }
             let bot = clients[botName];
             reply(interaction, "Waiting for message...", true);
             let collected = (await interaction.channel.awaitMessages({ time: 60000, max: 1 })).first();
-            if (!collected || !(collected instanceof Message)) { reply(interaction, 'Failed collection', true); return; };
+            if (!collected || !(collected instanceof Message)) {
+                reply(interaction, "Failed collection", true);
+                return;
+            }
             let content = collected.content;
             let attachments = Array.from(collected.attachments.values());
             say(bot, channel, { content: content, files: attachments });
             followup(interaction, "Announced!", true);
             break;
-        case 'warn': {
-            let reason = interaction.options.get('reason')?.value;
-            let player = interaction.options.get('player')?.member;
+        case "warn": {
+            let reason = interaction.options.get("reason")?.value;
+            let player = interaction.options.get("player")?.member;
 
             if (!(interaction.member instanceof GuildMember)) return;
-            if (!interaction.member.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
-            if (!player || !(player instanceof GuildMember) || !reason || !(typeof reason == "string") || !interaction.guildId || !interaction.channel) {
-                reply(interaction, 'Something went wrong', true);
+            if (!interaction.member.permissions.has("KICK_MEMBERS")) {
+                reply(interaction, "You can' do that", true);
+                return;
+            }
+            if (
+                !player ||
+                !(player instanceof GuildMember) ||
+                !reason ||
+                !(typeof reason == "string") ||
+                !interaction.guildId ||
+                !interaction.channel
+            ) {
+                reply(interaction, "Something went wrong", true);
                 return;
             }
             warn(player, interaction.guildId, reason, interaction);
             break;
         }
-        case 'unwarn':
-            let start = interaction.options.get('warning_start')?.value;
-            let end = interaction.options.get('warning_end')?.value;
-            let player = interaction.options.get('player')?.member;
+        case "unwarn":
+            let start = interaction.options.get("warning_start")?.value;
+            let end = interaction.options.get("warning_end")?.value;
+            let player = interaction.options.get("player")?.member;
             if (typeof start == "number") start--;
             else start = -1;
             if (typeof end == "number") end--;
             else end = start;
 
             if (!(interaction.member instanceof GuildMember)) return;
-            if (!interaction.member.permissions.has('KICK_MEMBERS')) { reply(interaction, 'You can\' do that', true); return; };
-            if (!player || !(player instanceof GuildMember) || !(typeof start == "number") || !(typeof end == "number") || !interaction.guildId || !interaction.channel) {
-                reply(interaction, 'Something went wrong', true);
+            if (!interaction.member.permissions.has("KICK_MEMBERS")) {
+                reply(interaction, "You can' do that", true);
+                return;
+            }
+            if (
+                !player ||
+                !(player instanceof GuildMember) ||
+                !(typeof start == "number") ||
+                !(typeof end == "number") ||
+                !interaction.guildId ||
+                !interaction.channel
+            ) {
+                reply(interaction, "Something went wrong", true);
                 return;
             }
 
-            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once('value')).val();
-            if (!warnings || typeof warnings != 'object') {
+            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val();
+            if (!warnings || typeof warnings != "object") {
                 warnings = [];
                 database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
                 reply(interaction, "This player has no warnings!", true);
@@ -99,32 +118,37 @@ d20.on('interactionCreate', async (interaction) => {
             }
 
             let i;
-            let reason = '';
-            for (i = 0; i <= (end - start); i++) {
+            let reason = "";
+            for (i = 0; i <= end - start; i++) {
                 // console.log(warnings, start, warnings[start]);
-                reason += warnings.splice(start, 1) + '\n';
+                reason += warnings.splice(start, 1) + "\n";
             }
 
             database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
-            interaction.reply(`Removed ${i} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`);
+            interaction.reply(
+                `Removed ${i} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`
+            );
 
             break;
-        case 'warnings': {
-            let player = interaction.options.get('player')?.member;
-            if (!player || !(player instanceof GuildMember)) { reply(interaction, 'Something went wrong', true); return; };
-            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once('value')).val();
-            if (!warnings || typeof warnings != 'object') warnings = [];
+        case "warnings": {
+            let player = interaction.options.get("player")?.member;
+            if (!player || !(player instanceof GuildMember)) {
+                reply(interaction, "Something went wrong", true);
+                return;
+            }
+            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val();
+            if (!warnings || typeof warnings != "object") warnings = [];
             let text = `${player.user.username} has ${warnings.length} warnings`;
             if (warnings.length > 0) {
-                text += '```';
+                text += "```";
                 for (let w in warnings) text += `\n${parseInt(w) + 1}: ${warnings[parseInt(w)]}`;
-                text += '```';
+                text += "```";
             }
             reply(interaction, text);
             break;
         }
         default:
-            reply(interaction, 'Sorry, I don\'t know that command', true);
+            reply(interaction, "Sorry, I don't know that command", true);
             break;
     }
 });

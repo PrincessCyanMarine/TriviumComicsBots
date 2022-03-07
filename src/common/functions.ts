@@ -11,6 +11,7 @@ import {
     MessageEmbed,
     MessageOptions,
     PresenceStatusData,
+    ReplyOptions,
     TextBasedChannel,
     TextChannel,
     User,
@@ -41,7 +42,13 @@ export function testAllWords(args: string, ...test: string[]): boolean {
     return !!res && res.length == test.length;
 }
 
-export const say = (bot: Client, channel: TextBasedChannel | string, content: string | MessageOptions, delay = 1000): Promise<Message> =>
+export const say = (
+    bot: Client,
+    channel: TextBasedChannel | string,
+    content: string | MessageOptions,
+    delay = 1000,
+    reply?: ReplyOptions
+): Promise<Message> =>
     new Promise((resolve, reject) => {
         // console.log(delay);
         delay = Math.max(1, delay);
@@ -49,8 +56,10 @@ export const say = (bot: Client, channel: TextBasedChannel | string, content: st
         else if (content.content) content.content = detectEmoji(content.content);
         let id = typeof channel == "string" ? channel : channel.id;
 
-        // if (typeof content == "string") content = { content: content, tts: true };
-        // else content.tts = true;
+        if (reply) {
+            if (typeof content == "string") content = { content, reply };
+            else content.reply = reply;
+        }
 
         bot.channels
             .fetch(id)
@@ -361,3 +370,14 @@ export const get_powers = () =>
     readFileSync("./bird_powers.txt", "utf-8")
         .split("\n")
         .map((a) => JSON.parse(a));
+
+export function getCharacterEmoji(character: string) {
+    if (character.match(/d20/i)) return "";
+    let res = "";
+    ["sadie", "ray", "krystal", "eli"].forEach((a) => {
+        if (character.match(new RegExp(a, "i")))
+            res = emojis[random_from_array(Object.keys(emojis).filter((emoji) => emoji.match(new RegExp(":gm" + a, "i"))))];
+    });
+    if (res != "") return res;
+    return emojis[random_from_array(Object.keys(emojis))];
+}

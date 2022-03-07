@@ -58,7 +58,11 @@ export class Calculator {
     };
 
     constructor(msg: Message, pub: boolean) {
-        say(eli, msg.channel, { components: this.calculator_component(msg.author.id, pub), content: "0" });
+        say(eli, msg.channel, {
+            components: this.calculator_component(msg.author.id, pub),
+            content: "0",
+            reply: { messageReference: msg, failIfNotExists: false },
+        });
     }
 
     static processInteraction(interaction: ButtonInteraction, button: string, pub: boolean) {

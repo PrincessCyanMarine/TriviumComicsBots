@@ -1,4 +1,4 @@
-export const command_list = {
+/*export const command_list = {
     "Krystal": [
         "Yeet",
         "Pfft",
@@ -61,4 +61,4 @@ export const command_list = {
     ]
 };
 
-export const command_list_string = new RegExp('(' + command_list.Krystal.join(')|(') + '|' + command_list.sadie.join(')|(') + ')|(' + command_list.d20.join(')|(') + ')|(' + command_list.multiple.join(')|(') + ')', 'i');
+export const command_list_string = new RegExp('(' + command_list.Krystal.join(')|(') + '|' + command_list.sadie.join(')|(') + ')|(' + command_list.d20.join(')|(') + ')|(' + command_list.multiple.join(')|(') + ')', 'i');*/
