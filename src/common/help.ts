@@ -1,7 +1,5 @@
 import {
     ButtonInteraction,
-    CacheType,
-    Interaction,
     Message,
     MessageActionRow,
     MessageButton,
@@ -9,19 +7,23 @@ import {
     MessageSelectMenu,
     SelectMenuInteraction,
 } from "discord.js";
+import { testing } from "..";
 import { ray } from "../clients";
 import { getCharacterEmoji, say } from "./functions";
-import { command_list } from "./variables";
+import { command_list, testChannelId } from "./variables";
 
 export class Help {
     static async processInteraction(interaction: ButtonInteraction | SelectMenuInteraction) {
+        if (testing) {
+            if (interaction.channelId != testChannelId) return;
+        } else if (interaction.channelId == testChannelId) return;
         //interaction.update({ fetchReply: true });
         if (interaction.isButton()) this.processButtonInteraction(interaction);
         else this.processSelectMenuInteraction(interaction);
     }
 
     public static components = {
-        main_menu: [
+        main_menu: () => [
             new MessageActionRow().addComponents(
                 new MessageSelectMenu()
                     .addOptions(
@@ -44,7 +46,7 @@ export class Help {
     };
 
     public static getMainMenu() {
-        return Help.components.main_menu;
+        return Help.components.main_menu();
     }
 
     public static processSelectMenuInteraction(interaction: SelectMenuInteraction) {
