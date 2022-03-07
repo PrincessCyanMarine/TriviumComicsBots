@@ -94,8 +94,6 @@ export class Help {
         let components: MessageActionRow[] = extraButtons.components.length > 0 ? [extraButtons] : [];
         components = components.concat(this.getMainMenu());
 
-        console.log(components.length);
-
         let data = { content, components };
         try {
             interaction.update(data);
