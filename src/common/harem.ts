@@ -1,17 +1,44 @@
-import { GuildMember, Message, MessageOptions } from "discord.js";
+import { GuildMember, Message, MessageActionRow, MessageButton, MessageOptions } from "discord.js";
 import { database } from "..";
 import { eli } from "../clients";
 
 export class Harem {
+    getOpenMessage(msg: Message<boolean>): Promise<string | MessageOptions> {
+        return new Promise(async (resolve, reject) => {
+            resolve({
+                components: [
+                    new MessageActionRow().addComponents(
+                        new MessageButton()
+                            .setLabel("JOIN")
+                            .setStyle("SUCCESS")
+                            .setCustomId(`harem?command=accept_invite&harem_id=${msg.author.id}&timeout=3600000`)
+                    ),
+                ],
+                content: `${msg.member?.displayName}'s harem is temporarily open for anyone`,
+            });
+        });
+    }
     kick(id: string) {
-        throw new Error("Method not implemented.");
+        this.remove(`${this.path}/members`, id);
+        this.remove(`harem/${id}/isIn`, this.userId);
     }
 
     getMembersMessage(msg: Message): Promise<string | MessageOptions> {
         return new Promise(async (resolve, reject) => {
-            if (!this.harem?.members) return resolve("No one has joined your harem yet");
+            let harem = msg.mentions.members?.first() ? (await Harem.get(this.guildId, msg.mentions.members.first()!.id)).harem : this.harem;
+            let target = msg.mentions.members?.first() ? msg.mentions.members!.first() : msg.member;
             let guild_members = await msg.guild?.members.fetch();
-            resolve(this.harem.members.map((member) => guild_members?.get(member)?.displayName).join("\n"));
+            let res = "";
+            res += Array.isArray(harem?.members)
+                ? target?.displayName + "'s harem\n" + harem!.members.map((member) => guild_members?.get(member)?.displayName).join("\n")
+                : harem?.ownsOne
+                ? "There's no one on " + target?.displayName + "'s harem"
+                : "";
+            res += "\n\n";
+            res += Array.isArray(harem?.isIn)
+                ? target?.displayName + " is a part of\n" + harem!.isIn.map((member) => guild_members?.get(member)?.displayName).join("\n")
+                : target?.displayName + " hasn't joined any harems";
+            resolve(res);
         });
     }
 
@@ -45,10 +72,13 @@ export class Harem {
     }
 
     includes(id: string) {
+        if (!Array.isArray(this.harem?.members)) return false;
         return this.harem?.members?.includes(id);
     }
 
     isIn(id: string) {
+        if (!Array.isArray(this.harem?.isIn)) return false;
+        if (id == "any") return this.harem?.isIn != undefined;
         return this.harem?.isIn?.includes(id);
     }
 

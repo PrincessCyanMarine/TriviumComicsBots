@@ -455,6 +455,11 @@ d20.on("messageCreate", async (msg) => {
                             }
                             break;
 
+                        case "open": {
+                            say(eli, msg.channel, await harem.getOpenMessage(msg), undefined, { messageReference: msg });
+                            break;
+                        }
+
                         case "leave": {
                             if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem leave all", "harem leave @" or "harem leave <id>"';
                             let id = msg.mentions.members?.first()?.id || options[2];
@@ -467,8 +472,10 @@ d20.on("messageCreate", async (msg) => {
                         }
 
                         case "kick": {
-                            if (!msg.mentions.members?.first()) throw "";
-                            harem.kick(msg.mentions.members.first()?.id || "");
+                            if (!msg.mentions.members?.first() && !options[1]) throw 'Use "!harem kick @" or "!harem kick <id>"';
+                            let id = msg.mentions.members?.first()?.id || options[1];
+                            if (!harem.includes(id)) throw "Selected user is not a part of your harem";
+                            harem.kick(id);
                             break;
                         }
 
@@ -591,3 +598,13 @@ const welcome_functions = [
                 .catch(reject);
         }),
 ];
+
+d20.on("guildMemberRemove", (member) => {
+    if (testing && member.guild.id != testGuildId) return;
+    else if (!testing && member.guild.id == testGuildId) return;
+
+    Harem.get(member.guild.id, member.id).then((harem) => {
+        if (harem.isIn("any")) harem.leave("all");
+        if (harem.ownsOne) harem.disband();
+    });
+});

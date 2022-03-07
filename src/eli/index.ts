@@ -36,21 +36,41 @@ eli.on("interactionCreate", async (interaction) => {
                 parameters[key] = value;
             });
 
-            console.log(parameters);
-
+            if (
+                interaction.message instanceof Message &&
+                new Date().valueOf() - interaction.message.createdTimestamp >= parseInt(parameters.timeout)
+            ) {
+                interaction.update({
+                    components: [],
+                    content: "This invite expired, ask " + userMention(parameters.harem_id) + " to open their harem again",
+                });
+                return;
+            }
             if (parameters.invited_id && parameters.invited_id != interaction.user.id) {
                 interaction.reply({ ephemeral: true, content: "This invite is not for you" });
                 return;
             }
 
             if (!parameters.harem_id) interaction.update({ content: "Invalid invite", components: [] });
+            if (parameters.harem_id == interaction.user.id) {
+                interaction.reply({ ephemeral: true, content: "You can't join your own harem" });
+                return;
+            }
+
+            let harem = await Harem.get(interaction.guildId, interaction.user.id);
+
+            if (harem.isIn(parameters.harem_id)) {
+                interaction.reply({ ephemeral: true, content: "You are already in that harem" });
+                return;
+            }
 
             if (parameters.command)
                 switch (parameters.command) {
                     case "accept_invite":
-                        let harem = await Harem.get(interaction.guildId, interaction.user.id);
                         harem.join(parameters.harem_id);
-                        interaction.update({ content: `${interaction.user} joined ${userMention(parameters.harem_id)}'s harem`, components: [] });
+                        let content = `${interaction.user} joined ${userMention(parameters.harem_id)}'s harem`;
+                        if (parameters.invited_id) interaction.update({ content, components: [] });
+                        else interaction.reply(content);
                         break;
 
                     case "reject_invite":
