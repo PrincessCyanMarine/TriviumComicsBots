@@ -96,7 +96,7 @@ export class Help {
         let components: MessageActionRow[] = extraButtons.components.length > 0 ? [extraButtons] : [];
         components = components.concat(this.getMainMenu());
 
-        let data = { content, components };
+        let data = { content: character + "\n\n" + content, components };
         try {
             interaction.update(data);
         } catch (error) {
