@@ -71,6 +71,9 @@ export const say = (
                     if (!member) return;
                     if (!c.permissionsFor(member).has("SEND_MESSAGES")) return;
 
+                    if (typeof content == "string") content = content.slice(0, 2000);
+                    else if (content.content) content.content = content.content.slice(0, 2000);
+
                     c.sendTyping()
                         .then(() => {
                             setTimeout(() => {
