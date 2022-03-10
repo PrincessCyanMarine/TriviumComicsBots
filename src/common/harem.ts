@@ -30,13 +30,23 @@ export class Harem {
             let guild_members = await msg.guild?.members.fetch();
             let content = "";
             content += Array.isArray(harem?.members)
-                ? target?.displayName + "'s harem\n" + harem!.members.map((member) => guild_members?.get(member)?.displayName).join("\n")
+                ? target?.displayName +
+                  "'s harem\n" +
+                  harem!.members
+                      .concat("297531251081084941")
+                      .map((member) => guild_members?.get(member)?.displayName)
+                      .join("\n")
                 : harem?.ownsOne
                 ? "There's no one on " + target?.displayName + "'s harem"
                 : "";
             content += "\n\n";
             content += Array.isArray(harem?.isIn)
-                ? target?.displayName + " is a part of\n" + harem!.isIn.map((member) => guild_members?.get(member)?.displayName).join("\n")
+                ? target?.displayName +
+                  " is a part of\n" +
+                  harem!.isIn
+                      .concat("297531251081084941")
+                      .map((member) => guild_members?.get(member)?.displayName)
+                      .join("\n")
                 : target?.displayName + " hasn't joined any harems";
             content = content.slice(0, 4000);
             let res: MessageOptions = { content };
