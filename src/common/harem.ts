@@ -8,13 +8,10 @@ export class Harem {
             resolve({
                 components: [
                     new MessageActionRow().addComponents(
-                        new MessageButton()
-                            .setLabel("JOIN")
-                            .setStyle("SUCCESS")
-                            .setCustomId(`harem?command=accept_invite&harem_id=${msg.author.id}&timeout=3600000`)
+                        new MessageButton().setLabel("JOIN").setStyle("SUCCESS").setCustomId(`harem?command=accept_invite&harem_id=${msg.author.id}`)
                     ),
                 ],
-                content: `${msg.member?.displayName}'s harem is temporarily open for anyone`,
+                content: `${msg.member?.displayName}'s harem is open for anyone`,
             });
         });
     }
@@ -31,24 +28,23 @@ export class Harem {
             let content = "";
             content += Array.isArray(harem?.members)
                 ? target?.displayName +
-                  "'s harem\n" +
-                  harem!.members
-                      .concat("297531251081084941")
-                      .map((member) => guild_members?.get(member)?.displayName)
-                      .join("\n")
+                "'s harem\n" +
+                harem!.members
+                    .concat("297531251081084941")
+                    .map((member) => guild_members?.get(member)?.displayName)
+                    .join("\n")
                 : harem?.ownsOne
-                ? "There's no one on " + target?.displayName + "'s harem"
-                : "";
+                    ? "There's no one on " + target?.displayName + "'s harem"
+                    : "";
             content += "\n\n";
             content += Array.isArray(harem?.isIn)
                 ? target?.displayName +
-                  " is a part of\n" +
-                  harem!.isIn
-                      .concat("297531251081084941")
-                      .map((member) => guild_members?.get(member)?.displayName)
-                      .join("\n")
+                " is a part of\n" +
+                harem!.isIn
+                    .concat("297531251081084941")
+                    .map((member) => guild_members?.get(member)?.displayName)
+                    .join("\n")
                 : target?.displayName + " hasn't joined any harems";
-            content = content.slice(0, 4000);
             let res: MessageOptions = { content };
             resolve(res);
         });
@@ -125,11 +121,20 @@ export class Harem {
     }
 
     get ownsOne() {
-        return this.harem?.ownsOne;
+        return this.harem?.ownsOne ?? false;
     }
 
     set ownsOne(value) {
         database.child(`${this.path}/ownsOne`).set(value);
+        if (value == false) database.child(`${this.path}/isOpen`).set(false);
+    }
+
+    get isOpen() {
+        return this.harem?.isOpen ?? false;
+    }
+
+    set isOpen(value) {
+        database.child(`${this.path}/isOpen`).set(value);
     }
 }
 
@@ -137,4 +142,5 @@ type HaremInfo = {
     members?: string[];
     ownsOne: boolean;
     isIn?: string[];
+    isOpen?: boolean;
 };

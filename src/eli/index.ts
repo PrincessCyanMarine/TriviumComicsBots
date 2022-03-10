@@ -36,7 +36,7 @@ eli.on("interactionCreate", async (interaction) => {
                 parameters[key] = value;
             });
 
-            if (
+            /*if (
                 interaction.message instanceof Message &&
                 new Date().valueOf() - interaction.message.createdTimestamp >= parseInt(parameters.timeout)
             ) {
@@ -45,7 +45,8 @@ eli.on("interactionCreate", async (interaction) => {
                     content: "This invite expired, ask " + userMention(parameters.harem_id) + " to open their harem again",
                 });
                 return;
-            }
+            }*/
+
             if (parameters.invited_id && parameters.invited_id != interaction.user.id) {
                 interaction.reply({ ephemeral: true, content: "This invite is not for you" });
                 return;
@@ -58,9 +59,18 @@ eli.on("interactionCreate", async (interaction) => {
             }
 
             let harem = await Harem.get(interaction.guildId, interaction.user.id);
+            let joining_harem = await Harem.get(interaction.guildId, parameters.harem_id);
 
             if (harem.isIn(parameters.harem_id)) {
                 interaction.reply({ ephemeral: true, content: "You are already in that harem" });
+                return;
+            }
+
+            if (!parameters.invited_id && !joining_harem.isOpen) {
+                interaction.update({
+                    components: [],
+                    content: userMention(parameters.harem_id) + " closed their harem. Ask them to open it again",
+                });
                 return;
             }
 

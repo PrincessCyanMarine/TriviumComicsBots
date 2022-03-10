@@ -432,16 +432,14 @@ d20.on("messageCreate", async (msg) => {
                                             new MessageActionRow().addComponents(
                                                 new MessageButton()
                                                     .setCustomId(
-                                                        `harem?command=accept_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
-                                                            msg.author.id
+                                                        `harem?command=accept_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${msg.author.id
                                                         }`
                                                     )
                                                     .setLabel("ACCEPT")
                                                     .setStyle("SUCCESS"),
                                                 new MessageButton()
                                                     .setCustomId(
-                                                        `harem?command=reject_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
-                                                            msg.author.id
+                                                        `harem?command=reject_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${msg.author.id
                                                         }`
                                                     )
                                                     .setLabel("REJECT")
@@ -456,7 +454,29 @@ d20.on("messageCreate", async (msg) => {
                             break;
 
                         case "open": {
+                            if (!harem.ownsOne) throw "You don't have a harem"
+                            harem.isOpen = true;
                             say(eli, msg.channel, await harem.getOpenMessage(msg), undefined, { messageReference: msg });
+                            break;
+                        }
+
+                        case "join": {
+                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem join @" or "harem join <id>"';
+                            let id = msg.mentions.members?.first()?.id || options[2];
+                            if (harem.isIn(id)) throw "You are already in that player's harem";
+                            if (!(await Harem.get(msg.guildId, id)).isOpen) throw userMention(id) + "'s harem is not open"
+                            harem.join(id);
+                            say(eli, msg.channel, `${msg.author} joined ${userMention(id) + "'s harem"}!!!`, undefined, {
+                                messageReference: msg,
+                            });
+                            break;
+                        }
+
+                        case "close": {
+                            if (!harem.ownsOne) throw "You don't have a harem"
+                            if (!harem.isOpen) throw "Your harem is already closed"
+                            harem.isOpen = false;
+                            say(eli, msg.channel, `${userMention(msg.author.id)} closed their harem`, undefined, { messageReference: msg });
                             break;
                         }
 
