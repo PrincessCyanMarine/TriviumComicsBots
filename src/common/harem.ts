@@ -23,21 +23,23 @@ export class Harem {
         this.remove(`harem/${id}/isIn`, this.userId);
     }
 
-    getMembersMessage(msg: Message): Promise<string | MessageOptions> {
+    getMembersMessage(msg: Message): Promise<MessageOptions> {
         return new Promise(async (resolve, reject) => {
             let harem = msg.mentions.members?.first() ? (await Harem.get(this.guildId, msg.mentions.members.first()!.id)).harem : this.harem;
             let target = msg.mentions.members?.first() ? msg.mentions.members!.first() : msg.member;
             let guild_members = await msg.guild?.members.fetch();
-            let res = "";
-            res += Array.isArray(harem?.members)
+            let content = "";
+            content += Array.isArray(harem?.members)
                 ? target?.displayName + "'s harem\n" + harem!.members.map((member) => guild_members?.get(member)?.displayName).join("\n")
                 : harem?.ownsOne
                 ? "There's no one on " + target?.displayName + "'s harem"
                 : "";
-            res += "\n\n";
-            res += Array.isArray(harem?.isIn)
+            content += "\n\n";
+            content += Array.isArray(harem?.isIn)
                 ? target?.displayName + " is a part of\n" + harem!.isIn.map((member) => guild_members?.get(member)?.displayName).join("\n")
                 : target?.displayName + " hasn't joined any harems";
+            content = content.slice(0, 4000);
+            let res: MessageOptions = { content };
             resolve(res);
         });
     }

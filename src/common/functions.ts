@@ -28,7 +28,8 @@ import { greet } from "../krystal/functions";
 import { ray_activities } from "../ray/activities";
 import { sadie_activities } from "../sadie/activities";
 import emojis from "./emojis";
-import { disturb_channels, ignore_channels, testChannelId } from "./variables";
+import { Harem } from "./harem";
+import { disturb_channels, ignore_channels, testChannelId, triviumGuildId } from "./variables";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");

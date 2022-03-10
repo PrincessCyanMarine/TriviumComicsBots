@@ -1,5 +1,5 @@
 require("https").globalAgent.options.ca = require("fs").readFileSync(
-  "node_modules/node_extra_ca_certs_mozilla_bundle/ca_bundle/ca_intermediate_root_bundle.pem"
+    "node_modules/node_extra_ca_certs_mozilla_bundle/ca_bundle/ca_intermediate_root_bundle.pem"
 );
 
 import "./express";
@@ -12,12 +12,12 @@ if (!process.env.FIREBASE_PRIVATE_KEY) exit(1);
 const private_key = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
 
 admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    privateKey: private_key,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  }),
-  databaseURL: process.env.DATABASE_URL,
+    credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: private_key,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    }),
+    databaseURL: process.env.DATABASE_URL,
 });
 export const database = admin.database().ref();
 
@@ -29,5 +29,6 @@ import "./eli/index";
 import "./ray/index";
 import "./interactions/index";
 import "./games/index";
+import { writeFileSync } from "fs";
 export const testing = process.env.TESTING == "true";
 console.log("Testing: " + testing);
