@@ -285,12 +285,12 @@ export function ignore_message(msg: Message, bot: Client): boolean {
 
 export type imageComponent =
     | {
-        path: string | Buffer;
-        x?: number;
-        y?: number;
-        width?: number;
-        height?: number;
-    }
+          path: string | Buffer;
+          x?: number;
+          y?: number;
+          width?: number;
+          height?: number;
+      }
     | string
     | Buffer;
 

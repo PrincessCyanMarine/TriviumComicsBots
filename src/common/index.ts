@@ -422,7 +422,8 @@ d20.on("messageCreate", async (msg) => {
                                 if (msg.mentions.members.first()?.id == msg.author.id) throw "You can't join your own harem";
                                 if (harem.includes(msg.mentions.members.first()!.id))
                                     throw `${msg.mentions.members.first()?.displayName} is already in your harem`;
-                                if (harem.isBanned(msg.mentions.members.first()!.id)) throw "That player is banned from your harem (use 'harem unban @')"
+                                if (harem.isBanned(msg.mentions.members.first()!.id))
+                                    throw "That player is banned from your harem (use 'harem unban @')";
 
                                 say(
                                     eli,
@@ -433,14 +434,16 @@ d20.on("messageCreate", async (msg) => {
                                             new MessageActionRow().addComponents(
                                                 new MessageButton()
                                                     .setCustomId(
-                                                        `harem?command=accept_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${msg.author.id
+                                                        `harem?command=accept_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
+                                                            msg.author.id
                                                         }`
                                                     )
                                                     .setLabel("ACCEPT")
                                                     .setStyle("SUCCESS"),
                                                 new MessageButton()
                                                     .setCustomId(
-                                                        `harem?command=reject_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${msg.author.id
+                                                        `harem?command=reject_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
+                                                            msg.author.id
                                                         }`
                                                     )
                                                     .setLabel("REJECT")
@@ -455,7 +458,7 @@ d20.on("messageCreate", async (msg) => {
                             break;
 
                         case "open": {
-                            if (!harem.ownsOne) throw "You don't have a harem"
+                            if (!harem.ownsOne) throw "You don't have a harem";
                             harem.isOpen = true;
                             say(eli, msg.channel, await harem.getOpenMessage(msg), undefined, { messageReference: msg });
                             break;
@@ -466,9 +469,9 @@ d20.on("messageCreate", async (msg) => {
                             let id = msg.mentions.members?.first()?.id || options[2];
                             if (id == msg.author.id) throw "You can't join your own harem";
                             if (harem.isIn(id)) throw "You are already in that player's harem";
-                            let joining = (await Harem.get(msg.guildId, id));
-                            if (!joining.isOpen) throw userMention(id) + "'s harem is not open"
-                            if (joining.isBanned(msg.author.id)) throw "You are banned from that harem"
+                            let joining = await Harem.get(msg.guildId, id);
+                            if (!joining.isOpen) throw userMention(id) + "'s harem is not open";
+                            if (joining.isBanned(msg.author.id)) throw "You are banned from that harem";
                             harem.join(id);
                             say(eli, msg.channel, `${msg.author} joined ${userMention(id) + "'s harem"}!!!`, undefined, {
                                 messageReference: msg,
@@ -478,8 +481,9 @@ d20.on("messageCreate", async (msg) => {
 
                         case "ban":
                         case "block": {
-                            if (!harem.ownsOne) throw "You don't have a harem"
-                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
+                            if (!harem.ownsOne) throw "You don't have a harem";
+                            if (!options[2] && !msg.mentions.members?.first())
+                                throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
                             let id = msg.mentions.members?.first()?.id || options[2];
                             harem.kick(id);
                             if (harem.isBanned(id)) throw "That player is already banned";
@@ -491,8 +495,9 @@ d20.on("messageCreate", async (msg) => {
                         }
                         case "unban":
                         case "unblock": {
-                            if (!harem.ownsOne) throw "You don't have a harem"
-                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
+                            if (!harem.ownsOne) throw "You don't have a harem";
+                            if (!options[2] && !msg.mentions.members?.first())
+                                throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
                             let id = msg.mentions.members?.first()?.id || options[2];
                             if (!harem.isBanned(id)) throw "That player is not banned";
                             harem.unban(id);
@@ -502,9 +507,21 @@ d20.on("messageCreate", async (msg) => {
                             break;
                         }
 
+                        case "list": {
+                            switch (options[2]) {
+                                case "open":
+                                    say(eli, msg.channel, await Harem.GetOpenHarems(msg.guild!.id));
+                                    break;
+                                default:
+                                    say(eli, msg.channel, await Harem.GetHarems(msg.guild!.id));
+                                    break;
+                            }
+                            break;
+                        }
+
                         case "close": {
-                            if (!harem.ownsOne) throw "You don't have a harem"
-                            if (!harem.isOpen) throw "Your harem is already closed"
+                            if (!harem.ownsOne) throw "You don't have a harem";
+                            if (!harem.isOpen) throw "Your harem is already closed";
                             harem.isOpen = false;
                             say(eli, msg.channel, `${userMention(msg.author.id)} closed their harem`, undefined, { messageReference: msg });
                             break;

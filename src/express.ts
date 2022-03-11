@@ -19,6 +19,7 @@ import { marineId, triviumGuildId } from "./common/variables";
 import { d20 } from "./clients";
 import { get_birds } from "./common/functions";
 import { readFileSync } from "fs";
+import { Harem } from "./common/harem";
 
 const express_app = express();
 const server = createServer(express_app);
@@ -274,6 +275,7 @@ express_app.get("/profile/:tokentype/:token", async (req, res) => {
             guild: profile.guild,
             prestige: profile.prestige,
             title: profile.style["title"],
+            harem: await Harem.get(guildId, user.id),
         })
     ).toDataURL();
 

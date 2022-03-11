@@ -29,6 +29,6 @@ import "./eli/index";
 import "./ray/index";
 import "./interactions/index";
 import "./games/index";
-import { writeFileSync } from "fs";
+
 export const testing = process.env.TESTING == "true";
 console.log("Testing: " + testing);

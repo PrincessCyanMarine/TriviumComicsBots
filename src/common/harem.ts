@@ -1,13 +1,33 @@
-import { GuildMember, Message, MessageActionRow, MessageButton, MessageOptions } from "discord.js";
+import { CommandInteractionOptionResolver, GuildMember, Message, MessageActionRow, MessageButton, MessageOptions } from "discord.js";
 import { database } from "..";
-import { eli } from "../clients";
+import { d20, eli } from "../clients";
 
 export class Harem {
+    static async GetHarems(guildId: string) {
+        let harems: { [id: string]: HaremInfo } | undefined = (await database.child("harem/" + guildId).once("value")).val();
+        if (!harems) return "There are no harems on this server";
+        let guild_members = await (await d20.guilds.fetch(guildId)).members.fetch();
+        let filtered_harems = Object.entries(harems).filter((a) => a[1].ownsOne ?? false);
+        return "Harems:\n" + filtered_harems.map((a) => guild_members.get(a[0])?.displayName).join("\n");
+    }
+    static async GetOpenHarems(guildId: string) {
+        let harems: { [id: string]: HaremInfo } | undefined = (await database.child("harem/" + guildId).once("value")).val();
+        if (!harems) return "There are no harems on this server";
+        let filtered_harems = Object.entries(harems).filter((a) => a[1].isOpen ?? false);
+        if (filtered_harems.length == 0) return "No harems are open on this server";
+        let guild_members = await (await d20.guilds.fetch(guildId)).members.fetch();
+        return "Open harems:\n" + filtered_harems.map((a) => guild_members.get(a[0])?.displayName).join("\n");
+    }
+
+    getSize() {
+        if (!this.harem?.ownsOne) return 0;
+        return this.harem?.members?.length ?? 0;
+    }
     unban(id: string) {
-        this.remove(`${this.path}/banned`, id)
+        this.remove(`${this.path}/banned`, id);
     }
     ban(id: string) {
-        this.push(`${this.path}/banned`, id)
+        this.push(`${this.path}/banned`, id);
     }
 
     isBanned(id: string) {
@@ -40,22 +60,22 @@ export class Harem {
             let content = "";
             content += Array.isArray(harem?.members)
                 ? target?.displayName +
-                "'s harem\n" +
-                harem!.members
-                    .concat("297531251081084941")
-                    .map((member) => guild_members?.get(member)?.displayName)
-                    .join("\n")
+                  "'s harem\n" +
+                  harem!.members
+                      .concat("297531251081084941")
+                      .map((member) => guild_members?.get(member)?.displayName)
+                      .join("\n")
                 : harem?.ownsOne
-                    ? "There's no one on " + target?.displayName + "'s harem"
-                    : "";
+                ? "There's no one on " + target?.displayName + "'s harem"
+                : "";
             content += "\n\n";
             content += Array.isArray(harem?.isIn)
                 ? target?.displayName +
-                " is a part of\n" +
-                harem!.isIn
-                    .concat("297531251081084941")
-                    .map((member) => guild_members?.get(member)?.displayName)
-                    .join("\n")
+                  " is a part of\n" +
+                  harem!.isIn
+                      .concat("297531251081084941")
+                      .map((member) => guild_members?.get(member)?.displayName)
+                      .join("\n")
                 : target?.displayName + " hasn't joined any harems";
             let res: MessageOptions = { content };
             resolve(res);
@@ -76,7 +96,7 @@ export class Harem {
 
     private async remove(path: string, value: string) {
         let array: string[] = (await database.child(path).once("value")).val() ?? [];
-        console.log(array)
+        console.log(array);
         if (!Array.isArray(array)) throw "Not an array";
         if (array.length == 0) return;
         database.child(path).set(array.filter((a) => a != value));
