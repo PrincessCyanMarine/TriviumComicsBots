@@ -188,7 +188,7 @@ export function changeActivity(
             console.error(`Couldn\'t change ${bot.user?.username}\'s avatar'`);
         });
     bot.guilds.cache.forEach((guild) => {
-        if (nickname) guild.me?.setNickname(nickname);
+        guild.me?.setNickname(nickname);
     });
     // console.log(bot.user?.username + ': ' + bot.user?.presence.status);
     database.child("activities/" + bot.user?.username).set(name);
@@ -285,12 +285,12 @@ export function ignore_message(msg: Message, bot: Client): boolean {
 
 export type imageComponent =
     | {
-          path: string | Buffer;
-          x?: number;
-          y?: number;
-          width?: number;
-          height?: number;
-      }
+        path: string | Buffer;
+        x?: number;
+        y?: number;
+        width?: number;
+        height?: number;
+    }
     | string
     | Buffer;
 
