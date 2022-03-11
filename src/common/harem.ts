@@ -3,6 +3,18 @@ import { database } from "..";
 import { eli } from "../clients";
 
 export class Harem {
+    unban(id: string) {
+        this.remove(`${this.path}/banned`, id)
+    }
+    ban(id: string) {
+        this.push(`${this.path}/banned`, id)
+    }
+
+    isBanned(id: string) {
+        if (!Array.isArray(this.harem?.banned)) return false;
+        return this.harem?.banned?.includes(id);
+    }
+
     getOpenMessage(msg: Message<boolean>): Promise<string | MessageOptions> {
         return new Promise(async (resolve, reject) => {
             resolve({
@@ -17,7 +29,7 @@ export class Harem {
     }
     kick(id: string) {
         this.remove(`${this.path}/members`, id);
-        this.remove(`harem/${id}/isIn`, this.userId);
+        this.remove(`harem/${this.guildId}/${id}/isIn`, this.userId);
     }
 
     getMembersMessage(msg: Message): Promise<MessageOptions> {
@@ -51,19 +63,22 @@ export class Harem {
     }
 
     private async push(path: string, value: any) {
-        let current = (await database.child(path).once("value")).val();
+        let current = (await database.child(path).once("value")).val() ?? [];
         let current_len = Array.isArray(current) ? current.length : 0;
         database.child(path + "/" + current_len).set(value);
     }
 
     async join(id: string) {
+        if (id == this.userId || this.isBanned(id) || this.includes(id)) return;
         this.push(`harem/${this.guildId}/${id}/members`, this.userId);
         this.push(`${this.path}/isIn`, id);
     }
 
     private async remove(path: string, value: string) {
-        let array: string[] = (await database.child(path).once("value")).val();
+        let array: string[] = (await database.child(path).once("value")).val() ?? [];
+        console.log(array)
         if (!Array.isArray(array)) throw "Not an array";
+        if (array.length == 0) return;
         database.child(path).set(array.filter((a) => a != value));
     }
 
@@ -143,4 +158,5 @@ type HaremInfo = {
     ownsOne: boolean;
     isIn?: string[];
     isOpen?: boolean;
+    banned?: string[];
 };

@@ -61,10 +61,16 @@ eli.on("interactionCreate", async (interaction) => {
             let harem = await Harem.get(interaction.guildId, interaction.user.id);
             let joining_harem = await Harem.get(interaction.guildId, parameters.harem_id);
 
+            if (joining_harem.isBanned(interaction.user.id)) {
+                interaction.reply({ ephemeral: true, content: "You are banned from that harem" });
+                return
+            }
+
             if (harem.isIn(parameters.harem_id)) {
                 interaction.reply({ ephemeral: true, content: "You are already in that harem" });
                 return;
             }
+
 
             if (!parameters.invited_id && !joining_harem.isOpen) {
                 interaction.update({

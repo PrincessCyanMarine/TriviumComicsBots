@@ -422,6 +422,7 @@ d20.on("messageCreate", async (msg) => {
                                 if (msg.mentions.members.first()?.id == msg.author.id) throw "You can't join your own harem";
                                 if (harem.includes(msg.mentions.members.first()!.id))
                                     throw `${msg.mentions.members.first()?.displayName} is already in your harem`;
+                                if (harem.isBanned(msg.mentions.members.first()!.id)) throw "That player is banned from your harem (use 'harem unban @')"
 
                                 say(
                                     eli,
@@ -463,10 +464,39 @@ d20.on("messageCreate", async (msg) => {
                         case "join": {
                             if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem join @" or "harem join <id>"';
                             let id = msg.mentions.members?.first()?.id || options[2];
+                            if (id == msg.author.id) throw "You can't join your own harem";
                             if (harem.isIn(id)) throw "You are already in that player's harem";
-                            if (!(await Harem.get(msg.guildId, id)).isOpen) throw userMention(id) + "'s harem is not open"
+                            let joining = (await Harem.get(msg.guildId, id));
+                            if (!joining.isOpen) throw userMention(id) + "'s harem is not open"
+                            if (joining.isBanned(msg.author.id)) throw "You are banned from that harem"
                             harem.join(id);
                             say(eli, msg.channel, `${msg.author} joined ${userMention(id) + "'s harem"}!!!`, undefined, {
+                                messageReference: msg,
+                            });
+                            break;
+                        }
+
+                        case "ban":
+                        case "block": {
+                            if (!harem.ownsOne) throw "You don't have a harem"
+                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
+                            let id = msg.mentions.members?.first()?.id || options[2];
+                            harem.kick(id);
+                            if (harem.isBanned(id)) throw "That player is already banned";
+                            harem.ban(id);
+                            say(eli, msg.channel, `Banned ${userMention(id)} from ${msg.author}'s harem!!!`, undefined, {
+                                messageReference: msg,
+                            });
+                            break;
+                        }
+                        case "unban":
+                        case "unblock": {
+                            if (!harem.ownsOne) throw "You don't have a harem"
+                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
+                            let id = msg.mentions.members?.first()?.id || options[2];
+                            if (!harem.isBanned(id)) throw "That player is not banned";
+                            harem.unban(id);
+                            say(eli, msg.channel, `Unbanned ${userMention(id)} from ${msg.author}'s harem!!!`, undefined, {
                                 messageReference: msg,
                             });
                             break;
