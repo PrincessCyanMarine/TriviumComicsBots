@@ -369,21 +369,49 @@ express_app.get("/commands", (req, res) => {
     res.send(JSON.parse(readFileSync("./commands.json", "utf-8")));
 });
 
-express_app.get("/harem/:guild_id/:user_id", async (req, res) => {
+express_app.get("/harem/harem/:guild_id/:user_id", async (req, res) => {
     let { guild_id, user_id } = req.params;
     let harem = (await Harem.get(guild_id, user_id)).harem;
-    if (!harem) return res.json({});
+    if (!harem) return res.json(null);
     let members = await (await d20.guilds.fetch(guild_id)).members.fetch();
-    if (!members.get(user_id)) return res.json({});
+    if (!members.get(user_id)) return res.json(null);
 
-    let names: { [id: string]: string } = {};
+    let users: { [id: string]: { displayName: string; displayAvatarURL: string } } = {};
 
-    harem?.members?.filter((member) => members.get(member) != null).forEach((member) => (names[member] = members.get(member)!.displayName));
-    harem?.isIn?.filter((member) => !(member in names) && members.get(member) != null).map((member) => members.get(member)!.displayName);
+    const addUser = (id: string) => {
+        let member = members.get(id);
+        if (!member) return;
+        users[id] = { displayName: member.displayName, displayAvatarURL: member.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }) };
+    };
 
-    names[user_id] = members.get(user_id)!.displayName;
+    harem?.members?.filter((member) => members.get(member) != null).forEach(addUser);
+    harem?.isIn?.filter((member) => !(member in users) && members.get(member) != null).forEach(addUser);
 
-    res.json({ ...harem, names });
+    addUser(user_id);
+
+    res.json({ ...harem, users });
+});
+
+express_app.get("/harem/guild/:guild_id", async (req, res) => {
+    let { guild_id } = req.params;
+    let harem = (await database.child("harem/" + guild_id).once("value")).val();
+    if (!harem) return res.json(null);
+    let guild = await d20.guilds.fetch(guild_id);
+    let members = await guild.members.fetch();
+
+    const addUser = (id: string) => {
+        let member = members.get(id);
+        if (!member) return;
+        users[id] = { displayName: member.displayName, displayAvatarURL: member.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }) };
+    };
+
+    let users: { [id: string]: { displayName: string; displayAvatarURL: string } } = {};
+
+    Object.keys(harem).forEach(addUser);
+
+    let guild_info = { name: guild.name };
+
+    res.json({ harems: harem, users, guild: guild_info });
 });
 
 server.listen(port, () => {
