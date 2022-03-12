@@ -47,8 +47,6 @@ d20.on("messageCreate", async (msg) => {
                 prestige(msg);
                 break;
             case "c":
-                // say(d20, msg.channel, "Currently unavailable");
-                // return;
                 say(d20, msg.channel, {
                     content: "You can customize your card here",
                     components: [
