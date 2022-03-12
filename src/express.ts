@@ -399,6 +399,10 @@ express_app.get("/harem/guild/:guild_id", async (req, res) => {
     let guild = await d20.guilds.fetch(guild_id);
     let members = await guild.members.fetch();
 
+    Object.entries(harem)
+        .filter((h: any) => !h[1].ownsOne)
+        .forEach((h) => delete harem[h[0]]);
+
     const addUser = (id: string) => {
         let member = members.get(id);
         if (!member) return;
