@@ -86,7 +86,7 @@ export class Harem {
             let components: MessageActionRow[] = [
                 new MessageActionRow().addComponents(
                     new MessageButton()
-                        .setURL(`https://cyanmarine.net/tc/${this.guildId}/${target.id}/harem`)
+                        .setURL(`https://cyanmarine.net/tc/harem/${this.guildId}/${target.id}`)
                         .setStyle("LINK")
                         .setEmoji(getCharacterEmoji())
                         .setLabel(`${target instanceof GuildMember ? target.displayName : target.username}'s harem info`)
