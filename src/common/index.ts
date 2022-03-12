@@ -555,6 +555,7 @@ d20.on("messageCreate", async (msg) => {
                     else console.error(err);
                     return;
                 }
+                break;
             }
 
             case "harems": {
@@ -569,7 +570,6 @@ d20.on("messageCreate", async (msg) => {
                         ),
                     ],
                 });
-
                 break;
             }
         }
