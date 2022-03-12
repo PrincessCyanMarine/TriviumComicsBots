@@ -89,7 +89,7 @@ export class Harem {
                         .setURL(`https://cyanmarine.net/tc/${this.guildId}/${target.id}/harem`)
                         .setStyle("LINK")
                         .setEmoji(getCharacterEmoji())
-                        .setLabel(`${target instanceof GuildMember ? target.displayName : target.username}'s guild info`)
+                        .setLabel(`${target instanceof GuildMember ? target.displayName : target.username}'s harem info`)
                 ),
             ];
             resolve({ components });
