@@ -1,6 +1,7 @@
 import { CommandInteractionOptionResolver, GuildMember, Message, MessageActionRow, MessageButton, MessageOptions } from "discord.js";
 import { database } from "..";
 import { d20, eli } from "../clients";
+import { getCharacterEmoji } from "./functions";
 
 export class Harem {
     static async GetHarems(guildId: string) {
@@ -54,7 +55,7 @@ export class Harem {
 
     getMembersMessage(msg: Message): Promise<MessageOptions> {
         return new Promise(async (resolve, reject) => {
-            let harem = msg.mentions.members?.first() ? (await Harem.get(this.guildId, msg.mentions.members.first()!.id)).harem : this.harem;
+            /*let harem = msg.mentions.members?.first() ? (await Harem.get(this.guildId, msg.mentions.members.first()!.id)).harem : this.harem;
             let target = msg.mentions.members?.first() ? msg.mentions.members!.first() : msg.member;
             let guild_members = await msg.guild?.members.fetch();
             let content = "";
@@ -78,7 +79,20 @@ export class Harem {
                       .join("\n")
                 : target?.displayName + " hasn't joined any harems";
             let res: MessageOptions = { content };
-            resolve(res);
+            resolve(res);*/
+
+            let target = msg.mentions.members?.first() ?? msg.member ?? msg.author;
+
+            let components: MessageActionRow[] = [
+                new MessageActionRow().addComponents(
+                    new MessageButton()
+                        .setURL(`https://cyanmarine.net/tc/${this.guildId}/${target.id}/harem`)
+                        .setStyle("LINK")
+                        .setEmoji(getCharacterEmoji())
+                        .setLabel(`${target instanceof GuildMember ? target.displayName : target.username}'s guild info`)
+                ),
+            ];
+            resolve({ components });
         });
     }
 

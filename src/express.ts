@@ -369,6 +369,23 @@ express_app.get("/commands", (req, res) => {
     res.send(JSON.parse(readFileSync("./commands.json", "utf-8")));
 });
 
+express_app.get("/harem/:guild_id/:user_id", async (req, res) => {
+    let { guild_id, user_id } = req.params;
+    let harem = (await Harem.get(guild_id, user_id)).harem;
+    if (!harem) return res.json({});
+    let members = await (await d20.guilds.fetch(guild_id)).members.fetch();
+    if (!members.get(user_id)) return res.json({});
+
+    let names: { [id: string]: string } = {};
+
+    harem?.members?.filter((member) => members.get(member) != null).forEach((member) => (names[member] = members.get(member)!.displayName));
+    harem?.isIn?.filter((member) => !(member in names) && members.get(member) != null).map((member) => members.get(member)!.displayName);
+
+    names[user_id] = members.get(user_id)!.displayName;
+
+    res.json({ ...harem, names });
+});
+
 server.listen(port, () => {
     console.log("Server is listening on http://localhost:" + port);
 });

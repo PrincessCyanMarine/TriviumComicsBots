@@ -375,7 +375,8 @@ export const get_powers = () =>
         .split("\n")
         .map((a) => JSON.parse(a));
 
-export function getCharacterEmoji(character: string) {
+export function getCharacterEmoji(character?: string) {
+    if (!character) return emojis[random_from_array(Object.keys(emojis))];
     if (character.match(/d20/i)) return "";
     let res = "";
     ["sadie", "ray", "krystal", "eli"].forEach((a) => {
