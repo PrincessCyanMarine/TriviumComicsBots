@@ -20,6 +20,7 @@ import { d20 } from "./clients";
 import { get_birds } from "./common/functions";
 import { readFileSync } from "fs";
 import { Harem } from "./common/harem";
+import { verify } from "jsonwebtoken";
 
 const express_app = express();
 const server = createServer(express_app);
@@ -109,57 +110,6 @@ function getUser(tokenType: string, accessToken: string): Promise<getUserStuff> 
         );
     });
 }
-
-express_app.get("/card/:tokentype/:token", async (req, res) => {
-    let tokenType = req.params.tokentype;
-    let accessToken = req.params.token;
-
-    let { statusCode, user } = await getUser(tokenType, accessToken);
-    database
-        .child("card")
-        .child(user.id)
-        .once("value")
-        .then((card) => res.send(card.val()));
-});
-
-express_app.post("/card/:tokentype/:token", async (req, res) => {
-    let tokenType = req.params.tokentype;
-    let accessToken = req.params.token;
-
-    // console.log(req.body);
-
-    let card = {
-        type: req.body.type,
-        color: req.body.color,
-        color2: req.body.color2,
-        title: req.body.title,
-    };
-
-    let { statusCode, user } = await getUser(tokenType, accessToken);
-    database
-        .child("card")
-        .child(user.id)
-        .set(card)
-        .then(() => {
-            res.send(card);
-        });
-});
-
-express_app.get("/result", async (req, res) => {
-    let type = req.query.type;
-    let color = req.query.color;
-    let color2 = req.query.color2;
-
-    if (typeof type != "string") type = "normal";
-    if (typeof color != "string") color = "#000000";
-    if (typeof color2 != "string") color2 = "#000000";
-
-    if (!color.startsWith("#")) color = "#" + color;
-    if (!color2.startsWith("#")) color2 = "#" + color2;
-
-    let canvas = await createXpBar(type, color, color2);
-    res.send(canvas.toDataURL());
-});
 
 express_app.get("/user/:tokentype/:token", async (req, res) => {
     let { user } = await getUser(req.params.tokentype, req.params.token);
