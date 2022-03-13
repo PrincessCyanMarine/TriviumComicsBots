@@ -55,7 +55,7 @@ d20.on("messageCreate", async (msg) => {
                                 type: "BUTTON",
                                 label: "Customize",
                                 style: "LINK",
-                                url: "https://cyanmarine.net/tc/card/customize",
+                                url: "https://www.cyanmarine.net/tc/card/customize",
                             },
                         ]),
                     ],
@@ -65,7 +65,7 @@ d20.on("messageCreate", async (msg) => {
                 let target = msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member;
                 const profile = [
                     () => {
-                        say(d20, msg.channel, "You can customize your card at https://cyanmarine.net/tc/card/customize");
+                        say(d20, msg.channel, "You can customize your card at https://www.cyanmarine.net/tc/card/customize");
                     },
                     () => {
                         msg.channel.sendTyping();
@@ -260,7 +260,7 @@ d20.on("messageCreate", async (msg) => {
                                 new MessageButton()
                                     .setStyle("LINK")
                                     .setLabel(`See ${target.displayName}'s birddex`)
-                                    .setURL(`https://cyanmarine.net/tc/birddex?id=${target.id}&guild_id=${msg.guildId}`)
+                                    .setURL(`https://www.cyanmarine.net/tc/birddex?id=${target.id}&guild_id=${msg.guildId}`)
                                     .setEmoji("🐦")
                             ),
                         ],
@@ -563,7 +563,7 @@ d20.on("messageCreate", async (msg) => {
                     components: [
                         new MessageActionRow().addComponents(
                             new MessageButton()
-                                .setURL(`https://cyanmarine.net/tc/harem/${msg.guildId}`)
+                                .setURL(`https://www.cyanmarine.net/tc/harem/${msg.guildId}`)
                                 .setStyle("LINK")
                                 .setEmoji(getCharacterEmoji())
                                 .setLabel(`All harems of ${msg.guild?.name ?? "this server"}`)
