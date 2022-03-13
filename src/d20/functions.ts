@@ -209,7 +209,7 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
             ctx.fillText(`100%`, 710, 49);
         }
 
-        if (cardoptions.title) ctx.fillText(cardoptions.title, 15, 259);
+        if (cardoptions.title) ctx.fillText(cardoptions.title.replace(/\n/g, " ").substring(0, 140), 15, 259);
 
         let badge_positions = [665, 601, 537, 473];
         let badges = [];
