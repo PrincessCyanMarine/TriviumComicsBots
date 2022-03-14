@@ -209,8 +209,6 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
             ctx.fillText(`100%`, 710, 49);
         }
 
-        if (cardoptions.title) ctx.fillText(cardoptions.title.replace(/\n/g, " ").substring(0, 140), 15, 259);
-
         let badge_positions = [665, 601, 537, 473];
         let badges = [];
         let badge_patreon = await loadImage("./assets/d20/card/patreon.png");
@@ -234,7 +232,7 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
 
         if (cardoptions.target.user.bot) ctx.drawImage(await loadImage("./assets/d20/card/bot.png"), 906, 605);
 
-        if (cardoptions.title) ctx.fillText(cardoptions.title, 15, 235 + 24);
+        if (cardoptions.title) ctx.fillText(cardoptions.title.replace(/\n/g, " ").substring(0, 70), 15, 235 + 24);
         if (cardoptions.guild) ctx.fillText(cardoptions.guild, 800, 73 + 24);
 
         ctx.fillText(`${cardoptions.time_on_server.toString()} months`, 521, 340 + 24);
