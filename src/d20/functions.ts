@@ -334,7 +334,7 @@ export async function bankick(interaction: CommandInteraction, type: "ban" | "ki
         return;
     }
     if (target.permissions.has(perm)) {
-        reply(interaction, "You can't ban that player", true);
+        reply(interaction, "You can't " + type + " that player", true);
         return;
     }
 
