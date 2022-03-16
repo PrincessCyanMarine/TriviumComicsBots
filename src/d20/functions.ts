@@ -333,6 +333,11 @@ export async function bankick(interaction: CommandInteraction, type: "ban" | "ki
         reply(interaction, "You don' have permission to do that...", true);
         return;
     }
+    if (target.permissions.has(perm)) {
+        reply(interaction, "You can't ban that player", true);
+        return;
+    }
+
     let target_name = target.displayName;
 
     let fun = type == "ban" ? target.ban({ reason: reason, days: days }) : target.kick(reason);
