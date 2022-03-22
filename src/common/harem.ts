@@ -164,7 +164,7 @@ export class Harem {
     static get(guildId: string | null, userId: string): Promise<Harem> {
         return new Promise(async (resolve, reject) => {
             let instance = new Harem(guildId, userId);
-            instance.harem = (await database.child(instance.path).once("value")).val();
+            instance.harem = (await database.child(instance.path).once("value")).val() ?? {};
             resolve(instance);
         });
     }
