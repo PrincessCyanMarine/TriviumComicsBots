@@ -12,7 +12,8 @@ const roleplay_channels = () => {
         output: '909152121037926420'
     }; else return {
         input: '726171325856743525',
-        output: '562431692703531018'
+        //output: '562431692703531018'
+        output: "725932268891406368"
     };
 
 }
