@@ -14,7 +14,6 @@ ray.on("messageCreate", (msg) => {
 
 // ray.on("typingStart", async (typing) => {
 //     if (typing.channel.id == roleplay_channels().input) {
-//         console.log(typing);
 //         let bot = await (await database.child("roleplay/" + typing.user.id).once("value")).val();
 //         if (!bot) {
 //             say(ray, typing.channel, "You need to select a character to roleplay as");
