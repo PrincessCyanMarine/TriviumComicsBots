@@ -83,7 +83,7 @@ export const roleplay_channels = () => {
     else
         return {
             input: "726171325856743525",
-            //output: '562431692703531018'
-            output: "725932268891406368",
+            output: "562431692703531018",
+            // output: "725932268891406368",
         };
 };
