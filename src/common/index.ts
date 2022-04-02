@@ -14,7 +14,7 @@ import { database, testing } from "..";
 import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { changeActivity, getCharacterEmoji, get_birds, random_from_array, say, wait } from "./functions";
+import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, random_from_array, say, wait } from "./functions";
 import { command_list, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, hyperlink, memberNicknameMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
@@ -632,7 +632,7 @@ d20.on("messageCreate", async (msg) => {
                             if (delay) await wait(parseInt(delay));
                             await channel.sendTyping();
                             await wait(parseInt(typing ?? "0"));
-                            if (content) await channel.send(content);
+                            if (content) await channel.send(detectEmoji(content));
                             next();
                         }
                     });
