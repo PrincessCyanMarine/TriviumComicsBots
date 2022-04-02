@@ -28,6 +28,7 @@ import { Calculator } from "../games/calculator";
 import emojis from "./emojis";
 import { Help } from "./help";
 import { Harem } from "./harem";
+import axios from "axios";
 
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
@@ -571,6 +572,22 @@ d20.on("messageCreate", async (msg) => {
                     ],
                 });
                 break;
+            }
+
+            case "isekai": {
+                if (!msg.attachments.first()) {
+                    say(d20, msg.channel, "You need to attach a file to this command");
+                    return;
+                }
+                if (msg.attachments.first()!.contentType != "text/plain; charset=utf-8") {
+                    say(d20, msg.channel, "Incorrect file format");
+                    return;
+                }
+                let url = msg.attachments.first()!.url;
+                let text: string = (await axios.get(url)).data;
+                console.log(text.split(/^# \<[A-Z]+\> [0-9]+/gi));
+                // # \<[A-Z]+\> [0-9]+[\n\r]{1,2}[^#]+
+                // say(d20, msg.channel, text);
             }
         }
     }
