@@ -72,3 +72,15 @@ export enum TIME {
 export const command_list: { [character: string]: { [command_name: string]: string | boolean } } = JSON.parse(
     readFileSync("./commands.json", "utf-8")
 );
+
+export const roleplay_channels = () => {
+    if (testing) return {
+        input: '909151745605791804',
+        output: '909152121037926420'
+    }; else return {
+        input: '726171325856743525',
+        //output: '562431692703531018'
+        output: "725932268891406368"
+    };
+
+}

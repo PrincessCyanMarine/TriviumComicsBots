@@ -5,18 +5,8 @@ import assets from "../assetsIndexes";
 import { beat } from "../attachments";
 import { clients, id2bot, ray } from "../clients";
 import { getTarget, say } from "../common/functions";
+import { roleplay_channels } from "../common/variables";
 
-const roleplay_channels = () => {
-    if (testing) return {
-        input: '909151745605791804',
-        output: '909152121037926420'
-    }; else return {
-        input: '726171325856743525',
-        //output: '562431692703531018'
-        output: "725932268891406368"
-    };
-
-}
 export async function roleplay(msg: Message) {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
     let rc = roleplay_channels();
