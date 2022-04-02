@@ -19,7 +19,7 @@ export async function roleplay(msg: Message) {
     let message: MessageOptions = {};
     if (msg.content) message.content = msg.content;
     if (msg.attachments) message.files = msg.attachments.map((a) => a);
-    say(clients[id2bot[bot]], rc.output, message, 1).catch(console.error);
+    say(clients[id2bot[bot]], rc.output, message).catch(console.error);
 }
 
 export async function beating(msg: Message, target: User | GuildMember | undefined = getTarget(msg)) {
