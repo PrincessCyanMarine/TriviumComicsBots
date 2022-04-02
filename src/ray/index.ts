@@ -1,8 +1,8 @@
-import { testing } from "..";
-import { ray } from "../clients";
-import { ignore_message } from "../common/functions";
+import { database, testing } from "..";
+import { clients, id2bot, ray } from "../clients";
+import { ignore_message, say } from "../common/functions";
 import { Help } from "../common/help";
-import { ignore_channels, testChannelId } from "../common/variables";
+import { ignore_channels, roleplay_channels, testChannelId } from "../common/variables";
 import { testCommands } from "./commandHandler";
 import { roleplay } from "./functions";
 
@@ -10,6 +10,21 @@ ray.on("messageCreate", (msg) => {
     roleplay(msg);
     if (ignore_message(msg, ray)) return;
     testCommands(msg);
+});
+
+ray.on("typingStart", async (typing) => {
+    if (typing.channel.id == roleplay_channels().input) {
+        console.log(typing);
+        let bot = await (await database.child("roleplay/" + typing.user.id).once("value")).val();
+        if (!bot) {
+            say(ray, typing.channel, "You need to select a character to roleplay as");
+            return;
+        }
+
+        let out = await clients[id2bot[bot]].channels.fetch(roleplay_channels().output);
+        if (!out?.isText()) return;
+        out.sendTyping();
+    }
 });
 
 ray.on("interactionCreate", (interaction) => {

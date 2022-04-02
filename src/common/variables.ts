@@ -1,6 +1,7 @@
 // IDs are already public
 
 import { readFileSync } from "fs";
+import { testing } from "..";
 
 export const testGuildId: string = "620635349173010465";
 export const triviumGuildId: string = "562429293364248587";
@@ -74,13 +75,15 @@ export const command_list: { [character: string]: { [command_name: string]: stri
 );
 
 export const roleplay_channels = () => {
-    if (testing) return {
-        input: '909151745605791804',
-        output: '909152121037926420'
-    }; else return {
-        input: '726171325856743525',
-        //output: '562431692703531018'
-        output: "725932268891406368"
-    };
-
-}
+    if (testing)
+        return {
+            input: "909151745605791804",
+            output: "909152121037926420",
+        };
+    else
+        return {
+            input: "726171325856743525",
+            //output: '562431692703531018'
+            output: "725932268891406368",
+        };
+};

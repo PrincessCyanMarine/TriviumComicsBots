@@ -9,6 +9,7 @@ const intents = [
     Intents.FLAGS.GUILD_INTEGRATIONS,
     Intents.FLAGS.GUILD_MEMBERS,
     Intents.FLAGS.GUILD_PRESENCES,
+    Intents.FLAGS.GUILD_MESSAGE_TYPING,
 ];
 
 export var krystal = new Client({ intents }),
