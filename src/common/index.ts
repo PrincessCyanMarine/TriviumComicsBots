@@ -1,4 +1,5 @@
 import {
+    AnyChannel,
     BaseMessageComponentOptions,
     GuildMember,
     Message,
@@ -10,10 +11,10 @@ import {
     TextChannel,
 } from "discord.js";
 import { database, testing } from "..";
-import { clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
+import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { changeActivity, getCharacterEmoji, get_birds, random_from_array, say } from "./functions";
+import { changeActivity, getCharacterEmoji, get_birds, random_from_array, say, wait } from "./functions";
 import { command_list, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, hyperlink, memberNicknameMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
@@ -575,6 +576,11 @@ d20.on("messageCreate", async (msg) => {
             }
 
             case "isekai": {
+                if (!msg.member.permissions.has("MANAGE_MESSAGES")) {
+                    say(d20, msg.channel, "You don't have the permission to use this command");
+                    return;
+                }
+
                 if (!msg.attachments.first()) {
                     say(d20, msg.channel, "You need to attach a file to this command");
                     return;
@@ -585,7 +591,52 @@ d20.on("messageCreate", async (msg) => {
                 }
                 let url = msg.attachments.first()!.url;
                 let text: string = (await axios.get(url)).data;
-                console.log(text.split(/^# \<[A-Z]+\> [0-9]+/gi));
+
+                let match = text
+                    .split("# ")
+                    .map((a) => a.match(/\<(?<character>[A-Z0-9]+)\> (?<typing>[0-9]+) ?(?<delay>[0-9]+)?[\n\r]{1,2}(?<content>[\w\W]+)/i));
+
+                match.shift();
+
+                let channel_id = msg.mentions.channels.first()?.id ?? msg.channel.id;
+
+                let channels: { [character: string]: Promise<AnyChannel | null> } = {
+                    d20: d20.channels.fetch(channel_id),
+                    eli: eli.channels.fetch(channel_id),
+                    sadie: sadie.channels.fetch(channel_id),
+                    krystal: krystal.channels.fetch(channel_id),
+                    ray: ray.channels.fetch(channel_id),
+                    cerby: cerby.channels.fetch(channel_id),
+                };
+
+                let nextLine = (i: number): Promise<void> =>
+                    new Promise(async (resolve) => {
+                        let next = async () => {
+                            if (i < match.length - 1) await nextLine(i + 1);
+                            resolve();
+                        };
+                        let current = match[i];
+                        if (
+                            !current ||
+                            !current.groups ||
+                            !("character" in current.groups) ||
+                            !("typing" in current.groups) ||
+                            !("content" in current.groups)
+                        ) {
+                            next();
+                            return;
+                        }
+                        let { character, delay = null, typing, content } = current.groups;
+                        let channel = await channels[character.toLowerCase()];
+                        if (channel?.isText()) {
+                            if (delay) await wait(parseInt(delay));
+                            await channel.sendTyping();
+                            await wait(parseInt(typing ?? "0"));
+                            if (content) await channel.send(content);
+                            next();
+                        }
+                    });
+                nextLine(0);
                 // # \<[A-Z]+\> [0-9]+[\n\r]{1,2}[^#]+
                 // say(d20, msg.channel, text);
             }
