@@ -15,8 +15,8 @@ import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from ".
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, random_from_array, say, wait } from "./functions";
-import { command_list, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
-import { channelMention, hyperlink, memberNicknameMention, userMention } from "@discordjs/builders";
+import { colors, command_list, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
+import { ActionRow, ButtonComponent, channelMention, hyperlink, memberNicknameMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 import { summon, SUMMON_NAMES } from "../games/summon";
@@ -30,6 +30,8 @@ import emojis from "./emojis";
 import { Help } from "./help";
 import { Harem } from "./harem";
 import axios from "axios";
+import { MessageButtonStyles } from "discord.js/typings/enums";
+import { ButtonStyle } from "discord-api-types";
 
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
@@ -393,6 +395,28 @@ d20.on("messageCreate", async (msg) => {
             }
             case "help": {
                 new Help(msg);
+                break;
+            }
+
+            case "colors": {
+                if (msg.author.id != marineId) return;
+
+                let components = [];
+                for (let [name, color, roleId, emoji, necessaryIds] of colors) {
+                    if (!components[components.length - 1] || components[components.length - 1]?.components.length >= 5)
+                        components.push(new MessageActionRow());
+                    components[components.length - 1]?.addComponents(
+                        new MessageButton()
+                            .setLabel(name)
+                            .setStyle("PRIMARY")
+                            .setEmoji(emoji)
+                            .setCustomId(`colors?id=${roleId}&necessary=${necessaryIds.join(",")}`)
+                    );
+                }
+                say(krystal, options[1], {
+                    content: "What color do you want your name to be displayed as? (You need to have the role that corresponds to that color)",
+                    components,
+                });
                 break;
             }
 
