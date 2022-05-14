@@ -24,14 +24,10 @@ import { krystal_activities } from "../krystal/activities";
 import { sadie_activities } from "../sadie/activities";
 import { eli_activities } from "../eli/activities";
 import { ray_activities } from "../ray/activities";
-import { readFileSync } from "fs";
 import { Calculator } from "../games/calculator";
-import emojis from "./emojis";
 import { Help } from "./help";
 import { Harem } from "./harem";
 import axios from "axios";
-import { MessageButtonStyles } from "discord.js/typings/enums";
-import { ButtonStyle } from "discord-api-types";
 
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;

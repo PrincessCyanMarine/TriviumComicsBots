@@ -8,6 +8,7 @@ import {
     Message,
     MessageAttachment,
     MessageComponent,
+    MessageEditOptions,
     MessageEmbed,
     MessageOptions,
     PresenceStatusData,
@@ -86,7 +87,7 @@ export const say = (
             .catch(reject);
     });
 
-export function edit(msg: Message, content: string | MessageOptions, delay = 1000) {
+export function edit(msg: Message, content: string | MessageEditOptions, delay = 1000) {
     return new Promise((resolve, reject) => {
         delay = Math.max(1, delay);
 
