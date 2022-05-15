@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { testing } from "../..";
+import { database, testing } from "../..";
 import { krystal } from "../../clients";
 import { colors, triviumGuildId } from "../../common/variables";
 
@@ -21,6 +21,7 @@ krystal.on("interactionCreate", async (interaction) => {
                 interaction.member.roles.remove(roleId);
                 if (roleId === id) {
                     interaction.reply({ content: "Removed the " + color + " role", ephemeral: true });
+                    await database.child(`colors/${interaction.member.id}`).remove();
                     break;
                 }
             }
@@ -33,6 +34,7 @@ krystal.on("interactionCreate", async (interaction) => {
 
                         interaction.member.roles.add(roleId);
                         interaction.reply({ content: "You have been given the " + color + " role", ephemeral: true });
+                        await database.child(`colors/${interaction.member.id}`).set(color);
                         break;
                     }
                 if (!hasRole) interaction.reply({ content: "You don't have the necessary role", ephemeral: true });
