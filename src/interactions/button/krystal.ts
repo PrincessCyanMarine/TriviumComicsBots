@@ -26,10 +26,12 @@ krystal.on("interactionCreate", async (interaction) => {
                 }
             }
 
+            let mod = interaction.member.permissions.has("MANAGE_ROLES");
+
             if (id === roleId) {
                 let hasRole = false;
                 for (const necessary of necessaryIds)
-                    if (interaction.member.roles.cache.has(necessary)) {
+                    if (mod || interaction.member.roles.cache.has(necessary)) {
                         hasRole = true;
 
                         interaction.member.roles.add(roleId);
