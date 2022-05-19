@@ -64,19 +64,14 @@ d20.on("interactionCreate", async (interaction) => {
             let reason = interaction.options.get("reason")?.value;
             let player = interaction.options.get("player")?.member;
 
-            if (!(interaction.member instanceof GuildMember)) return;
-            if (!interaction.member.permissions.has("KICK_MEMBERS")) {
+            if (!(interaction.member instanceof GuildMember) || !(player instanceof GuildMember)) return;
+
+            if (!interaction.member.permissions.has("KICK_MEMBERS") && !player.permissions.has("KICK_MEMBERS")) {
                 reply(interaction, "You can' do that", true);
                 return;
             }
-            if (
-                !player ||
-                !(player instanceof GuildMember) ||
-                !reason ||
-                !(typeof reason == "string") ||
-                !interaction.guildId ||
-                !interaction.channel
-            ) {
+
+            if (!reason || !(typeof reason == "string") || !interaction.guildId || !interaction.channel) {
                 reply(interaction, "Something went wrong", true);
                 return;
             }
