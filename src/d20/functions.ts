@@ -478,11 +478,13 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
     if (!warnings || typeof warnings != "object") warnings = [];
     warnings.push(reason);
     let text = `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings\n${
-        warnings.length == 2
-            ? "If they receive one more warning, they will be kicked from the server"
-            : warnings.length >= 3
-            ? "Therefore they were kicked from the server"
-            : "The next warning will result on them getting muted"
+        !player.permissions.has("KICK_MEMBERS")
+            ? warnings.length == 2
+                ? "If they receive one more warning, they will be kicked from the server"
+                : warnings.length >= 3
+                ? "Therefore they were kicked from the server"
+                : "The next warning will result on them getting muted"
+            : "They are a moderator and therefore this is useless"
     }\nIf you think this warning was undeserved, talk to a Queensblade`;
     database.child(`warnings/${guildId}/${player.id}`).set(warnings);
     if (!player.permissions.has("KICK_MEMBERS"))
