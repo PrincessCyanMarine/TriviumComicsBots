@@ -477,17 +477,18 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
     let warnings = await (await database.child(`warnings/${guildId}/${player.id}`).once("value")).val();
     if (!warnings || typeof warnings != "object") warnings = [];
     warnings.push(reason);
+    let works = !player.permissions.has("KICK_MEMBERS");
     let text = `${player.user.username} has been warned for ${reason}\nThey have ${warnings.length} warnings\n${
-        !player.permissions.has("KICK_MEMBERS")
+        works
             ? warnings.length == 2
                 ? "If they receive one more warning, they will be kicked from the server"
                 : warnings.length >= 3
                 ? "Therefore they were kicked from the server"
                 : "The next warning will result on them getting muted"
             : "They are a Queensblade and therefore this is useless"
-    }\nIf you think this warning was undeserved, talk to a Queensblade`;
+    }${works ? "\nIf you think this warning was undeserved, talk to a Queensblade" : ""}`;
     database.child(`warnings/${guildId}/${player.id}`).set(warnings);
-    if (!player.permissions.has("KICK_MEMBERS"))
+    if (works)
         if (warnings.length == 2 && [triviumGuildId, testGuildId].includes(guildId)) {
             player.timeout(TIME.DAYS, reason);
 
