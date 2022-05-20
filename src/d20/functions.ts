@@ -484,7 +484,7 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
                 : warnings.length >= 3
                 ? "Therefore they were kicked from the server"
                 : "The next warning will result on them getting muted"
-            : "They are a moderator and therefore this is useless"
+            : "They are a Queensblade and therefore this is useless"
     }\nIf you think this warning was undeserved, talk to a Queensblade`;
     database.child(`warnings/${guildId}/${player.id}`).set(warnings);
     if (!player.permissions.has("KICK_MEMBERS"))
