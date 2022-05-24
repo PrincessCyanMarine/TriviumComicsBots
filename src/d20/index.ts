@@ -6,6 +6,7 @@ import { testCommands } from "./commandHandler";
 import { countMessages, removeRoles } from "./functions";
 
 d20.on("ready", () => {
+    if (testing) return;
     removeRoles();
     setInterval(removeRoles, TIME.HOURS);
 });
