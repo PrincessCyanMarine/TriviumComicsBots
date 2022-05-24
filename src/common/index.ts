@@ -581,6 +581,32 @@ d20.on("messageCreate", async (msg) => {
                 break;
             }
 
+            case "stats": {
+                let rolls: number[][] = [];
+                let stats: string[] = [];
+
+                for (let i = 0; i < 6; i++) {
+                    rolls[i] = [];
+                    for (let e = 0; e < 4; e++) rolls[i][e] = Math.floor(Math.random() * 6) + 1;
+                }
+
+                for (const i in rolls) {
+                    let roll = rolls[i];
+                    let lowest = 0;
+                    roll.forEach((r, e) => {
+                        if (r < roll[lowest]) lowest = e;
+                    });
+                    let sum = roll.reduce((a, b) => a + b);
+                    stats[i] = `${["str", "dex", "con", "wis", "int", "cha"][i]} ${sum - roll[lowest]}    (${roll
+                        .map((r, i) => (i == lowest ? `~~${r}~~` : r))
+                        .join(", ")})`;
+                }
+
+                msg.reply(stats.join("\n"));
+
+                break;
+            }
+
             case "harems": {
                 say(eli, msg.channel, {
                     components: [
