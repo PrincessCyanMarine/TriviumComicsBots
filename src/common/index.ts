@@ -17,7 +17,7 @@ import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, random_from_array, say, wait } from "./functions";
 import { colors, command_list, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
-import { ActionRow, ButtonComponent, channelMention, hyperlink, memberNicknameMention, userMention } from "@discordjs/builders";
+import { channelMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 import { summon, SUMMON_NAMES } from "../games/summon";
@@ -710,14 +710,14 @@ krystal.on("guildMemberAdd", async (member: GuildMember) => {
 const welcome_functions = [
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
         new Promise(async (resolve, reject) => {
-            say(krystal, channel, `Welcome to the game of life, ${memberNicknameMention(member.id)}!`)
+            say(krystal, channel, `Welcome to the game of life, ${userMention(member.id)}!`)
                 .then(resolve)
                 .catch(reject);
         }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
         new Promise(async (resolve, reject) => {
             await say(krystal, channel, {
-                content: `I would welcome you, ${memberNicknameMention(member.id)}, but I\'m currently a lamp and lamps do not talk.`,
+                content: `I would welcome you, ${userMention(member.id)}, but I\'m currently a lamp and lamps do not talk.`,
                 files: [lamp],
             })
                 .then(resolve)
@@ -728,7 +728,7 @@ const welcome_functions = [
             say(
                 krystal,
                 channel,
-                `Greetings, ${memberNicknameMention(
+                `Greetings, ${userMention(
                     member.id
                 )}! \nRay told me to tell you that I'm his girlfriend, so don't try anything. \nThen Sadie told me to tell you to tell you that I'm not Ray's girlfriend. \nThen Eli told me they are both wrong and that I'm his girlfriend. \nThey're still arguing, so I still don't know who's girfriend I am.`
             )
@@ -738,7 +738,7 @@ const welcome_functions = [
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
         new Promise(async (resolve, reject) => {
             say(krystal, channel, {
-                content: `Welcome, ${memberNicknameMention(member.id)}!\nNow that you are properly greeted, I will return to the clothes pile.`,
+                content: `Welcome, ${userMention(member.id)}!\nNow that you are properly greeted, I will return to the clothes pile.`,
                 files: [sleep],
             })
                 .then(resolve)
@@ -746,17 +746,13 @@ const welcome_functions = [
         }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
         new Promise(async (resolve, reject) => {
-            say(
-                krystal,
-                channel,
-                `Welcome, ${memberNicknameMention(member.id)}!\nIf I had what you call "emotions", I would be happy that you're here`
-            )
+            say(krystal, channel, `Welcome, ${userMention(member.id)}!\nIf I had what you call "emotions", I would be happy that you're here`)
                 .then(resolve)
                 .catch(reject);
         }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
         new Promise(async (resolve, reject) => {
-            say(krystal, channel, `Konnichiwa, ${memberNicknameMention(member.id)}-Chan (◕ᴗ◕✿)`)
+            say(krystal, channel, `Konnichiwa, ${userMention(member.id)}-Chan (◕ᴗ◕✿)`)
                 .then(resolve)
                 .catch(reject);
         }),
@@ -765,7 +761,7 @@ const welcome_functions = [
             say(
                 krystal,
                 channel,
-                `For some reason the residence of this place keep on saying something like \"I would tell you to grab a chair, but we can\'t afford those\" when new people join. \nI don\'t really know what that means, but welcome anyways, ${memberNicknameMention(
+                `For some reason the residence of this place keep on saying something like \"I would tell you to grab a chair, but we can\'t afford those\" when new people join. \nI don\'t really know what that means, but welcome anyways, ${userMention(
                     member.id
                 )}.`
             )
@@ -774,18 +770,14 @@ const welcome_functions = [
         }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
         new Promise(async (resolve, reject) => {
-            say(
-                krystal,
-                channel,
-                `Welcome, to what the residents of this place call \"Hell\", ${memberNicknameMention(member.id)}. Hope you like it in here`
-            )
+            say(krystal, channel, `Welcome, to what the residents of this place call \"Hell\", ${userMention(member.id)}. Hope you like it in here`)
                 .then(resolve)
                 .catch(reject);
         }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
         new Promise(async (resolve, reject) => {
             await say(ray, channel, `Hi, longshot133!`);
-            await say(krystal, channel, `I think their name is ${memberNicknameMention(member.id)}`);
+            await say(krystal, channel, `I think their name is ${userMention(member.id)}`);
             say(ray, channel, `You just don't get jokes, do you?`).then(resolve).catch(reject);
         }),
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
