@@ -20,7 +20,7 @@ import assets from "../assetsIndexes";
 import { d20 } from "../clients";
 import { capitalize, say } from "../common/functions";
 import { Harem } from "../common/harem";
-import { not_count_in_channel_ids, testGuildId, TIME, triviumGuildId } from "../common/variables";
+import { colors, not_count_in_channel_ids, queensbladeRoleId, testGuildId, TIME, triviumGuildId } from "../common/variables";
 import { reply } from "../interactions/slash/common";
 
 registerFont(assets.d20.card.fonts.letterer, { family: "LETTERER" });
@@ -617,5 +617,16 @@ export function get_rank_message(
         if (rank_components[0].components.length > 0)
             resolve({ content: text, components: rank_components[1].components.length > 0 ? rank_components : [rank_components[0]] });
         else resolve(text);
+    });
+}
+
+export async function removeRoles() {
+    let guild = await d20.guilds.fetch(triviumGuildId);
+    let members = await guild.members.fetch({ withPresences: false });
+    colors.forEach(([name, color, roleId, emoji, necessaryIds]) => {
+        members
+            .filter((member) => member.roles.cache.has(roleId))
+            .filter((member) => !member.roles.cache.hasAny(...necessaryIds, queensbladeRoleId))
+            .forEach((member) => member.roles.remove(roleId));
     });
 }

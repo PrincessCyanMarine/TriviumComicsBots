@@ -7,6 +7,7 @@ import {
     MessageActionRowOptions,
     MessageAttachment,
     MessageButton,
+    MessageEmbed,
     MessageSelectMenu,
     TextChannel,
 } from "discord.js";
@@ -592,6 +593,36 @@ d20.on("messageCreate", async (msg) => {
                         ),
                     ],
                 });
+                break;
+            }
+
+            case "test": {
+                if (msg.author.id != marineId) return;
+                let embed = new MessageEmbed()
+                    .setAuthor({
+                        name: "Test",
+                        iconURL: "https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024",
+                        url: "https://www.cyanmarine.net/",
+                    })
+                    .setDescription("This is a test")
+                    .setColor("#00ff00")
+                    .setFooter({
+                        iconURL: "https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024",
+                        text: "Cyanmarine",
+                    })
+                    .setThumbnail("https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024")
+                    .setTimestamp(new Date())
+                    .setURL("https://cyanmarine.net/")
+                    .setTitle("Test")
+                    .setImage("https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024")
+                    .addField("FIELD", "THIS IS AN INLINE FIELD", true)
+                    .addField("FIELD", "THIS IS AN INLINE FIELD", true)
+                    .addField("FIELD", "THIS IS NOT AN INLINE FIELD", false)
+                    .addField("FIELD", "THIS IS NOT AN INLINE FIELD", false)
+                    .addField("Test", "This is a test")
+                    .addField("Something", "Something");
+
+                msg.reply({ embeds: [embed] });
                 break;
             }
 

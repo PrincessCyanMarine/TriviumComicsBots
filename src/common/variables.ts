@@ -102,3 +102,5 @@ export const colors = [
     ["Gemini Twilight Fan", "Dark Pink", "975071133860769862", "DarkPink:975077054674513952", ["819361862474661890"]],
     ["Game Masters Fan", "Dark Blue", "975071215658102915", "DarkBlue:975077025654140988", ["774127564675481600"]],
 ] as [name: string, color: string, roleId: string, emoji: string, necessaryIds: string[]][];
+
+export const queensbladeRoleId = "609593848448155668";
