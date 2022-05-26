@@ -14,6 +14,7 @@ import {
     MessageActionRow,
     Guild,
     MessageButton,
+    PresenceStatus,
 } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
@@ -446,25 +447,25 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
         let card = (
             await createCard({
                 avatar_url: target.user.displayAvatarURL({ format: "png", size: 1024 }),
-                target: target,
-                level: level,
-                message_to_levelup: message_to_levelup,
+                target,
+                level,
+                message_to_levelup,
                 messages: messages,
-                nextlevel_min_messages: nextlevel_min_messages,
-                percentage: percentage,
-                position: position,
+                nextlevel_min_messages,
+                percentage,
+                position,
                 time_on_server: months,
                 username: target.displayName,
-                warnings: warnings,
+                warnings,
                 xp_bar: {
                     style: style["type"],
                     color_a: style["color"],
                     color_b: style["color2"],
                 },
-                guild: guild,
-                prestige: prestige,
+                guild,
+                prestige,
                 title: style["title"],
-                stats: stats,
+                stats,
                 harem,
             })
         ).toBuffer();
@@ -620,9 +621,41 @@ export function get_rank_message(
     });
 }
 
-export async function removeRoles() {
+export async function d20TimedFunction() {
     let guild = await d20.guilds.fetch(triviumGuildId);
     let members = await guild.members.fetch({ withPresences: false });
+    guild.channels.fetch("748330400220446770").then((channel) => {
+        channel?.setName(`Info | Players: ${members.size}`);
+    });
+
+    let ONLINE = 0,
+        DND = 0,
+        IDLE = 0,
+        OFFLINE = 0,
+        INVISIBLE = 0,
+        NONE = 0;
+
+    members.forEach((member) => {
+        if (member.presence?.status === "online") ONLINE++;
+        if (member.presence?.status === "dnd") DND++;
+        if (member.presence?.status === "idle") IDLE++;
+        if (member.presence?.status === "invisible") INVISIBLE++;
+        if (member.presence?.status === "offline") OFFLINE++;
+        if (!member.presence?.status) NONE++;
+    });
+
+    console.log(`ONLINE: ${ONLINE} | DND: ${DND} | IDLE: ${IDLE} | OFFLINE: ${OFFLINE} | INVISIBLE: ${INVISIBLE} | NONE: ${NONE}`);
+
+    guild.channels.fetch("748330400643940483").then((channel) => {
+        console.log(channel?.name);
+        let membersOnline = members.reduce(
+            (acc, member) =>
+                member.presence?.status && (["online", "dnd", "idle"] as PresenceStatus[]).includes(member.presence?.status) ? acc + 1 : acc,
+            0
+        );
+        console.log(membersOnline);
+        channel?.setName(`Online Users: ${membersOnline}`).then(console.log).catch(console.error);
+    });
     colors.forEach(([name, color, roleId, emoji, necessaryIds]) => {
         members
             .filter((member) => member.roles.cache.has(roleId))
