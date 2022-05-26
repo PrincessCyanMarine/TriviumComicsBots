@@ -647,14 +647,12 @@ export async function d20TimedFunction() {
     console.log(`ONLINE: ${ONLINE} | DND: ${DND} | IDLE: ${IDLE} | OFFLINE: ${OFFLINE} | INVISIBLE: ${INVISIBLE} | NONE: ${NONE}`);
 
     guild.channels.fetch("748330400643940483").then((channel) => {
-        console.log(channel?.name);
         let membersOnline = members.reduce(
             (acc, member) =>
                 member.presence?.status && (["online", "dnd", "idle"] as PresenceStatus[]).includes(member.presence?.status) ? acc + 1 : acc,
             0
         );
-        console.log(membersOnline);
-        channel?.setName(`Online Users: ${membersOnline}`).then(console.log).catch(console.error);
+        channel?.setName(`Online Users: ${membersOnline}`);
     });
     colors.forEach(([name, color, roleId, emoji, necessaryIds]) => {
         members
