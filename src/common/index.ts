@@ -717,6 +717,36 @@ d20.on("messageCreate", async (msg) => {
                 // # \<[A-Z]+\> [0-9]+[\n\r]{1,2}[^#]+
                 // say(d20, msg.channel, text);
             }
+            case "toggleroles": {
+                console.log(options);
+                if (msg.author.id != marineId) return;
+                console.log(options);
+                let channelId = options[1];
+                let messageId = options[2];
+
+                let channel = await krystal.channels.fetch(channelId);
+                if (!channel?.isText()) return;
+                let message = await channel.messages.fetch(messageId);
+
+                message.edit({
+                    components: [
+                        new MessageActionRow().addComponents([
+                            new MessageButton()
+                                .setEmoji("<:GMBelleNotificationNew:724792043880055094>")
+                                .setCustomId("gamemastersfanrole")
+                                .setLabel("Game masters")
+                                .setStyle("PRIMARY"),
+                            new MessageButton()
+                                .setEmoji("<:GTHariAnnoyed:614743726337556480>")
+                                .setCustomId("geminitwilightfanrole")
+                                .setLabel("Gemini twilight")
+                                .setStyle("PRIMARY"),
+                        ]),
+                    ],
+                    content:
+                        "To get a free Role that notifies you when there are new episodes or announcements, please click on one of the buttons bellow\nIf you already have a role and want to remove it, click on the button again",
+                });
+            }
         }
     }
 });
