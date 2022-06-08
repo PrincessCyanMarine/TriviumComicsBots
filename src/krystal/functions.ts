@@ -431,11 +431,14 @@ export function dead(msg: Message, target: GuildMember | undefined = getMember(m
     if (!target) return say(krystal, msg.channel, `It has expired!`);
     say(krystal, msg.channel, `${target.displayName} has expired!`);
 }
-export function pattron(msg: Message, target: GuildMember | undefined = getMember(msg)) {
+export function patron(msg: Message, target: GuildMember | undefined = getMember(msg)) {
     if (target)
-        patreon_roles.forEach((role) => {
-            if (target.roles.cache.has(role)) return say(krystal, msg.channel, `Thanks for being a supporter, <@${target.id}>`);
-        });
+        for (const role of patreon_roles) {
+            if (target.roles.cache.has(role)) {
+                say(krystal, msg.channel, `Thanks for being a supporter, <@${target.id}>`);
+                break;
+            }
+        }
     say(krystal, msg.channel, { content: "Support!\nSupport!\nSupport!\nSupport!", files: [patreon] });
 }
 

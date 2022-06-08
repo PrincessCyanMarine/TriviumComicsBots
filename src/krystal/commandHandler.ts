@@ -22,7 +22,7 @@ import {
     killing,
     loving,
     nonowords,
-    pattron,
+    patron,
     pong,
     prideful,
     rebel,
@@ -78,7 +78,7 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "despacito")) despacito(msg);
         else if (testWord(args, "not (an|the) enemy", "spare")) sparing(msg);
         else if (testWord(args, "expired", "dead", "died")) dead(msg);
-        else if (testWord(args, "support", "patr(e?)on")) pattron(msg);
+        else if (testWord(args, "support", "patr(e?)on")) patron(msg);
         else if (testWord(args, "rebel")) rebel(msg, true);
         else if (testWord(args, "ping")) pong(msg);
         else greet(msg);
