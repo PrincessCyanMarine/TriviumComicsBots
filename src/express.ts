@@ -379,7 +379,6 @@ express_app.post("/card/getInfo", async (req, res) => {
     let { user } = await getUser(tokenType as string, accessToken as string);
     if (!user) return res.sendStatus(401);
     let { style } = req.body;
-    console.log(style);
     if (!style) return res.sendStatus(400);
     await database.child(`card/` + user.id).set(style);
     res.sendStatus(200);
