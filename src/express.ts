@@ -20,7 +20,6 @@ import { d20 } from "./clients";
 import { get_birds } from "./common/functions";
 import { readFileSync } from "fs";
 import { Harem } from "./common/harem";
-import { request } from "undici";
 
 const express_app = express();
 const server = createServer(express_app);
