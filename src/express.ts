@@ -20,6 +20,7 @@ import { d20 } from "./clients";
 import { get_birds } from "./common/functions";
 import { readFileSync } from "fs";
 import { Harem } from "./common/harem";
+import { request } from "undici";
 
 const express_app = express();
 const server = createServer(express_app);
@@ -365,6 +366,24 @@ express_app.get("/harem/guild/:guild_id", async (req, res) => {
     let guild_info = { name: guild.name };
 
     res.json({ harems: harem, users, guild: guild_info });
+});
+
+express_app.get("/card/getInfo", async (req, res) => {
+    const { tokenType, accessToken } = req.query;
+    let { user } = await getUser(tokenType as string, accessToken as string);
+    if (!user) return res.sendStatus(401);
+    let style = await (await database.child(`card/` + user.id).once("value")).val();
+    res.json(style);
+});
+express_app.post("/card/getInfo", async (req, res) => {
+    const { tokenType, accessToken } = req.query;
+    let { user } = await getUser(tokenType as string, accessToken as string);
+    if (!user) return res.sendStatus(401);
+    let { style } = req.body;
+    console.log(style);
+    if (!style) return res.sendStatus(400);
+    await database.child(`card/` + user.id).set(style);
+    res.sendStatus(200);
 });
 
 server.listen(port, () => {
