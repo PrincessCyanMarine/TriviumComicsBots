@@ -58,6 +58,7 @@ export const alert_role_id: string = "900363259188772865";
 export const disturb_channels: string[] = ["892800588469911663", "562431692703531018", "620088019868844044"];
 
 export const marineId = "305883924310261760";
+export const dodoId = "297531251081084941";
 export const marinaId = "334997744265723905";
 
 export enum TIME {

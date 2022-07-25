@@ -16,7 +16,7 @@ import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from ".
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
 import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, random_from_array, say, wait } from "./functions";
-import { colors, command_list, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
+import { colors, command_list, dodoId, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
 import { channelMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
@@ -29,6 +29,7 @@ import { Calculator } from "../games/calculator";
 import { Help } from "./help";
 import { Harem } from "./harem";
 import axios from "axios";
+import { EmojiCycler } from "../d20/EmojiCycler";
 
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
@@ -746,6 +747,16 @@ d20.on("messageCreate", async (msg) => {
                     content:
                         "To get a free Role that notifies you when there are new episodes or announcements, please click on one of the buttons bellow\nIf you already have a role and want to remove it, click on the button again",
                 });
+                break;
+            }
+            case "rotate": {
+                if (![marineId, dodoId].includes(msg.author.id)) {
+                    say(d20, msg.channel, "You don't have permission to use that command");
+                    break;
+                }
+
+                new EmojiCycler(msg.channel.id).cycle(options[1]);
+                break;
             }
         }
     }
