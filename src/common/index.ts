@@ -755,12 +755,6 @@ d20.on("messageCreate", async (msg) => {
                     break;
                 }
 
-                await say(
-                    d20,
-                    options[2],
-                    `<@&774127564675481600> <@&819361862474661890>\nToo many emojis! Not enough space! What do?! Rotation! Yup, emojis will now rotate in and out every two weeks with brand new ones thrown in every now and then!`
-                );
-
                 new EmojiCycler(options[1]).cycle(options[2]);
                 break;
             }
