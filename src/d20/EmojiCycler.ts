@@ -131,7 +131,7 @@ export class EmojiCycler {
                         roles: [],
                         reason,
                     });
-                } else return undefined;
+                } else return new Promise<undefined>((resolve) => resolve(undefined));
                 // let dist = "./assets/emojis/current/" + emojiName + ".png";
                 // if (!existsSync(dist)) {
                 //     // console.log(emojiName);
