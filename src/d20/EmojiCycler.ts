@@ -128,7 +128,6 @@ export class EmojiCycler {
             const addEmoji = (path: string, emojiName: string, reason?: string) => {
                 if (!emojiNames.includes(emojiName)) {
                     return emojiManager.create(path, emojiName, {
-                        roles: [],
                         reason,
                     });
                 } else return new Promise<undefined>((resolve) => resolve(undefined));
