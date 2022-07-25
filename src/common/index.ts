@@ -755,7 +755,7 @@ d20.on("messageCreate", async (msg) => {
                     break;
                 }
 
-                new EmojiCycler(msg.channel.id).cycle(options[1]);
+                new EmojiCycler(options[1]).cycle(options[2]);
                 break;
             }
         }
