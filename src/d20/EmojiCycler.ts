@@ -46,7 +46,9 @@ export class EmojiCycler {
     }
 
     private addEmojiRotation(_keys: string[]) {
+        // console.log(_keys);
         let keys = _keys.map((key) => parse(key).name);
+        // console.log(keys);
         let rotation = this._rotationOffset ?? {};
 
         for (const key of keys)
@@ -74,14 +76,13 @@ export class EmojiCycler {
         let rotation = await this.getEmojiRotation();
         let emojis: string[] = [];
         let cycled = this.cycled.map((a) => a);
-        cycled.filter((e) => !(e in rotation)).forEach((e) => (rotation[e] = 0));
-        // let k = Object.keys(rotation);
+        cycled.filter((e) => !(e in rotation)).forEach((e) => (rotation[e] = 1));
+        let k = Object.keys(rotation);
         let val = Object.values(rotation);
 
         let sum = val.reduce((pv, cv) => cv + pv, 0);
         if (sum == 0) sum = val.length;
 
-        // console.log(sum);
         let prev = 0;
         let ind = Object.fromEntries(
             Object.entries(rotation).map(([k, v]) => {
@@ -91,17 +92,21 @@ export class EmojiCycler {
         );
 
         for (let i = 0; i < emojiLimit; i++) {
-            let r = Math.floor(Math.random() * prev);
-            for (const e of Object.keys(ind)) {
+            let indKeys = Object.keys(ind);
+            console.log(indKeys.length);
+            let r = Math.floor(Math.random() * parseInt(indKeys[indKeys.length - 1]));
+            for (const e of indKeys) {
                 if (parseInt(e) > r) {
-                    let c = cycled.splice(cycled.indexOf(ind[e]), 1)[0];
+                    let c = cycled.splice(r, 1)[0];
                     emojis.push(c);
-                    break;
+                    delete ind[e];
+                    if (cycled.length === 0) break;
+                    // break;
                 }
             }
         }
 
-        this.addEmojiRotation(emojis);
+        // this.addEmojiRotation(emojis);
 
         return emojis;
     };
@@ -110,19 +115,9 @@ export class EmojiCycler {
         new Promise(async (resolve, reject) => {
             if (!this.guild) this.guild = await d20.guilds.fetch(this.guildId);
             let emojiLimit = this.getEmojiLimit(this.guild.premiumTier) - this.permanent.length;
-            let offset = await this.getEmojiRotation();
             let emojiManager = this.guild.emojis;
             let emojis = await emojiManager.fetch();
-            let newCycled = await this.getRandomEmojis(emojiLimit);
-            // console.log(newCycled);
-
-            this.cycled.forEach((c) => {
-                let path = `./assets/emojis/current/${c}`;
-                if (!newCycled.includes(c) && existsSync(path)) {
-                    // console.log(path);
-                    unlinkSync(path);
-                }
-            });
+            let newCycled = this.cycled.map((a) => a); //await this.getRandomEmojis(emojiLimit);
 
             let emojiNames = emojis.map((emoji) => emoji.name);
             const addEmoji = (path: string, emojiName: string, reason?: string) => {
@@ -131,55 +126,62 @@ export class EmojiCycler {
                         reason,
                     });
                 } else return new Promise<undefined>((resolve) => resolve(undefined));
-                // let dist = "./assets/emojis/current/" + emojiName + ".png";
-                // if (!existsSync(dist)) {
-                //     // console.log(emojiName);
-                //     copyFileSync(path, dist);
-                // }
             };
 
-            emojis
-                .filter((emoji) => !(this.permanent.includes(`${emoji.name}.png`) || newCycled.includes(`${emoji.name}.png`)))
-                .forEach((emoji) => emoji.delete("Cycling"));
-            this.permanent.forEach((emoji, i) => {
-                addEmoji(`${permPath}/${emoji}`, parse(emoji).name);
-            });
+            // await Promise.allSettled(
+            //     emojis
+            //         .filter((emoji) => !(this.permanent.includes(`${emoji.name}.png`) || newCycled.includes(`${emoji.name}.png`)))
+            //         .map((emoji) => emoji.delete("Cycling"))
+            // );
+            // await Promise.allSettled(this.permanent.map((emoji, i) => addEmoji(`${permPath}/${emoji}`, parse(emoji).name)));
 
-            Promise.allSettled(newCycled.map((emoji) => addEmoji(`${cycPath}/${emoji}`, parse(emoji).name, "cycling"))).then((e) => {
-                let added_emojis = (e.map((e) => (e.status === "fulfilled" ? e.value : undefined)).filter((e) => !!e) as GuildEmoji[]).map((e) =>
-                    e.toString()
-                );
+            // console.log("-------------------------------------------");
+            // console.log(newCycled.length);
+            // console.log(newCycled);
+            // console.log("-------------------------------------------");
+            Promise.allSettled(newCycled.map((emoji) => addEmoji(`${cycPath}/${emoji}`, parse(emoji).name, "cycling")))
+                .then((e) => {
+                    let added_emojis = e.map((e) => (e.status === "fulfilled" ? e.value : undefined)).filter((e) => !!e) as GuildEmoji[];
 
-                if (announce)
-                    d20.channels.fetch(announce).then((channel) => {
-                        if (channel && channel?.isText())
-                            channel.send(`These emojis have just been rotated into discord!\n${added_emojis.join(", ")}`);
-                    });
-            });
+                    console.log("-------------------------------------------");
+                    console.log(added_emojis.length);
+                    console.log(added_emojis);
+                    console.log("-------------------------------------------");
+                    // if (announce)
+                    //     d20.channels.fetch(announce).then((channel) => {
+                    //         if (channel && channel?.isText())
+                    //             channel
+                    //                 .send(`These emojis have just been rotated into discord!\n${added_emojis.map((e) => e.toString()).join(" ")}`)
+                    //                 .then(async (m) => {
+                    //                     for (let emoji of added_emojis) await m.react(emoji);
+                    //                 });
+                    //     });
+                })
+                .catch(console.error);
 
             database.child("emojiRotation/timer/" + triviumGuildId).set(Date.now().valueOf());
         });
 }
 
-setInterval(() => {
-    database
-        .child("emojiRotation/timer/" + triviumGuildId)
-        .once("value")
-        .then((snapshot) => {
-            let emojiTimer = snapshot.val();
-            if (typeof emojiTimer === "number" && emojiTimer + 2 * TIME.WEEKS < Date.now().valueOf())
-                new EmojiCycler(triviumGuildId).cycle(announcementChannelId);
-            // TODO ANNOUNCE THE ONES THAT WILL LEAVE, 1 WEEK BEFORE THEY LEAVE
-        });
-}, TIME.HOURS);
+// setInterval(() => {
+//     database
+//         .child("emojiRotation/timer/" + triviumGuildId)
+//         .once("value")
+//         .then((snapshot) => {
+//             let emojiTimer = snapshot.val();
+//             if (typeof emojiTimer === "number" && emojiTimer + 2 * TIME.WEEKS < Date.now().valueOf())
+//                 new EmojiCycler(triviumGuildId).cycle(announcementChannelId);
+//             // TODO ANNOUNCE THE ONES THAT WILL LEAVE, 1 WEEK BEFORE THEY LEAVE
+//         });
+// }, TIME.HOURS);
 
-database
-    .child("emojiRotation/timer/" + triviumGuildId)
-    .once("value")
-    .then((snapshot) => {
-        let emojiTimer = snapshot.val();
-        console.log(emojiTimer);
-    });
+// database
+//     .child("emojiRotation/timer/" + triviumGuildId)
+//     .once("value")
+//     .then((snapshot) => {
+//         let emojiTimer = snapshot.val();
+//         // console.log(emojiTimer);
+//     });
 // let cycler = new EmojiCycler("999917474885677126");
 // cycler.cycle();
 // setInterval(() => {
