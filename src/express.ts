@@ -367,14 +367,14 @@ express_app.get("/harem/guild/:guild_id", async (req, res) => {
     res.json({ harems: harem, users, guild: guild_info });
 });
 
-express_app.get("/card/getInfo", async (req, res) => {
+express_app.get("/card/info", async (req, res) => {
     const { tokenType, accessToken } = req.query;
     let { user } = await getUser(tokenType as string, accessToken as string);
     if (!user) return res.sendStatus(401);
     let style = await (await database.child(`card/` + user.id).once("value")).val();
     res.json(style);
 });
-express_app.post("/card/getInfo", async (req, res) => {
+express_app.post("/card/info", async (req, res) => {
     const { tokenType, accessToken } = req.query;
     let { user } = await getUser(tokenType as string, accessToken as string);
     if (!user) return res.sendStatus(401);
