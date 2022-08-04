@@ -505,8 +505,7 @@ export function nonowords(msg: Message) {
     });
     if (res.length > 0)
         say(krystal, msg.channel, res.join(" ")).then(() => {
-            if (res.length > 2) sadieAngry();
-            else if (randomchance()) sadieAngry();
+            if (randomchance(10 * res.length)) sadieAngry();
         });
 }
 

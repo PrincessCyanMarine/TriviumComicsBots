@@ -44,7 +44,7 @@ export function testCommands(msg: Message) {
     let tip = argClean(args).match(/(\S+?)s tip of the day/i);
 
     if (tip) thankMarin(msg, tip);
-    if (testWord(args, "dumbass") && randomchance(5)) say(krystal, msg.channel, userMention("601943025253482496"));
+    if (testWord(args, "dumbass") && randomchance()) say(krystal, msg.channel, userMention("601943025253482496"));
     if (testWord(args, "arson")) burning(msg);
     else if (testWord(args, "ye{2,}t")) yeeting(msg);
     else if (testWord(args, "pf{2,}t")) rebel(msg, true);
