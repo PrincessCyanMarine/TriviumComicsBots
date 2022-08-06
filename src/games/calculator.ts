@@ -11,8 +11,8 @@ import {
     MessageButtonStyleResolvable,
     User,
 } from "discord.js";
-import { eli, ray } from "../clients";
-import { msg2embed, say } from "../common/functions";
+import { eli, ray, sadie } from "../clients";
+import { msg2embed, randomchance, say } from "../common/functions";
 import { getOperationResult } from "../eli/functions";
 import { followup } from "../interactions/slash/common";
 
@@ -173,6 +173,7 @@ export class Calculator {
 
     static joke(interaction: ButtonInteraction, bot: Client, content: string) {
         if (!interaction.channel) return;
+        if (randomchance()) return this.joke(interaction, sadie, "That joke is dumb, just use the damn calculator");
         let reply = interaction.message instanceof Message ? { messageReference: interaction.message } : undefined;
         let interactionId = interaction.message.id;
         let botId = bot.user!.id;
