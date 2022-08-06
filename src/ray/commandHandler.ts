@@ -8,7 +8,7 @@ export function testCommands(msg: Message) {
     let args = msg.content;
 
     if (testWord(args, "69"))
-        if (randomchance(5)) say(sadie, msg.channel, "That joke is dumb");
-        else say(randomchance(80) ? ray : eli, msg.channel, "Nice");
+        if (randomchance(5)) say(sadie, msg.channel, "That joke is dumb", undefined, { messageReference: msg });
+        else say(randomchance(80) ? ray : eli, msg.channel, "Nice", undefined, { messageReference: msg });
     else if (testWord(args, "ray")) if (testWord(args, ...killWords)) return beating(msg);
 }
