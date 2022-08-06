@@ -173,7 +173,10 @@ export class Calculator {
 
     static joke(interaction: ButtonInteraction, bot: Client, content: string) {
         if (!interaction.channel) return;
-        if (randomchance()) return this.joke(interaction, sadie, "That joke is dumb, just use the damn calculator");
+        if (randomchance()) {
+            this.joke(interaction, sadie, "That joke is dumb, just use the damn calculator");
+            return;
+        }
         let reply = interaction.message instanceof Message ? { messageReference: interaction.message } : undefined;
         let interactionId = interaction.message.id;
         let botId = bot.user!.id;
