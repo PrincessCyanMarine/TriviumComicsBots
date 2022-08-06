@@ -1,6 +1,7 @@
 import {
     AnyChannel,
     BaseMessageComponentOptions,
+    Collection,
     GuildMember,
     Message,
     MessageActionRow,
@@ -867,3 +868,45 @@ d20.on("guildMemberRemove", (member) => {
         if (harem.ownsOne) harem.disband();
     });
 });
+
+export const cloneArray = <T>(array: T[] | Collection<any, T>) => (array as T[]).map((a) => a);
+
+export async function asyncForEach<T>(
+    array: T[],
+    func: (value: T[], i: number) => Promise<void | any> | void | any,
+    i = 0,
+    resolve?: (value: void) => void,
+    reject?: (reason?: any) => void
+) {
+    try {
+        await func(array, i);
+        if (i < array.length - 1)
+            if (resolve)
+                return new Promise<void>(async (resolve, reject) => {
+                    await asyncForEach(array, func, i + 1, resolve, reject);
+                });
+            else await asyncForEach(array, func, i + 1, resolve, reject);
+        else if (resolve) resolve();
+        else return;
+    } catch (err) {
+        if (reject) reject(err);
+        else throw err;
+    }
+}
+
+export function asyncWhile(func: (...values: any[]) => Promise<boolean> | boolean) {
+    return new Promise<void>(async (resolve, reject) => {
+        try {
+            const repeat = async () => {
+                if (!(await func())) {
+                    resolve();
+                    return;
+                }
+                repeat();
+            };
+            repeat();
+        } catch (err) {
+            reject(err);
+        }
+    });
+}

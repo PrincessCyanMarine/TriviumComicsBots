@@ -1,10 +1,12 @@
-import { Guild, GuildEmoji, PremiumTier } from "discord.js";
+import { Collection, Guild, GuildEmoji, PremiumTier } from "discord.js";
 import e from "express";
 import { copyFile, copyFileSync, existsSync, readdirSync, readFileSync, unlinkSync } from "fs";
 import { parse } from "path";
+import { alea } from "seedrandom";
 import { database } from "..";
 import { d20 } from "../clients";
-import { random_from_array, say } from "../common/functions";
+import { asyncForEach, cloneArray } from "../common";
+import { random_from_array, say, wait } from "../common/functions";
 import { announcementChannelId, TIME, triviumGuildId } from "../common/variables";
 
 const permPath = "./assets/emojis/permanent";
@@ -51,9 +53,10 @@ export class EmojiCycler {
         // console.log(keys);
         let rotation = this._rotationOffset ?? {};
 
-        for (const key of keys)
+        for (const key of keys) {
             if (!rotation[key]) rotation[key] = 1;
             else rotation[key]++;
+        }
         // console.log(rotation);
 
         return this.offsetDatabaseChild.set(rotation);
@@ -72,94 +75,128 @@ export class EmojiCycler {
         }
     }
 
-    private getRandomEmojis = async (emojiLimit: number) => {
-        let rotation = await this.getEmojiRotation();
-        let emojis: string[] = [];
-        let cycled = this.cycled.map((a) => a);
-        cycled.filter((e) => !(e in rotation)).forEach((e) => (rotation[e] = 1));
-        let k = Object.keys(rotation);
-        let val = Object.values(rotation);
+    private getRandomEmojis = async (emojiLimit: number) =>
+        new Promise<string[]>(async (resolve, reject) => {
+            try {
+                let rotation = await this.getEmojiRotation();
+                let emojis: string[] = [];
+                let cycled = cloneArray(this.cycled);
+                cycled.filter((e) => !(e in rotation)).forEach((e) => (rotation[e] = 1)); // TODO default to 0
+                cycled = cycled.sort((a, b) => rotation[a] - rotation[b]);
+                // console.log(cycled);
+                // console.log(cycled.map((a) => rotation[a]));
+                // console.log(cycled);
+                let random = alea((await database.child("emojiRotation/timer/" + this.guildId).once("value")).val() || Date.now().valueOf(), {
+                    entropy: true,
+                });
+                const addFromArray = (array: string[], limit: number) => {
+                    // console.log(limit, array.length);
+                    if (limit >= array.length) {
+                        emojis = cloneArray(array);
+                        array = [];
+                    } else
+                        while (emojis.length < limit) {
+                            if (array.length <= 0) break;
+                            let v = Math.floor(random.double() * emojis.length);
+                            let i = v;
+                            emojis.push(...array.splice(i, 1));
+                        }
+                };
 
-        let sum = val.reduce((pv, cv) => cv + pv, 0);
-        if (sum == 0) sum = val.length;
+                if (emojiLimit >= cycled.length) emojis = cloneArray(cycled);
+                else {
+                    while (cycled.length > 0 && emojis.length < emojiLimit && rotation[cycled[0]] === 0) emojis.push(...cycled.splice(0, 1));
 
-        let prev = 0;
-        let ind = Object.fromEntries(
-            Object.entries(rotation).map(([k, v]) => {
-                prev += sum - v;
-                return [prev, k];
-            })
-        );
-
-        for (let i = 0; i < emojiLimit; i++) {
-            let indKeys = Object.keys(ind);
-            console.log(indKeys.length);
-            let r = Math.floor(Math.random() * parseInt(indKeys[indKeys.length - 1]));
-            for (const e of indKeys) {
-                if (parseInt(e) > r) {
-                    let c = cycled.splice(r, 1)[0];
-                    emojis.push(c);
-                    delete ind[e];
-                    if (cycled.length === 0) break;
-                    // break;
+                    // console.log(emojis);
+                    // console.log(cycled.length);
+                    let halfCycled = cycled.splice(0, cycled.length / 2);
+                    // console.log(halfCycled.length, cycled.length);
+                    addFromArray(halfCycled, emojiLimit / 2);
+                    cycled = halfCycled?.concat(cycled) || [];
+                    addFromArray(cycled, emojiLimit);
+                    // while (emojis.length < emojiLimit && (cycled = addFromArray(cycled)).length > 0) {}
                 }
+
+                // console.log(emojis);
+
+                this.addEmojiRotation(emojis);
+                // console.log(emojis);
+
+                return resolve(emojis);
+            } catch (err) {
+                reject(err);
             }
-        }
-
-        // this.addEmojiRotation(emojis);
-
-        return emojis;
-    };
+        });
 
     public cycle = (announce?: string) =>
         new Promise(async (resolve, reject) => {
-            if (!this.guild) this.guild = await d20.guilds.fetch(this.guildId);
-            let emojiLimit = this.getEmojiLimit(this.guild.premiumTier) - this.permanent.length;
-            let emojiManager = this.guild.emojis;
-            let emojis = await emojiManager.fetch();
-            let newCycled = this.cycled.map((a) => a); //await this.getRandomEmojis(emojiLimit);
+            try {
+                if (!this.guild) this.guild = await d20.guilds.fetch(this.guildId);
+                let emojiLimit = this.getEmojiLimit(this.guild.premiumTier) - this.permanent.length;
+                let emojiManager = this.guild.emojis;
+                let emojis = await emojiManager.fetch();
+                let newCycled = await this.getRandomEmojis(emojiLimit);
 
-            let emojiNames = emojis.map((emoji) => emoji.name);
-            const addEmoji = (path: string, emojiName: string, reason?: string) => {
-                if (!emojiNames.includes(emojiName)) {
-                    return emojiManager.create(path, emojiName, {
-                        reason,
+                let emojiNames = emojis.map((emoji) => emoji.name);
+                const addEmoji = (path: string, emojiName: string, reason?: string) => {
+                    // console.log(emojiName);
+                    // return new Promise<undefined>((resolve) => resolve(undefined));
+                    if (!emojiNames.includes(emojiName)) {
+                        return emojiManager.create(path, emojiName, {
+                            reason,
+                        });
+                    } else return new Promise<undefined>((resolve) => resolve(undefined));
+                };
+
+                const deleteEmoji = (toBeDeleted: GuildEmoji[], i = 0) =>
+                    new Promise<void>(async (resolve) => {
+                        // console.log(toBeDeleted[i].name);
+                        await toBeDeleted[i].delete("Cycling");
+                        await wait(5000);
+                        resolve();
                     });
-                } else return new Promise<undefined>((resolve) => resolve(undefined));
-            };
 
-            // await Promise.allSettled(
-            //     emojis
-            //         .filter((emoji) => !(this.permanent.includes(`${emoji.name}.png`) || newCycled.includes(`${emoji.name}.png`)))
-            //         .map((emoji) => emoji.delete("Cycling"))
-            // );
-            // await Promise.allSettled(this.permanent.map((emoji, i) => addEmoji(`${permPath}/${emoji}`, parse(emoji).name)));
+                const addPerm = async (perm: string[], i: number) => {
+                    let emoji = perm[i];
+                    await addEmoji(`${permPath}/${emoji}`, parse(emoji).name, "Permanent");
+                    await wait(5000);
+                    return;
+                };
 
-            // console.log("-------------------------------------------");
-            // console.log(newCycled.length);
-            // console.log(newCycled);
-            // console.log("-------------------------------------------");
-            Promise.allSettled(newCycled.map((emoji) => addEmoji(`${cycPath}/${emoji}`, parse(emoji).name, "cycling")))
-                .then((e) => {
-                    let added_emojis = e.map((e) => (e.status === "fulfilled" ? e.value : undefined)).filter((e) => !!e) as GuildEmoji[];
+                let added_emojis = [] as GuildEmoji[];
+                const addCycled = async (cycled: string[], i: number) => {
+                    let emoji = cycled[i];
+                    let em = await addEmoji(`${cycPath}/${emoji}`, parse(emoji).name, "Cycling");
+                    if (em instanceof GuildEmoji) added_emojis.push(em);
+                    await wait(5000);
+                    return;
+                };
 
-                    console.log("-------------------------------------------");
-                    console.log(added_emojis.length);
-                    console.log(added_emojis);
-                    console.log("-------------------------------------------");
-                    // if (announce)
-                    //     d20.channels.fetch(announce).then((channel) => {
-                    //         if (channel && channel?.isText())
-                    //             channel
-                    //                 .send(`These emojis have just been rotated into discord!\n${added_emojis.map((e) => e.toString()).join(" ")}`)
-                    //                 .then(async (m) => {
-                    //                     for (let emoji of added_emojis) await m.react(emoji);
-                    //                 });
-                    //     });
-                })
-                .catch(console.error);
+                let tbd = cloneArray(
+                    emojis.filter((emoji) => !(this.permanent.includes(`${emoji.name}.png`) || newCycled.includes(`${emoji.name}.png`)))
+                );
 
-            database.child("emojiRotation/timer/" + triviumGuildId).set(Date.now().valueOf());
+                await asyncForEach(tbd, deleteEmoji);
+                await asyncForEach(this.permanent, addPerm);
+                await asyncForEach(newCycled, addCycled);
+
+                if (announce)
+                    d20.channels.fetch(announce).then((channel) => {
+                        if (channel && channel?.isText())
+                            channel
+                                .send(`These emojis have just been rotated into discord!\n${added_emojis.map((e) => e.toString()).join(" ")}`)
+                                .then(async (m) => {
+                                    for (let emoji of added_emojis) {
+                                        await m.react(emoji);
+                                        await wait(1000);
+                                    }
+                                });
+                    });
+
+                database.child("emojiRotation/timer/" + this.guildId).set(Date.now().valueOf());
+            } catch (err) {
+                reject(err);
+            }
         });
 }
 
@@ -183,7 +220,8 @@ export class EmojiCycler {
 //         // console.log(emojiTimer);
 //     });
 // let cycler = new EmojiCycler("999917474885677126");
-// cycler.cycle();
+// let cycler = new EmojiCycler(triviumGuildId);
+// cycler.cycle("613507549085302796");
 // setInterval(() => {
 // cycler.cycle();
 // }, 5000);
