@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import {
     ButtonInteraction,
+    Client,
     GuildMember,
     Interaction,
     Message,
@@ -10,9 +11,12 @@ import {
     MessageButtonStyleResolvable,
     User,
 } from "discord.js";
-import { eli } from "../clients";
+import { eli, ray } from "../clients";
 import { msg2embed, say } from "../common/functions";
 import { getOperationResult } from "../eli/functions";
+import { followup } from "../interactions/slash/common";
+
+const messages: { [interaction: string]: { [bot: string]: Message } } = {};
 
 export class Calculator {
     private calculator_component = (id: string, pub: boolean) => {
@@ -145,9 +149,38 @@ export class Calculator {
 
         let content = operations.join(" ");
 
+        // let url = `https://www.webtoons.com/en/challenge/0/0l/viewer?title_no=237252&episode_no=${ep}&webtoonType=CHALLENGE`;
+
+        if (interaction.channel) {
+            if (content === "420") this.joke(interaction, eli, "Look dad it's the good cush");
+            else if (content === "69") this.joke(interaction, ray, "Nice");
+            else {
+                let e = content.match(/e\+([0-9]+)/);
+                if (e?.[1])
+                    this.joke(
+                        interaction,
+                        ray,
+                        `https://www.webtoons.com/en/challenge/0/0/viewer?title_no=237252&episode_no=${e[1]}&webtoonType=CHALLENGE`
+                    );
+            }
+        }
+
         if (pub && interaction.member)
             content += "\n" + (interaction.member instanceof GuildMember ? interaction.member.displayName : interaction.member.user.username);
 
         interaction.update({ content });
+    }
+
+    static joke(interaction: ButtonInteraction, bot: Client, content: string) {
+        if (!interaction.channel) return;
+        let reply = interaction.message instanceof Message ? { messageReference: interaction.message } : undefined;
+        let interactionId = interaction.message.id;
+        let botId = bot.user!.id;
+        if (!messages[interactionId]?.[botId])
+            say(bot, interaction.channel, content, undefined, reply).then((message) => {
+                if (!messages[interactionId]) messages[interactionId] = {};
+                messages[interactionId][botId] = message;
+            });
+        else messages[interactionId][botId].edit(content);
     }
 }

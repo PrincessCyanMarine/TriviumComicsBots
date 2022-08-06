@@ -49,6 +49,7 @@ export function calculate(math_exp: RegExpMatchArray) {
 }
 
 export function getOperationResult(operations: string[]) {
+    if (["9 + 10", "10 + 9"].includes(operations.join(" "))) return ["21"];
     let result = parseFloat(operations[0]);
     for (let i = 1; i < operations.length; i++) {
         let symbol = operations[i];
