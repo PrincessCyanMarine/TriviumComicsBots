@@ -609,20 +609,20 @@ d20.on("messageCreate", async (msg) => {
                 break;
             }
 
-            case "harems": {
-                say(eli, msg.channel, {
-                    components: [
-                        new MessageActionRow().addComponents(
-                            new MessageButton()
-                                .setURL(`https://www.cyanmarine.net/tc/harem/${msg.guildId}`)
-                                .setStyle("LINK")
-                                .setEmoji(getCharacterEmoji())
-                                .setLabel(`All harems of ${msg.guild?.name ?? "this server"}`)
-                        ),
-                    ],
-                });
-                break;
-            }
+            // case "harems": {
+            //     say(eli, msg.channel, {
+            //         components: [
+            //             new MessageActionRow().addComponents(
+            //                 new MessageButton()
+            //                     .setURL(`https://www.cyanmarine.net/tc/harem/${msg.guildId}`)
+            //                     .setStyle("LINK")
+            //                     .setEmoji(getCharacterEmoji())
+            //                     .setLabel(`All harems of ${msg.guild?.name ?? "this server"}`)
+            //             ),
+            //         ],
+            //     });
+            //     break;
+            // }
 
             case "test": {
                 if (msg.author.id != marineId) return;

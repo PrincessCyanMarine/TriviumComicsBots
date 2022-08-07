@@ -30,7 +30,7 @@ export class Help {
                         ...Object.keys(command_list).map((character) => ({
                             label: character,
                             value: character,
-                            emoji: getCharacterEmoji(character),
+                            // emoji: getCharacterEmoji(character),
                         }))
                     )
                     .setCustomId("help_main_menu")
@@ -41,8 +41,8 @@ export class Help {
             new MessageButton()
                 .setCustomId("help_page_" + character + "_" + page)
                 .setLabel(tittle)
-                .setStyle(style)
-                .setEmoji(getCharacterEmoji(character)),
+                .setStyle(style),
+        // .setEmoji(getCharacterEmoji(character)),
     };
 
     public static getMainMenu() {

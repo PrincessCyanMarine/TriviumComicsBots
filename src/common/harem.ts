@@ -83,16 +83,17 @@ export class Harem {
 
             let target = msg.mentions.members?.first() ?? msg.member ?? msg.author;
 
-            let components: MessageActionRow[] = [
-                new MessageActionRow().addComponents(
-                    new MessageButton()
-                        .setURL(`https://www.cyanmarine.net/tc/harem/${this.guildId}/${target.id}`)
-                        .setStyle("LINK")
-                        .setEmoji(getCharacterEmoji())
-                        .setLabel(`${target instanceof GuildMember ? target.displayName : target.username}'s harem info`)
-                ),
-            ];
-            resolve({ components });
+            // let components: MessageActionRow[] = [
+            //     new MessageActionRow().addComponents(
+            //         new MessageButton()
+            //             .setURL(`https://www.cyanmarine.net/tc/harem/${this.guildId}/${target.id}`)
+            //             .setStyle("LINK")
+            //             .setEmoji(getCharacterEmoji())
+            //             .setLabel(`${target instanceof GuildMember ? target.displayName : target.username}'s harem info`)
+            //     ),
+            // ];
+            // resolve({ components });
+            resolve({});
         });
     }
 

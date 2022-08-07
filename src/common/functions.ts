@@ -134,17 +134,17 @@ export function createEncoder(
 
 export function detectEmoji(content: string): string {
     // let text_emojis = content.match(/<:[^:]+:[0-9]+>/gi);
-    let text_emojis = content.match(/:[^:]+:/gi);
-    let changed: string[] = [];
-    if (text_emojis)
-        for (let emoji of text_emojis) {
-            if (changed.includes(emoji)) continue;
-            changed.push(emoji);
-            if (emojis[emoji]) {
-                let regexp = new RegExp(emoji, "gi");
-                content = content.replace(regexp, emojis[emoji]);
-            }
-        }
+    // let text_emojis = content.match(/:[^:]+:/gi);
+    // let changed: string[] = [];
+    // if (text_emojis)
+    //     for (let emoji of text_emojis) {
+    //         if (changed.includes(emoji)) continue;
+    //         changed.push(emoji);
+    //         if (emojis[emoji]) {
+    //             let regexp = new RegExp(emoji, "gi");
+    //             content = content.replace(regexp, emojis[emoji]);
+    //         }
+    //     }
     return content;
 }
 
@@ -377,13 +377,13 @@ export const get_powers = () =>
         .map((a) => JSON.parse(a));
 
 export function getCharacterEmoji(character?: string) {
-    if (!character) return emojis[random_from_array(Object.keys(emojis))];
-    if (character.match(/d20/i)) return "";
-    let res = "";
-    ["sadie", "ray", "krystal", "eli"].forEach((a) => {
-        if (character.match(new RegExp(a, "i")))
-            res = emojis[random_from_array(Object.keys(emojis).filter((emoji) => emoji.match(new RegExp(":gm" + a, "i"))))];
-    });
-    if (res != "") return res;
-    return emojis[random_from_array(Object.keys(emojis))];
+    // if (!character) return emojis[random_from_array(Object.keys(emojis))];
+    // if (character.match(/d20/i)) return "";
+    // let res = "";
+    // ["sadie", "ray", "krystal", "eli"].forEach((a) => {
+    //     if (character.match(new RegExp(a, "i")))
+    //         res = emojis[random_from_array(Object.keys(emojis).filter((emoji) => emoji.match(new RegExp(":gm" + a, "i"))))];
+    // });
+    // if (res != "") return res;
+    // return emojis[random_from_array(Object.keys(emojis))];
 }
