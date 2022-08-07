@@ -420,167 +420,168 @@ d20.on("messageCreate", async (msg) => {
             }
 
             case "harem": {
-                let harem = await Harem.get(msg.guildId, msg.author.id);
+                say(d20, msg.channel, "That command has been temporary removed");
+                // let harem = await Harem.get(msg.guildId, msg.author.id);
 
-                try {
-                    switch (options[1]) {
-                        case "create": {
-                            if (harem?.ownsOne) throw "You already have a harem";
-                            harem.create();
-                            say(eli, msg.channel, `${msg.author} just created a harem!!!`, undefined, { messageReference: msg });
-                            break;
-                        }
+                // try {
+                //     switch (options[1]) {
+                //         case "create": {
+                //             if (harem?.ownsOne) throw "You already have a harem";
+                //             harem.create();
+                //             say(eli, msg.channel, `${msg.author} just created a harem!!!`, undefined, { messageReference: msg });
+                //             break;
+                //         }
 
-                        case "disband": {
-                            if (!harem?.ownsOne) throw "You don't have a harem to disband";
-                            harem.disband();
-                            say(eli, msg.channel, `${msg.author} disbanded their harem!!!`, undefined, { messageReference: msg });
-                            break;
-                        }
+                //         case "disband": {
+                //             if (!harem?.ownsOne) throw "You don't have a harem to disband";
+                //             harem.disband();
+                //             say(eli, msg.channel, `${msg.author} disbanded their harem!!!`, undefined, { messageReference: msg });
+                //             break;
+                //         }
 
-                        case "invite":
-                            {
-                                if (!harem?.ownsOne) throw 'You don\'t have a harem yet\nCreate one by using "harem create"';
-                                if (!msg.mentions.members?.first()) throw "You need to mention someone";
-                                if (msg.mentions.members.first()?.id == msg.author.id) throw "You can't join your own harem";
-                                if (harem.includes(msg.mentions.members.first()!.id))
-                                    throw `${msg.mentions.members.first()?.displayName} is already in your harem`;
-                                if (harem.isBanned(msg.mentions.members.first()!.id))
-                                    throw "That player is banned from your harem (use 'harem unban @')";
+                //         case "invite":
+                //             {
+                //                 if (!harem?.ownsOne) throw 'You don\'t have a harem yet\nCreate one by using "harem create"';
+                //                 if (!msg.mentions.members?.first()) throw "You need to mention someone";
+                //                 if (msg.mentions.members.first()?.id == msg.author.id) throw "You can't join your own harem";
+                //                 if (harem.includes(msg.mentions.members.first()!.id))
+                //                     throw `${msg.mentions.members.first()?.displayName} is already in your harem`;
+                //                 if (harem.isBanned(msg.mentions.members.first()!.id))
+                //                     throw "That player is banned from your harem (use 'harem unban @')";
 
-                                say(
-                                    eli,
-                                    msg.channel,
-                                    {
-                                        content: `${userMention(msg.mentions.members.first()!.id)}, ${msg.author} invited you to their harem`,
-                                        components: [
-                                            new MessageActionRow().addComponents(
-                                                new MessageButton()
-                                                    .setCustomId(
-                                                        `harem?command=accept_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
-                                                            msg.author.id
-                                                        }`
-                                                    )
-                                                    .setLabel("ACCEPT")
-                                                    .setStyle("SUCCESS"),
-                                                new MessageButton()
-                                                    .setCustomId(
-                                                        `harem?command=reject_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
-                                                            msg.author.id
-                                                        }`
-                                                    )
-                                                    .setLabel("REJECT")
-                                                    .setStyle("DANGER")
-                                            ),
-                                        ],
-                                    },
-                                    undefined,
-                                    { messageReference: msg }
-                                );
-                            }
-                            break;
+                //                 say(
+                //                     eli,
+                //                     msg.channel,
+                //                     {
+                //                         content: `${userMention(msg.mentions.members.first()!.id)}, ${msg.author} invited you to their harem`,
+                //                         components: [
+                //                             new MessageActionRow().addComponents(
+                //                                 new MessageButton()
+                //                                     .setCustomId(
+                //                                         `harem?command=accept_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
+                //                                             msg.author.id
+                //                                         }`
+                //                                     )
+                //                                     .setLabel("ACCEPT")
+                //                                     .setStyle("SUCCESS"),
+                //                                 new MessageButton()
+                //                                     .setCustomId(
+                //                                         `harem?command=reject_invite&invited_id=${msg.mentions.members.first()?.id}&harem_id=${
+                //                                             msg.author.id
+                //                                         }`
+                //                                     )
+                //                                     .setLabel("REJECT")
+                //                                     .setStyle("DANGER")
+                //                             ),
+                //                         ],
+                //                     },
+                //                     undefined,
+                //                     { messageReference: msg }
+                //                 );
+                //             }
+                //             break;
 
-                        case "open": {
-                            if (!harem.ownsOne) throw "You don't have a harem";
-                            harem.isOpen = true;
-                            say(eli, msg.channel, await harem.getOpenMessage(msg), undefined, { messageReference: msg });
-                            break;
-                        }
+                //         case "open": {
+                //             if (!harem.ownsOne) throw "You don't have a harem";
+                //             harem.isOpen = true;
+                //             say(eli, msg.channel, await harem.getOpenMessage(msg), undefined, { messageReference: msg });
+                //             break;
+                //         }
 
-                        case "join": {
-                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem join @" or "harem join <id>"';
-                            let id = msg.mentions.members?.first()?.id || options[2];
-                            if (id == msg.author.id) throw "You can't join your own harem";
-                            if (harem.isIn(id)) throw "You are already in that player's harem";
-                            let joining = await Harem.get(msg.guildId, id);
-                            if (!joining.isOpen) throw userMention(id) + "'s harem is not open";
-                            if (joining.isBanned(msg.author.id)) throw "You are banned from that harem";
-                            harem.join(id);
-                            say(eli, msg.channel, `${msg.author} joined ${userMention(id) + "'s harem"}!!!`, undefined, {
-                                messageReference: msg,
-                            });
-                            break;
-                        }
+                //         case "join": {
+                //             if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem join @" or "harem join <id>"';
+                //             let id = msg.mentions.members?.first()?.id || options[2];
+                //             if (id == msg.author.id) throw "You can't join your own harem";
+                //             if (harem.isIn(id)) throw "You are already in that player's harem";
+                //             let joining = await Harem.get(msg.guildId, id);
+                //             if (!joining.isOpen) throw userMention(id) + "'s harem is not open";
+                //             if (joining.isBanned(msg.author.id)) throw "You are banned from that harem";
+                //             harem.join(id);
+                //             say(eli, msg.channel, `${msg.author} joined ${userMention(id) + "'s harem"}!!!`, undefined, {
+                //                 messageReference: msg,
+                //             });
+                //             break;
+                //         }
 
-                        case "ban":
-                        case "block": {
-                            if (!harem.ownsOne) throw "You don't have a harem";
-                            if (!options[2] && !msg.mentions.members?.first())
-                                throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
-                            let id = msg.mentions.members?.first()?.id || options[2];
-                            harem.kick(id);
-                            if (harem.isBanned(id)) throw "That player is already banned";
-                            harem.ban(id);
-                            say(eli, msg.channel, `Banned ${userMention(id)} from ${msg.author}'s harem!!!`, undefined, {
-                                messageReference: msg,
-                            });
-                            break;
-                        }
-                        case "unban":
-                        case "unblock": {
-                            if (!harem.ownsOne) throw "You don't have a harem";
-                            if (!options[2] && !msg.mentions.members?.first())
-                                throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
-                            let id = msg.mentions.members?.first()?.id || options[2];
-                            if (!harem.isBanned(id)) throw "That player is not banned";
-                            harem.unban(id);
-                            say(eli, msg.channel, `Unbanned ${userMention(id)} from ${msg.author}'s harem!!!`, undefined, {
-                                messageReference: msg,
-                            });
-                            break;
-                        }
+                //         case "ban":
+                //         case "block": {
+                //             if (!harem.ownsOne) throw "You don't have a harem";
+                //             if (!options[2] && !msg.mentions.members?.first())
+                //                 throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
+                //             let id = msg.mentions.members?.first()?.id || options[2];
+                //             harem.kick(id);
+                //             if (harem.isBanned(id)) throw "That player is already banned";
+                //             harem.ban(id);
+                //             say(eli, msg.channel, `Banned ${userMention(id)} from ${msg.author}'s harem!!!`, undefined, {
+                //                 messageReference: msg,
+                //             });
+                //             break;
+                //         }
+                //         case "unban":
+                //         case "unblock": {
+                //             if (!harem.ownsOne) throw "You don't have a harem";
+                //             if (!options[2] && !msg.mentions.members?.first())
+                //                 throw 'Use "harem ' + options[1] + ' @" or "harem ' + options[1] + ' <id>"';
+                //             let id = msg.mentions.members?.first()?.id || options[2];
+                //             if (!harem.isBanned(id)) throw "That player is not banned";
+                //             harem.unban(id);
+                //             say(eli, msg.channel, `Unbanned ${userMention(id)} from ${msg.author}'s harem!!!`, undefined, {
+                //                 messageReference: msg,
+                //             });
+                //             break;
+                //         }
 
-                        case "list": {
-                            switch (options[2]) {
-                                case "open":
-                                    say(eli, msg.channel, await Harem.GetOpenHarems(msg.guild!.id));
-                                    break;
-                                default:
-                                    say(eli, msg.channel, await Harem.GetHarems(msg.guild!.id));
-                                    break;
-                            }
-                            break;
-                        }
+                //         case "list": {
+                //             switch (options[2]) {
+                //                 case "open":
+                //                     say(eli, msg.channel, await Harem.GetOpenHarems(msg.guild!.id));
+                //                     break;
+                //                 default:
+                //                     say(eli, msg.channel, await Harem.GetHarems(msg.guild!.id));
+                //                     break;
+                //             }
+                //             break;
+                //         }
 
-                        case "close": {
-                            if (!harem.ownsOne) throw "You don't have a harem";
-                            if (!harem.isOpen) throw "Your harem is already closed";
-                            harem.isOpen = false;
-                            say(eli, msg.channel, `${userMention(msg.author.id)} closed their harem`, undefined, { messageReference: msg });
-                            break;
-                        }
+                //         case "close": {
+                //             if (!harem.ownsOne) throw "You don't have a harem";
+                //             if (!harem.isOpen) throw "Your harem is already closed";
+                //             harem.isOpen = false;
+                //             say(eli, msg.channel, `${userMention(msg.author.id)} closed their harem`, undefined, { messageReference: msg });
+                //             break;
+                //         }
 
-                        case "leave": {
-                            if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem leave all", "harem leave @" or "harem leave <id>"';
-                            let id = msg.mentions.members?.first()?.id || options[2];
-                            if (id != "all" && !harem.isIn(id)) throw "You aren't in that player's harem";
-                            harem.leave(id);
-                            say(eli, msg.channel, `${msg.author} left ${id == "all" ? "all harems" : userMention(id) + "'s harem"}!!!`, undefined, {
-                                messageReference: msg,
-                            });
-                            break;
-                        }
+                //         case "leave": {
+                //             if (!options[2] && !msg.mentions.members?.first()) throw 'Use "harem leave all", "harem leave @" or "harem leave <id>"';
+                //             let id = msg.mentions.members?.first()?.id || options[2];
+                //             if (id != "all" && !harem.isIn(id)) throw "You aren't in that player's harem";
+                //             harem.leave(id);
+                //             say(eli, msg.channel, `${msg.author} left ${id == "all" ? "all harems" : userMention(id) + "'s harem"}!!!`, undefined, {
+                //                 messageReference: msg,
+                //             });
+                //             break;
+                //         }
 
-                        case "kick": {
-                            if (!msg.mentions.members?.first() && !options[1]) throw 'Use "!harem kick @" or "!harem kick <id>"';
-                            let id = msg.mentions.members?.first()?.id || options[1];
-                            if (!harem.includes(id)) throw "Selected user is not a part of your harem";
-                            harem.kick(id);
-                            break;
-                        }
+                //         case "kick": {
+                //             if (!msg.mentions.members?.first() && !options[1]) throw 'Use "!harem kick @" or "!harem kick <id>"';
+                //             let id = msg.mentions.members?.first()?.id || options[1];
+                //             if (!harem.includes(id)) throw "Selected user is not a part of your harem";
+                //             harem.kick(id);
+                //             break;
+                //         }
 
-                        default:
-                            say(eli, msg.channel, await harem.getMembersMessage(msg), undefined, {
-                                messageReference: msg,
-                            });
-                            break;
-                    }
-                } catch (err) {
-                    if (typeof err == "string") say(eli, msg.channel, err, undefined, { messageReference: msg });
-                    else console.error(err);
-                    return;
-                }
-                break;
+                //         default:
+                //             say(eli, msg.channel, await harem.getMembersMessage(msg), undefined, {
+                //                 messageReference: msg,
+                //             });
+                //             break;
+                //     }
+                // } catch (err) {
+                //     if (typeof err == "string") say(eli, msg.channel, err, undefined, { messageReference: msg });
+                //     else console.error(err);
+                //     return;
+                // }
+                // break;
             }
 
             case "stats": {
