@@ -421,6 +421,7 @@ d20.on("messageCreate", async (msg) => {
 
             case "harem": {
                 say(d20, msg.channel, "That command has been temporary removed");
+                break;
                 // let harem = await Harem.get(msg.guildId, msg.author.id);
 
                 // try {
