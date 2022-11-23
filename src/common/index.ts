@@ -91,12 +91,17 @@ d20.on("messageCreate", async (msg) => {
                     return;
                 }
                 let dice: number, ammount: number;
+                const parseNum = (str: string) => {
+                    let num = parseInt(str);
+                    if (str.includes("e")) num *= 10 ** parseInt(str.split("e")[1]);
+                    return num;
+                };
                 if (options[1].includes("d")) {
-                    dice = parseInt(options[1].split("d")[1]);
+                    dice = parseNum(options[1].split("d")[1]);
                     if (options[1].split("d")[0] == "") ammount = 1;
                     else ammount = parseInt(options[1].split("d")[0]);
                 } else {
-                    dice = parseInt(options[1]);
+                    dice = parseNum(options[1]);
                     ammount = 1;
                 }
                 if (isNaN(dice) || isNaN(ammount) || dice < 0 || ammount < 0) {
