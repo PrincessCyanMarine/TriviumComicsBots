@@ -99,7 +99,7 @@ d20.on("messageCreate", async (msg) => {
                 if (options[1].includes("d")) {
                     dice = parseNum(options[1].split("d")[1]);
                     if (options[1].split("d")[0] == "") ammount = 1;
-                    else ammount = parseInt(options[1].split("d")[0]);
+                    else ammount = parseNum(options[1].split("d")[0]);
                 } else {
                     dice = parseNum(options[1]);
                     ammount = 1;
