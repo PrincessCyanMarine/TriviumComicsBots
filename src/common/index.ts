@@ -714,11 +714,11 @@ d20.on("messageCreate", async (msg) => {
                         }
                         let { character, delay = null, typing, content } = current.groups;
                         let channel = await channels[character.toLowerCase()];
-                        if (channel?.isText()) {
+                        if (channel && channel instanceof TextChannel) {
                             if (delay) await wait(parseInt(delay));
                             await channel.sendTyping();
                             await wait(parseInt(typing ?? "0"));
-                            if (content) await channel.send(detectEmoji(content));
+                            if (content) await channel.send(await detectEmoji(content, channel));
                             next();
                         }
                     });

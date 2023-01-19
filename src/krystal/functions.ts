@@ -118,7 +118,7 @@ export async function yeeting(msg: Message, target: GuildMember | undefined = ge
             }
             ctx.drawImage(yeetOverlays[i.toString()], 0, 0, width, height);
         }
-        encoder.addFrame(ctx as CanvasRenderingContext2D);
+        encoder.addFrame(ctx as unknown as CanvasRenderingContext2D);
         // console.timeEnd(i.toString());
         if (i < 7) drawYeetFrame(i + 1);
         else encoder.finish();

@@ -1,9 +1,10 @@
-import { hyperlink } from "@discordjs/builders";
+import { formatEmoji, hyperlink } from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
 import {
     ActivityType,
     Client,
     Guild,
+    GuildEmoji,
     GuildMember,
     Message,
     MessageAttachment,
@@ -51,11 +52,9 @@ export const say = (
     delay = 1000,
     reply?: ReplyOptions
 ): Promise<Message> =>
-    new Promise((resolve, reject) => {
+    new Promise(async (resolve, reject) => {
         // console.log(delay);
         delay = Math.max(1, delay);
-        if (typeof content == "string") content = detectEmoji(content);
-        else if (content.content) content.content = detectEmoji(content.content);
         let id = typeof channel == "string" ? channel : channel.id;
 
         if (reply) {
@@ -65,12 +64,15 @@ export const say = (
 
         bot.channels
             .fetch(id)
-            .then((c) => {
+            .then(async (c) => {
                 if (c instanceof TextChannel) {
                     if (!bot.user) return;
                     let member = c.members.get(bot.user.id);
                     if (!member) return;
                     if (!c.permissionsFor(member).has("SEND_MESSAGES")) return;
+
+                    if (typeof content == "string") content = await detectEmoji(content, c);
+                    else if (content.content) content.content = await detectEmoji(content.content, c);
 
                     if (typeof content == "string") content = content.slice(0, 2000);
                     else if (content.content) content.content = content.content.slice(0, 2000);
@@ -88,11 +90,12 @@ export const say = (
     });
 
 export function edit(msg: Message, content: string | MessageEditOptions, delay = 1000) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         delay = Math.max(1, delay);
+        if (!(msg.channel instanceof TextChannel)) return reject("Not a text channel");
 
-        if (typeof content == "string") content = detectEmoji(content);
-        else if (content.content) content.content = detectEmoji(content.content);
+        if (typeof content == "string") content = await detectEmoji(content, msg.channel);
+        else if (content.content) content.content = await detectEmoji(content.content, msg.channel);
 
         setTimeout(() => {
             msg.edit(content).then(resolve).catch(reject);
@@ -132,20 +135,32 @@ export function createEncoder(
     return { encoder, stream, canvas, ctx };
 }
 
-export function detectEmoji(content: string): string {
-    // let text_emojis = content.match(/<:[^:]+:[0-9]+>/gi);
-    // let text_emojis = content.match(/:[^:]+:/gi);
-    // let changed: string[] = [];
-    // if (text_emojis)
-    //     for (let emoji of text_emojis) {
-    //         if (changed.includes(emoji)) continue;
-    //         changed.push(emoji);
-    //         if (emojis[emoji]) {
-    //             let regexp = new RegExp(emoji, "gi");
-    //             content = content.replace(regexp, emojis[emoji]);
-    //         }
-    //     }
-    return content;
+export function detectEmoji(content: string, channel: TextChannel) {
+    return new Promise<string>((resolve) => {
+        channel.guild.emojis.fetch().then((_e) => {
+            let e = _e.map((e) => e).filter((e) => e.name);
+            let emojis: { [emoji: string]: GuildEmoji } = {};
+            for (const emoji of e) emojis[emoji.name!] = emoji;
+            Object.values(emojis).forEach((emoji) => console.log(emoji.name));
+
+            // let text_emojis = content.match(/<:[^:]+:[0-9]+>/gi);
+            let text_emojis = content.match(/(?<=:)[^:]+(?=:)/gi);
+
+            console.log(text_emojis);
+            let changed: string[] = [];
+            if (text_emojis)
+                for (let emoji of text_emojis) {
+                    console.log(emoji);
+                    if (changed.includes(emoji)) continue;
+                    changed.push(emoji);
+                    if (emojis[emoji]) {
+                        let regexp = new RegExp(`:${emoji}:`, "gi");
+                        content = content.replace(regexp, `${formatEmoji(emojis[emoji].id)}`);
+                    }
+                }
+            return resolve(content);
+        });
+    });
 }
 
 export function getTarget(msg: Message): User | undefined {
