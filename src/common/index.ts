@@ -727,9 +727,9 @@ d20.on("messageCreate", async (msg) => {
                 // say(d20, msg.channel, text);
             }
             case "toggleroles": {
-                console.log(options);
+                // console.log(options);
                 if (msg.author.id != marineId) return;
-                console.log(options);
+                // console.log(options);
                 let channelId = options[1];
                 let messageId = options[2];
 

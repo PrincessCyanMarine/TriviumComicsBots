@@ -141,16 +141,13 @@ export function detectEmoji(content: string, channel: TextChannel) {
             let e = _e.map((e) => e).filter((e) => e.name);
             let emojis: { [emoji: string]: GuildEmoji } = {};
             for (const emoji of e) emojis[emoji.name!] = emoji;
-            Object.values(emojis).forEach((emoji) => console.log(emoji.name));
 
             // let text_emojis = content.match(/<:[^:]+:[0-9]+>/gi);
             let text_emojis = content.match(/(?<=:)[^:]+(?=:)/gi);
 
-            console.log(text_emojis);
             let changed: string[] = [];
             if (text_emojis)
                 for (let emoji of text_emojis) {
-                    console.log(emoji);
                     if (changed.includes(emoji)) continue;
                     changed.push(emoji);
                     if (emojis[emoji]) {

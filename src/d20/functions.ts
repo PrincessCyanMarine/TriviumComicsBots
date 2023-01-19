@@ -644,7 +644,7 @@ export async function d20TimedFunction() {
         if (!member.presence?.status) NONE++;
     });
 
-    console.log(`ONLINE: ${ONLINE} | DND: ${DND} | IDLE: ${IDLE} | OFFLINE: ${OFFLINE} | INVISIBLE: ${INVISIBLE} | NONE: ${NONE}`);
+    // console.log(`ONLINE: ${ONLINE} | DND: ${DND} | IDLE: ${IDLE} | OFFLINE: ${OFFLINE} | INVISIBLE: ${INVISIBLE} | NONE: ${NONE}`);
 
     guild.channels.fetch("748330400643940483").then((channel) => {
         let membersOnline = members.reduce(
