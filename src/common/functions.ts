@@ -180,7 +180,7 @@ export function getMember(msg: Message): GuildMember | undefined {
 
 export function notificationCult(channel_id: string) {
     [krystal, sadie, ray, eli].forEach((bot) => {
-        say(bot, channel_id, ":GMBelleNotificationNew:").catch(console.error);
+        say(bot, channel_id, ":GMBelleNotification:").catch(console.error);
     });
 }
 
