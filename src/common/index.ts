@@ -16,8 +16,18 @@ import { database, testing } from "..";
 import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, random_from_array, say, wait } from "./functions";
-import { colors, command_list, dodoId, ignore_channels, marineId, testChannelId, testGuildId, triviumGuildId } from "./variables";
+import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, notificationCult, random_from_array, say, wait } from "./functions";
+import {
+    colors,
+    command_list,
+    dodoId,
+    ignore_channels,
+    marineId,
+    notificationChannel,
+    testChannelId,
+    testGuildId,
+    triviumGuildId,
+} from "./variables";
 import { channelMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
@@ -741,7 +751,7 @@ d20.on("messageCreate", async (msg) => {
                     components: [
                         new MessageActionRow().addComponents([
                             new MessageButton()
-                                .setEmoji("<:GMBelleNotificationNew:724792043880055094>")
+                                .setEmoji("<:GMBelleNotification:724792043880055094>")
                                 .setCustomId("gamemastersfanrole")
                                 .setLabel("Game masters")
                                 .setStyle("PRIMARY"),
@@ -764,6 +774,14 @@ d20.on("messageCreate", async (msg) => {
                 }
 
                 new EmojiCycler(options[1]).cycle(options[2]);
+                break;
+            }
+            case "notification": {
+                if (![marineId, dodoId].includes(msg.author.id)) {
+                    return;
+                    //say(d20, msg.channel, "You don't have permission to use that command");
+                }
+                notificationCult(msg.channel.id);
                 break;
             }
         }
