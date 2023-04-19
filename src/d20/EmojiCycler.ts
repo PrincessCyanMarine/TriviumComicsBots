@@ -87,7 +87,7 @@ export class EmojiCycler {
                 // console.log(cycled.map((a) => rotation[a]));
                 // console.log(cycled);
                 let random = alea((await database.child("emojiRotation/timer/" + this.guildId).once("value")).val() || Date.now().valueOf(), {
-                    entropy: true,
+                    // entropy: true,
                 });
                 const addFromArray = (array: string[], limit: number) => {
                     // console.log(limit, array.length);

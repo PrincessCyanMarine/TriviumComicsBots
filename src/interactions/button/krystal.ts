@@ -4,6 +4,7 @@ import { krystal } from "../../clients";
 import { colors, triviumGuildId } from "../../common/variables";
 
 krystal.on("interactionCreate", async (interaction) => {
+    console.log(interaction);
     if (!interaction.isButton()) return;
     if (testing && interaction.channelId != "892800588469911663") return;
     else if (!testing && interaction.channelId == "892800588469911663") return;
@@ -15,30 +16,34 @@ krystal.on("interactionCreate", async (interaction) => {
         const id = match[1];
 
         if (!(interaction.member instanceof GuildMember)) return;
-
-        for (const [name, color, roleId, emoji, necessaryIds] of colors) {
-            if (interaction.member.roles.cache.has(roleId)) {
-                interaction.member.roles.remove(roleId);
-                if (roleId === id) {
-                    interaction.reply({ content: "Removed the " + color + " role", ephemeral: true });
-                    break;
-                }
-            }
-
-            let mod = interaction.member.permissions.has("MANAGE_ROLES");
-
-            if (id === roleId) {
-                let hasRole = false;
-                for (const necessary of necessaryIds)
-                    if (mod || interaction.member.roles.cache.has(necessary)) {
-                        hasRole = true;
-
-                        interaction.member.roles.add(roleId);
-                        interaction.reply({ content: "You have been given the " + color + " role", ephemeral: true });
+        try {
+            for (const [name, color, roleId, emoji, necessaryIds] of colors) {
+                if (interaction.member.roles.cache.has(roleId)) {
+                    interaction.member.roles.remove(roleId);
+                    if (roleId === id) {
+                        interaction.reply({ content: "Removed the " + color + " role", ephemeral: true });
                         break;
                     }
-                if (!hasRole) interaction.reply({ content: "You don't have the necessary role", ephemeral: true });
+                }
+
+                let mod = interaction.member.permissions.has("MANAGE_ROLES");
+
+                if (id === roleId) {
+                    let hasRole = false;
+                    for (const necessary of necessaryIds)
+                        if (mod || interaction.member.roles.cache.has(necessary)) {
+                            hasRole = true;
+
+                            interaction.member.roles.add(roleId);
+                            interaction.reply({ content: "You have been given the " + color + " role", ephemeral: true });
+                            break;
+                        }
+                    if (!hasRole) interaction.reply({ content: "You don't have the necessary role", ephemeral: true });
+                }
             }
+        } catch (e) {
+            interaction.reply({ content: "Something went wrong", ephemeral: true });
+            console.error(e);
         }
     }
 

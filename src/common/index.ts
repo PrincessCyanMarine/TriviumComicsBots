@@ -756,7 +756,7 @@ d20.on("messageCreate", async (msg) => {
                                 .setLabel("Game masters")
                                 .setStyle("PRIMARY"),
                             new MessageButton()
-                                .setEmoji("<:GTHariAnnoyed:614743726337556480>")
+                                .setEmoji("<:GTHariAnnoyed:1000039329621618799>")
                                 .setCustomId("geminitwilightfanrole")
                                 .setLabel("Gemini twilight")
                                 .setStyle("PRIMARY"),
