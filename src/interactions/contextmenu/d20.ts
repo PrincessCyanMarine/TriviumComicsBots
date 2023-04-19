@@ -5,7 +5,7 @@ import { testChannelId, triviumGuildId } from "../../common/variables";
 import { generatecard, mute_unmute } from "../../d20/functions";
 
 d20.on("interactionCreate", async (interaction) => {
-    if (!interaction.isContextMenu()) return;
+    if (!interaction.isContextMenuCommand()) return;
     if (testing && interaction.channelId != testChannelId) return;
     else if (!testing && interaction.channelId == testChannelId) return;
 
@@ -22,10 +22,10 @@ d20.on("interactionCreate", async (interaction) => {
             break;
         case "get profile picture":
             let user;
-            if (interaction.targetType == "USER") user = interaction.options.getUser("user");
+            if (interaction.isUserContextMenuCommand()) user = interaction.options.getUser("user");
             else user = interaction.options.getMessage("message")?.author;
             if (!(user instanceof User)) return;
-            interaction.reply({ content: user.avatarURL({ size: 1024, dynamic: true }), ephemeral: true });
+            interaction.reply({ content: user.avatarURL({ size: 1024, forceStatic: false }) ?? "Something went wrong...", ephemeral: true });
             break;
         case "mute":
         case "unmute":

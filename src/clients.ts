@@ -1,15 +1,15 @@
-import { ActivityType, Client, Intents, WebhookClient } from "discord.js";
+import { ActivityType, Client, IntentsBitField as Intents, WebhookClient } from "discord.js";
 import { config } from "dotenv";
 import { changeActivities } from "./common/functions";
 config();
 
 const intents = [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_INTEGRATIONS,
-    Intents.FLAGS.GUILD_MEMBERS,
-    Intents.FLAGS.GUILD_PRESENCES,
-    Intents.FLAGS.GUILD_MESSAGE_TYPING,
+    Intents.Flags.Guilds,
+    Intents.Flags.GuildMessages,
+    Intents.Flags.GuildIntegrations,
+    Intents.Flags.GuildMembers,
+    Intents.Flags.GuildPresences,
+    Intents.Flags.GuildMessageTyping,
 ];
 
 export var krystal = new Client({ intents }),
@@ -71,4 +71,11 @@ export const id2bot: { [bot: string]: string } = {
     "723938416139567154": "siegfried",
 };
 
-export type CustomActivity = [string, Exclude<ActivityType, "CUSTOM"> | undefined, string | undefined, (string | Buffer)?, string?, string?];
+export type CustomActivity = [
+    string,
+    Exclude<ActivityType, ActivityType.Custom> | undefined,
+    string | undefined,
+    (string | Buffer)?,
+    string?,
+    string?
+];

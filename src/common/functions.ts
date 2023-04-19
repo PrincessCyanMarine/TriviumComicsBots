@@ -7,11 +7,9 @@ import {
     GuildEmoji,
     GuildMember,
     Message,
-    MessageAttachment,
     MessageComponent,
     MessageEditOptions,
-    MessageEmbed,
-    MessageOptions,
+
     PresenceStatusData,
     ReplyOptions,
     TextBasedChannel,

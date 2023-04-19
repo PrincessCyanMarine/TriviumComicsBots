@@ -1,4 +1,4 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, PermissionFlagsBits } from "discord.js";
 import { database, testing } from "../..";
 import { krystal } from "../../clients";
 import { colors, triviumGuildId } from "../../common/variables";
@@ -25,7 +25,7 @@ krystal.on("interactionCreate", async (interaction) => {
                 }
             }
 
-            let mod = interaction.member.permissions.has("MANAGE_ROLES");
+            let mod = interaction.member.permissions.has(PermissionFlagsBits.ManageRoles);
 
             if (id === roleId) {
                 let hasRole = false;

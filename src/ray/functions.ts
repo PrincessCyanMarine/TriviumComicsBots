@@ -1,5 +1,5 @@
 import { createCanvas, loadImage } from "canvas";
-import { GuildMember, Message, MessageOptions, User } from "discord.js";
+import { GuildMember, Message, MessageCreateOptions, User } from "discord.js";
 import { database, testing } from "..";
 import assets from "../assetsIndexes";
 import { beat } from "../attachments";
@@ -16,7 +16,7 @@ export async function roleplay(msg: Message) {
         say(ray, msg.channel, "You need to select a character to roleplay as");
         return;
     }
-    let message: MessageOptions = {};
+    let message: MessageCreateOptions = {};
     if (msg.content) message.content = msg.content;
     if (msg.attachments) message.files = msg.attachments.map((a) => a);
     say(clients[id2bot[bot]], rc.output, message).catch(console.error);
@@ -35,7 +35,7 @@ export async function beating(msg: Message, target: User | GuildMember | undefin
             height = 708;
         let canvas = createCanvas(width, height);
         let ctx = canvas.getContext("2d");
-        let avatarURL = target.displayAvatarURL({ size: 1024, format: "png" });
+        let avatarURL = target.displayAvatarURL({ size: 1024, extension: "png" });
         loadImage(avatarURL).then((avatar) => {
             loadImage(assets.ray.beat).then((top) => {
                 ctx.drawImage(avatar, 530, 144, 419, 419);

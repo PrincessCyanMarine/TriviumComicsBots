@@ -1,5 +1,5 @@
-import { hyperlink, userMention } from "@discordjs/builders";
-import { ButtonInteraction, GuildMember, Message, MessageActionRow, MessageAttachment, MessageButton, Role } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, hyperlink, userMention } from "@discordjs/builders";
+import { AttachmentBuilder, ButtonInteraction, ButtonStyle, GuildMember, Message, PermissionFlagsBits, Role } from "discord.js";
 import { readFileSync, writeFileSync } from "fs";
 import { database } from "..";
 import { glitch } from "../attachments";
@@ -55,7 +55,7 @@ export async function summon(msg: Message, options: string[]) {
                 msg.channel,
                 {
                     content: "*You draw a magic circle on the ground…*",
-                    files: [new MessageAttachment(`./assets/ray/roll/${summoned_creature}.gif`, "Roll.gif")],
+                    files: [new AttachmentBuilder(`./assets/ray/roll/${summoned_creature}.gif`).setName("Roll.gif")],
                 },
                 500
             );
@@ -134,7 +134,8 @@ export async function summon(msg: Message, options: string[]) {
                             content: "We don't have permission to use Merry's art",
                         });
                     if (mentioned == "297531251081084941") summoned_name = SUMMON_NAMES.DODO;
-                    else if ((await msg.guild?.members.fetch(mentioned))?.permissions.has("KICK_MEMBERS")) summoned_name = "mod/" + mentioned;
+                    else if ((await msg.guild?.members.fetch(mentioned))?.permissions.has(PermissionFlagsBits.KickMembers))
+                        summoned_name = "mod/" + mentioned;
                     else summoned_name = "player/" + mentioned;
                     break;
                 case 15:
@@ -154,8 +155,12 @@ export async function summon(msg: Message, options: string[]) {
                         {
                             content: "You summoned " + (bird.groups.bird.match(/^[aeiou]/i) ? "an " : "a ") + bird.groups.bird + "!",
                             components: [
-                                new MessageActionRow().addComponents(
-                                    new MessageButton().setLabel(bird.groups.bird).setStyle("LINK").setURL(bird.groups.url).setEmoji("🐦")
+                                new ActionRowBuilder().addComponents(
+                                    new ButtonBuilder()
+                                        .setLabel(bird.groups.bird)
+                                        .setStyle(ButtonStyle.Link)
+                                        .setURL(bird.groups.url)
+                                        .setEmoji({ id: "🐦" })
                                 ),
                             ],
                         },
@@ -172,7 +177,10 @@ export async function summon(msg: Message, options: string[]) {
                 case 19:
                     let moderators: string[] | undefined = (await msg.guild?.members.fetch())
                         ?.filter(
-                            (m) => !m.user.bot && m.permissions.has("KICK_MEMBERS") && !["297531251081084941", "238481145329745920"].includes(m.id)
+                            (m) =>
+                                !m.user.bot &&
+                                m.permissions.has(PermissionFlagsBits.KickMembers) &&
+                                !["297531251081084941", "238481145329745920"].includes(m.id)
                         )
                         .map((m) => m.id);
                     let mod;
@@ -226,7 +234,7 @@ export async function summon(msg: Message, options: string[]) {
         console.error(err);
         if (typeof err == "string") {
             let c = await d20.channels.fetch(notificationChannel);
-            if (c?.isText()) c.send(err);
+            if (c?.isTextBased()) c.send(err);
         }
     }
 }

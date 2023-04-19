@@ -1,7 +1,7 @@
 import { userMention } from "@discordjs/builders";
 import axios from "axios";
 import { createCanvas, Image, loadImage } from "canvas";
-import { GuildMember, Message, MessageAttachment, User, Widget } from "discord.js";
+import { AttachmentBuilder, GuildMember, Message, User, Widget } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
 import {
@@ -81,16 +81,16 @@ export async function yeeting(msg: Message, target: GuildMember | undefined = ge
     let { ctx, canvas, encoder } = createEncoder(
         width,
         height,
-        (buffer) => say(krystal, msg.channel, { files: [new MessageAttachment(buffer, "yeet.gif")] }, startTime - Date.now().valueOf()),
+        (buffer) => say(krystal, msg.channel, { files: [new AttachmentBuilder(buffer).setName("yeet.gif")] }, startTime - Date.now().valueOf()),
         { delay: 1000 }
     );
 
     let avatar = await loadImage(
-        msg.member ? msg.member.displayAvatarURL({ format: "png", size: 1024 }) : msg.author.displayAvatarURL({ format: "png", size: 1024 })
+        msg.member ? msg.member.displayAvatarURL({ extension: "png", size: 1024 }) : msg.author.displayAvatarURL({ extension: "png", size: 1024 })
     );
 
     let target_avatar: Image;
-    if (target) target_avatar = await loadImage(target.displayAvatarURL({ format: "png", size: 1024 }));
+    if (target) target_avatar = await loadImage(target.displayAvatarURL({ extension: "png", size: 1024 }));
 
     const drawYeetFrame = async (i: number) => {
         let frame = yeetFrames[i];
@@ -159,7 +159,7 @@ export function killing(
     target: User | undefined = msg ? getTarget(msg) : undefined,
     type: "normal" | "revenge" = "normal",
     text?: string
-): Promise<Buffer | MessageAttachment> {
+): Promise<Buffer | AttachmentBuilder> {
     return new Promise((resolve, reject) => {
         let startTime = new Date().valueOf();
 
@@ -179,9 +179,9 @@ export function killing(
             if (protectedFromKills.includes(target.id)) return killing(msg, msg.author, "revenge");
             if (target.id == spared_player_id)
                 return say(krystal, msg.channel, `Sorry, <@${msg.author.id}>, I was asked to spare that unattractive weeb`);
-            avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });
+            avatarURL = target.displayAvatarURL({ extension: "png", size: 1024 });
             if (avatarURL == null) return say(krystal, msg.channel, { content: text, files: [kill] }).catch(console.error);
-        } else if (target) avatarURL = target.displayAvatarURL({ format: "png", size: 1024 });
+        } else if (target) avatarURL = target.displayAvatarURL({ extension: "png", size: 1024 });
         else return resolve(kill);
 
         let canvas = createCanvas(1200, 713);
@@ -197,7 +197,7 @@ export function killing(
                         say(
                             krystal,
                             msg.channel,
-                            { content: text, files: [new MessageAttachment(canvas.toBuffer(), "Kill.png")] },
+                            { content: text, files: [new AttachmentBuilder(canvas.toBuffer()).setName("Kill.png")] },
                             1000 - (new Date().valueOf() - startTime)
                         );
                     else resolve(canvas.toBuffer());
@@ -209,7 +209,7 @@ export function killing(
  * TODO add rebel commands
  */
 export async function rebel(msg: Message, canRebel: boolean = false) {
-    let img: Buffer | MessageAttachment;
+    let img: Buffer | AttachmentBuilder;
     if (canRebel && randomchance(30))
         img = await random_from_array([
             killing,
@@ -236,7 +236,7 @@ export async function rebel(msg: Message, canRebel: boolean = false) {
 
     say(krystal, msg.channel, { content: "Pfft", files: [img] });
 }
-export function sleeping(msg: Message | undefined, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
+export function sleeping(msg: Message | undefined, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | AttachmentBuilder> {
     return new Promise((resolve, reject) => {
         imageCommand(
             krystal,
@@ -258,14 +258,14 @@ export function sleeping(msg: Message | undefined, target: User | undefined = ms
             .catch(reject);
     });
 }
-export function absorbing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<MessageAttachment | Buffer> {
+export function absorbing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<AttachmentBuilder | Buffer> {
     return new Promise((resolve, reject) => {
         imageCommand(krystal, msg, target, 1297, 707, { x: 82, y: 98, width: 512, height: 512 }, assets.krystal.absorb, undefined, absorb)
             .then(resolve)
             .catch(reject);
     });
 }
-export function eating(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<MessageAttachment | Buffer> {
+export function eating(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<AttachmentBuilder | Buffer> {
     return new Promise((resolve, reject) => {
         imageCommand(
             krystal,
@@ -286,13 +286,13 @@ export function eating(msg?: Message, target: User | undefined = msg ? getTarget
 export async function drowning(
     msg: Message | undefined,
     target: User | undefined = msg ? getTarget(msg) : undefined
-): Promise<Buffer | MessageAttachment> {
+): Promise<Buffer | AttachmentBuilder> {
     return new Promise(async (resolve, reject) => {
-        let img: Buffer | MessageAttachment;
+        let img: Buffer | AttachmentBuilder;
         if (target) {
             let canvas = createCanvas(833, 762);
             let ctx = canvas.getContext("2d");
-            let avatarURL = target.displayAvatarURL({ size: 1024, format: "png" });
+            let avatarURL = target.displayAvatarURL({ size: 1024, extension: "png" });
             let avatar = await loadImage(avatarURL);
             let bg = await loadImage(assets.krystal.drown.base);
             let top = await loadImage(assets.krystal.drown.top);
@@ -312,7 +312,7 @@ export function swimming(msg: Message) {
     if (msg.member?.displayName.toLowerCase() == "sadie") say(krystal, msg.channel, { files: [swimsadie] });
     else say(krystal, msg.channel, { files: [swim] });
 }
-export async function burning(msg?: Message): Promise<MessageAttachment> {
+export async function burning(msg?: Message): Promise<AttachmentBuilder> {
     return new Promise(async (resolve, reject) => {
         let activity = await (await database.child("activities/Krystal").once("value")).val();
         if (activity == "dnd")
@@ -344,7 +344,7 @@ export function flying(msg: Message) {
 export function silencedbox(
     msg: Message | undefined,
     target: User | undefined = msg ? getTarget(msg) : undefined
-): Promise<Buffer | MessageAttachment> {
+): Promise<Buffer | AttachmentBuilder> {
     return new Promise(async (resolve, reject) => {
         imageCommand(
             krystal,
@@ -372,7 +372,7 @@ export function silencedbox(
 export function silencing(
     msg: Message | undefined,
     target: User | undefined = msg ? getTarget(msg) : undefined
-): Promise<Buffer | MessageAttachment> {
+): Promise<Buffer | AttachmentBuilder> {
     return new Promise(async (resolve, reject) => {
         imageCommand(
             krystal,
@@ -395,7 +395,7 @@ export function silencing(
     });
 }
 
-export function boxxing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
+export function boxxing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | AttachmentBuilder> {
     return new Promise(async (resolve, reject) => {
         imageCommand(
             krystal,

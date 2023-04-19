@@ -330,7 +330,10 @@ express_app.get("/harem/harem/:guild_id/:user_id", async (req, res) => {
     const addUser = (id: string) => {
         let member = members.get(id);
         if (!member) return;
-        users[id] = { displayName: member.displayName, displayAvatarURL: member.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }) };
+        users[id] = {
+            displayName: member.displayName,
+            displayAvatarURL: member.displayAvatarURL({ forceStatic: false, extension: "png", size: 1024 }),
+        };
     };
 
     harem?.members?.filter((member) => members.get(member) != null).forEach(addUser);
@@ -355,7 +358,10 @@ express_app.get("/harem/guild/:guild_id", async (req, res) => {
     const addUser = (id: string) => {
         let member = members.get(id);
         if (!member) return;
-        users[id] = { displayName: member.displayName, displayAvatarURL: member.displayAvatarURL({ dynamic: true, format: "png", size: 1024 }) };
+        users[id] = {
+            displayName: member.displayName,
+            displayAvatarURL: member.displayAvatarURL({ forceStatic: false, extension: "png", size: 1024 }),
+        };
     };
 
     let users: { [id: string]: { displayName: string; displayAvatarURL: string } } = {};

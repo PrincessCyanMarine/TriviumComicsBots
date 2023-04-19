@@ -1,15 +1,9 @@
-import {
-    ButtonInteraction,
-    InteractionReplyOptions,
-    InteractionUpdateOptions,
-    MessageButton,
-    MessageSelectMenu,
-    SelectMenuInteraction,
-} from "discord.js";
+import { ButtonInteraction, ButtonStyle, InteractionReplyOptions, InteractionUpdateOptions, SelectMenuInteraction } from "discord.js";
 import emojis from "../common/emojis";
+import { ButtonBuilder, SelectMenuBuilder, SelectMenuOptionBuilder, StringSelectMenuOptionBuilder } from "@discordjs/builders";
 
 const getReplyMessage = (content: string | InteractionUpdateOptions | InteractionReplyOptions, exclusive: boolean): InteractionReplyOptions => ({
-    content: typeof content == "string" ? content : content.content,
+    content: typeof content == "string" ? content : content.content ?? "Something went wrong...",
     ephemeral: exclusive,
     components: typeof content == "string" ? [] : content.components,
 });
@@ -37,32 +31,34 @@ export function update(interaction: SelectMenuInteraction | ButtonInteraction, c
 export function get_rps_interactible(id: string, list: boolean = false, a = false) {
     return list
         ? [
-              new MessageSelectMenu()
+              new SelectMenuBuilder()
                   .setCustomId(`${a ? "a" : ""}rpssp-${id}`)
                   .setPlaceholder("Play")
                   .setMaxValues(1)
                   .addOptions(
-                      { label: "rock", value: "rock", emoji: emojis[":rock:"] },
-                      { label: "paper", value: "paper", emoji: emojis[":paper:"] },
-                      { label: "scissors", value: "scissors", emoji: emojis[":scissors:"] }
+                      new StringSelectMenuOptionBuilder().setLabel("rock").setValue("rock").setEmoji({ id: emojis[":rock:"] }),
+                      new StringSelectMenuOptionBuilder().setLabel("paper").setValue("paper").setEmoji({ id: emojis[":paper:"] }),
+                      new StringSelectMenuOptionBuilder().setLabel("scissors").setValue("scissors").setEmoji({ id: emojis[":scissors:"] })
+                      //   { label: "rock", value: "rock", emoji: emojis[":rock:"] },
+                      //   { label: "paper", value: "paper", emoji: emojis[":paper:"] },
+                      //   { label: "scissors", value: "scissors", emoji: emojis[":scissors:"] }
                   ),
           ]
         : [
-              new MessageButton()
+              new ButtonBuilder()
                   .setCustomId(`${a ? "a" : ""}rpssp-${id}/rock`)
-                  .setStyle("SECONDARY")
+                  .setStyle(ButtonStyle.Secondary)
                   .setLabel("Rock")
-                  .setEmoji(emojis[":rock:"]),
-              new MessageButton()
+                  .setEmoji({ id: emojis[":rock:"] }),
+              new ButtonBuilder()
                   .setCustomId(`${a ? "a" : ""}rpssp-${id}/paper`)
-                  .setStyle("SECONDARY")
+                  .setStyle(ButtonStyle.Secondary)
                   .setLabel("Paper")
-                  .setEmoji(emojis[":paper:"]),
-
-              new MessageButton()
+                  .setEmoji({ id: emojis[":paper:"] }),
+              new ButtonBuilder()
                   .setCustomId(`${a ? "a" : ""}rpssp-${id}/scissors`)
-                  .setStyle("SECONDARY")
+                  .setStyle(ButtonStyle.Secondary)
                   .setLabel("Scissors")
-                  .setEmoji(emojis[":scissors:"]),
+                  .setEmoji({ id: emojis[":scissors:"] }),
           ];
 }

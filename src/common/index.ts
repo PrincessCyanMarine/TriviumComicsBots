@@ -1,17 +1,4 @@
-import {
-    AnyChannel,
-    BaseMessageComponentOptions,
-    Collection,
-    GuildMember,
-    Message,
-    MessageActionRow,
-    MessageActionRowOptions,
-    MessageAttachment,
-    MessageButton,
-    MessageEmbed,
-    MessageSelectMenu,
-    TextChannel,
-} from "discord.js";
+import { Collection, GuildMember, Message } from "discord.js";
 import { database, testing } from "..";
 import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
@@ -28,7 +15,7 @@ import {
     testGuildId,
     triviumGuildId,
 } from "./variables";
-import { channelMention, userMention } from "@discordjs/builders";
+import { ActionRowBuilder, channelMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 import { summon, SUMMON_NAMES } from "../games/summon";
@@ -38,7 +25,7 @@ import { eli_activities } from "../eli/activities";
 import { ray_activities } from "../ray/activities";
 import { Calculator } from "../games/calculator";
 import { Help } from "./help";
-import { Harem } from "./harem";
+// import { Harem } from "./harem";
 import axios from "axios";
 import { EmojiCycler } from "../d20/EmojiCycler";
 
@@ -63,7 +50,7 @@ d20.on("messageCreate", async (msg) => {
                 say(d20, msg.channel, {
                     content: "You can customize your card here",
                     components: [
-                        new MessageActionRow().addComponents([
+                        new ActionRowBuilder().addComponents([
                             {
                                 type: "BUTTON",
                                 label: "Customize",

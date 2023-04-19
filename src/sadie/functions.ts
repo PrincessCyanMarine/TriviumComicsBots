@@ -1,5 +1,5 @@
 import { createCanvas, loadImage } from "canvas";
-import { Message, MessageAttachment, User } from "discord.js";
+import { AttachmentBuilder, Message, User } from "discord.js";
 import { sadie } from "../clients";
 import { createEncoder, getTarget, say, testWord } from "../common/functions";
 import { greetings } from "./greetings";
@@ -26,14 +26,14 @@ export function bestwaifu(msg: Message) {
                 say(
                     sadie,
                     msg.channel,
-                    { content: "Oh, dumb are we?\nI'm top bitch, you Weeb!", files: [new MessageAttachment(buffer, "Door.gif")] },
+                    { content: "Oh, dumb are we?\nI'm top bitch, you Weeb!", files: [new AttachmentBuilder(buffer).setName("Door.gif")] },
                     1000 - new Date().valueOf() - startTime
                 );
             },
             { delay: 4500, repeat: -1 }
         );
 
-        let avatarURL = msg.author.displayAvatarURL({ format: "png", size: 1024 });
+        let avatarURL = msg.author.displayAvatarURL({ extension: "png", size: 1024 });
         loadImage(avatarURL).then((avatar) => {
             loadImage(assets.sadie.door.open).then((openDoor) => {
                 loadImage(assets.sadie.door.closed).then((closedDoor) => {
@@ -86,13 +86,13 @@ export function punching(msg: Message, target: User | undefined = getTarget(msg)
                         : type == "tsundere"
                         ? "I SHOULD KICK YOUR DUMB ASS FOR THIS!!"
                         : "My pleasure!",
-                files: [new MessageAttachment(buffer, "Punch.gif")],
+                files: [new AttachmentBuilder(buffer).setName("Punch.gif")],
             },
             1000 - new Date().valueOf() - startTime
         );
     });
 
-    loadImage(target.displayAvatarURL({ format: "png", size: 1024 })).then((avatar) => {
+    loadImage(target.displayAvatarURL({ extension: "png", size: 1024 })).then((avatar) => {
         loadImage(assets.sadie.punch[0]).then((img0) => {
             loadImage(assets.sadie.punch[1]).then((img1) => {
                 loadImage(assets.sadie.punch[2]).then((img2) => {
@@ -131,11 +131,11 @@ export function dm(msg: Message) {
 
 export async function kicking(msg: Message, avatars: string[] = []) {
     let startTime = new Date().valueOf();
-    if (avatars.length == 0) avatars = msg.mentions.users.map((user, i) => user.displayAvatarURL({ format: "png", size: 1024 }));
+    if (avatars.length == 0) avatars = msg.mentions.users.map((user, i) => user.displayAvatarURL({ extension: "png", size: 1024 }));
     if (avatars.length == 0)
-        if (testWord(msg.content, "me")) avatars[0] = msg.author.displayAvatarURL({ format: "png", size: 1024 });
+        if (testWord(msg.content, "me")) avatars[0] = msg.author.displayAvatarURL({ extension: "png", size: 1024 });
         else return say(sadie, msg.channel, { files: [kick] });
-    if (avatars.length < 3 && testWord(msg.content, "me")) avatars[avatars.length] = msg.author.displayAvatarURL({ format: "png", size: 1024 });
+    if (avatars.length < 3 && testWord(msg.content, "me")) avatars[avatars.length] = msg.author.displayAvatarURL({ extension: "png", size: 1024 });
 
     let canvas = createCanvas(868, 587);
     let ctx = canvas.getContext("2d");
@@ -156,7 +156,7 @@ export async function kicking(msg: Message, avatars: string[] = []) {
     ctx.drawImage(avatar1, 78, 79, 72, 72);
     ctx.drawImage(avatar, 341, 57, 191, 191);
     ctx.drawImage(avatar2, 706, 37, 71, 71);
-    say(sadie, msg.channel, { files: [new MessageAttachment(canvas.toBuffer(), "Kick.png")] }, 1000 - (new Date().valueOf() - startTime));
+    say(sadie, msg.channel, { files: [new AttachmentBuilder(canvas.toBuffer()).setName("Kick.png")] }, 1000 - (new Date().valueOf() - startTime));
 
     database.child("images/sadie/kick1").set(save_canvas1.toDataURL());
     database.child("images/sadie/kick2").set(save_canvas2.toDataURL());

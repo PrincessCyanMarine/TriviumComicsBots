@@ -3,9 +3,9 @@ import { clients } from "../../clients";
 import { testChannelId } from "../../common/variables";
 import { makeAnnouncement } from "./common";
 
-Object.values(clients).forEach(bot => {
-    bot.on('interactionCreate', (interaction) => {
-        if (!interaction.isContextMenu()) return;
+Object.values(clients).forEach((bot) => {
+    bot.on("interactionCreate", (interaction) => {
+        if (!interaction.isContextMenuCommand()) return;
         if (testing && interaction.channelId != testChannelId) return;
         else if (!testing && interaction.channelId == testChannelId) return;
 
@@ -14,6 +14,6 @@ Object.values(clients).forEach(bot => {
             case "announce":
                 makeAnnouncement(interaction, bot);
                 break;
-        };
+        }
     });
-})
+});

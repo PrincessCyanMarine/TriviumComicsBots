@@ -1,62 +1,52 @@
 import { randomUUID } from "crypto";
-import {
-    ButtonInteraction,
-    Client,
-    GuildMember,
-    Interaction,
-    Message,
-    MessageActionRow,
-    MessageButton,
-    MessageButtonStyle,
-    MessageButtonStyleResolvable,
-    User,
-} from "discord.js";
+import { ButtonInteraction, ButtonStyle, Client, GuildMember, Interaction, Message, User } from "discord.js";
 import { eli, ray, sadie } from "../clients";
 import { msg2embed, randomchance, say } from "../common/functions";
 import { getOperationResult } from "../eli/functions";
 import { followup } from "../interactions/slash/common";
+import { ActionRowBuilder, ButtonBuilder } from "@discordjs/builders";
 
 const messages: { [interaction: string]: { [bot: string]: Message } } = {};
 
 export class Calculator {
     private calculator_component = (id: string, pub: boolean) => {
         let indentifier = pub ? "calculator" : `calculator_${id}`;
-        let style: MessageButtonStyleResolvable = pub ? "SUCCESS" : "PRIMARY";
+        let style: ButtonStyle = pub ? ButtonStyle.Success : ButtonStyle.Primary;
         return [
-            new MessageActionRow().addComponents(
-                new MessageButton().setCustomId(`${indentifier}_button_1/x`).setStyle(style).setLabel("1/x"),
-                new MessageButton().setCustomId(`${indentifier}_button_x²`).setStyle(style).setLabel("x²"),
-                new MessageButton().setCustomId(`${indentifier}_button_√`).setStyle(style).setLabel("√"),
-                new MessageButton().setCustomId(`${indentifier}_button_÷`).setStyle(style).setLabel("÷"),
-                new MessageButton().setCustomId(`${indentifier}_button_%`).setStyle(style).setLabel("%")
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId(`${indentifier}_button_1/x`).setStyle(style).setLabel("1/x"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_x²`).setStyle(style).setLabel("x²"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_√`).setStyle(style).setLabel("√"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_÷`).setStyle(style).setLabel("÷"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_%`).setStyle(style).setLabel("%")
             ),
-            new MessageActionRow().addComponents(
-                new MessageButton().setCustomId(`${indentifier}_button_7`).setStyle(style).setLabel("7"),
-                new MessageButton().setCustomId(`${indentifier}_button_8`).setStyle(style).setLabel("8"),
-                new MessageButton().setCustomId(`${indentifier}_button_9`).setStyle(style).setLabel("9"),
-                new MessageButton().setCustomId(`${indentifier}_button_x`).setStyle(style).setLabel("x"),
-                new MessageButton().setCustomId(`${indentifier}_button_CE`).setStyle(style).setLabel("CE")
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId(`${indentifier}_button_7`).setStyle(style).setLabel("7"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_8`).setStyle(style).setLabel("8"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_9`).setStyle(style).setLabel("9"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_x`).setStyle(style).setLabel("x"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_CE`).setStyle(style).setLabel("CE")
             ),
-            new MessageActionRow().addComponents(
-                new MessageButton().setCustomId(`${indentifier}_button_4`).setStyle(style).setLabel("4"),
-                new MessageButton().setCustomId(`${indentifier}_button_5`).setStyle(style).setLabel("5"),
-                new MessageButton().setCustomId(`${indentifier}_button_6`).setStyle(style).setLabel("6"),
-                new MessageButton().setCustomId(`${indentifier}_button_-`).setStyle(style).setLabel("-"),
-                new MessageButton().setCustomId(`${indentifier}_button_C`).setStyle(style).setLabel("C")
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId(`${indentifier}_button_4`).setStyle(style).setLabel("4"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_5`).setStyle(style).setLabel("5"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_6`).setStyle(style).setLabel("6"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_-`).setStyle(style).setLabel("-"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_C`).setStyle(style).setLabel("C")
             ),
-            new MessageActionRow().addComponents(
-                new MessageButton().setCustomId(`${indentifier}_button_1`).setStyle(style).setLabel("1"),
-                new MessageButton().setCustomId(`${indentifier}_button_2`).setStyle(style).setLabel("2"),
-                new MessageButton().setCustomId(`${indentifier}_button_3`).setStyle(style).setLabel("3"),
-                new MessageButton().setCustomId(`${indentifier}_button_+`).setStyle(style).setLabel("+"),
-                new MessageButton().setCustomId(`${indentifier}_button_⌫`).setStyle(style).setLabel("⌫")
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId(`${indentifier}_button_1`).setStyle(style).setLabel("1"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_2`).setStyle(style).setLabel("2"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_3`).setStyle(style).setLabel("3"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_+`).setStyle(style).setLabel("+"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_⌫`).setStyle(style).setLabel("⌫")
             ),
-            new MessageActionRow().addComponents(
-                new MessageButton().setCustomId(`${indentifier}_button_±`).setStyle(style).setLabel("±"),
-                new MessageButton().setCustomId(`${indentifier}_button_0`).setStyle(style).setLabel("0"),
-                new MessageButton().setCustomId(`${indentifier}_button_.`).setStyle(style).setLabel("."),
-                new MessageButton().setCustomId(`${indentifier}_button_=`).setStyle(style).setLabel("="),
-                new MessageButton().setCustomId(`${indentifier}_button_π`).setStyle(style).setLabel("π")
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId(`${indentifier}_button_±`).setStyle(style).setLabel("±"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_0`).setStyle(style).setLabel("0"),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_.`).setStyle(style).setLabel("."),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_=`).setStyle(style).setLabel("="),
+                new ButtonBuilder().setCustomId(`${indentifier}_button_π`).setStyle(style).setLabel("π")
             ),
         ];
     };
