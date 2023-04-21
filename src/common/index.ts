@@ -874,7 +874,7 @@ d20.on("messageCreate", async (msg) => {
                     break;
                 }
 
-                new EmojiCycler(options[1]).cycle(options[2]);
+                new EmojiCycler(options[1], options[2]).cycle();
                 break;
             }
             case "notification": {

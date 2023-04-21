@@ -399,11 +399,12 @@ export function getCharacterEmoji(character?: string) {
     // return emojis[random_from_array(Object.keys(emojis))];
 }
 
-function weightedRand<T extends { weight: number } | number>(spec: { [key: string | number]: T } | T[]) {
+export function weightedRandom<T extends { weight: number } | number>(spec: { [key: string | number]: T } | T[]) {
     let table: (string | number)[] = [];
-    let item;
-    for (const i in spec) for (let j = 0; j < (typeof (item = spec[i]) == "object" ? item.weight : item) * 10; j++) table.push(i);
-    console.log(table);
+    for (const i in spec) {
+        let item = spec[i];
+        let weight = typeof item == "number" ? item : item.weight;
+        for (let j = 0; j < weight; j++) table.push(i);
+    }
     return () => random_from_array(table);
 }
-var rand012 = weightedRand({ 0: 0.8, 1: 0.1, 2: 0.1 });

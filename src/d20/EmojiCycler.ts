@@ -1,4 +1,4 @@
-import { Collection, Guild, GuildEmoji, PremiumTier } from "discord.js";
+import { Collection, Guild, GuildEmoji, PremiumTier, Snowflake } from "discord.js";
 import e from "express";
 import { copyFile, copyFileSync, existsSync, readdirSync, readFileSync, unlinkSync } from "fs";
 import { parse } from "path";
@@ -6,60 +6,49 @@ import { alea } from "seedrandom";
 import { database } from "..";
 import { d20 } from "../clients";
 import { asyncForEach, cloneArray } from "../common";
-import { random_from_array, say, wait } from "../common/functions";
-import { announcementChannelId, TIME, triviumGuildId } from "../common/variables";
+import { random_from_array, say, wait, weightedRandom } from "../common/functions";
+import { TIME } from "../common/variables";
 
 const permPath = "./assets/emojis/permanent";
 const cycPath = "./assets/emojis/cycled";
 
+const BASE_TIME = 5000;
+const MAX_ADDED_TIME = 5000;
+
+const removeExtension = (name: string) => name.replace(/^(.*)\..*$/, (_, $1) => $1);
+
 export class EmojiCycler {
     private permanent;
     private cycled;
-    private changePerCycle = 15;
-    private _rotationOffset: undefined | { [name: string]: number } = undefined;
-    private offsetDatabaseChild;
-    private guild: Guild | undefined;
+    private data?: { timer: number; current: string[] };
 
-    constructor(private guildId: string) {
-        this.offsetDatabaseChild = database.child("emojiRotation/" + guildId);
-
+    constructor(private guildId: string, private announcementChannelId: string) {
         this.cycled = readdirSync(cycPath);
         this.permanent = readdirSync(permPath);
 
-        this.offsetDatabaseChild.on("value", (snapshot) => {
-            // console.log(snapshot.val());
-            this._rotationOffset = snapshot.val() ?? {};
+        database.child("emojiRotation/data/" + this.guildId).once("value", async (snapshot) => {
+            this.data = snapshot.val() as { timer: number; current: string[] };
+            this.testCycle();
         });
-
-        // console.log(this.cycled);
-        // console.log(this.permanent);
     }
 
-    private async getEmojiRotation() {
-        return Object.fromEntries(
-            Object.entries((this._rotationOffset ?? (await this.offsetDatabaseChild.once("value")).val() ?? {}) as { [name: string]: number })
-        );
-    }
-
-    private setEmojiRotation(key: string, value: number) {
-        if (!this._rotationOffset) this._rotationOffset = {};
-        this._rotationOffset[key] = value;
-        return this.offsetDatabaseChild.child(key).set(value);
-    }
-
-    private addEmojiRotation(_keys: string[]) {
-        // console.log(_keys);
-        let keys = _keys.map((key) => parse(key).name);
-        // console.log(keys);
-        let rotation = this._rotationOffset ?? {};
-
-        for (const key of keys) {
-            if (!rotation[key]) rotation[key] = 1;
-            else rotation[key]++;
+    private async testCycle() {
+        console.log("Testing emoji cycle...");
+        if (!this.data) {
+            this.cycle();
+            return;
         }
-        // console.log(rotation);
+        const guild = await d20.guilds.fetch(this.guildId);
 
-        return this.offsetDatabaseChild.set(rotation);
+        console.log(Date.now().valueOf(), this.data.timer + TIME.WEEKS * 1);
+        if (Date.now().valueOf() >= this.data.timer + TIME.WEEKS * 1) {
+            await this.cycle();
+        } else {
+            await this.updateEmojis(
+                guild,
+                this.data.current.map((e) => ({ emoji: e }))
+            );
+        }
     }
 
     private getEmojiLimit(tier: PremiumTier) {
@@ -75,129 +64,161 @@ export class EmojiCycler {
         }
     }
 
-    private getRandomEmojis = async (emojiLimit: number) =>
-        new Promise<string[]>(async (resolve, reject) => {
-            try {
-                let rotation = await this.getEmojiRotation();
-                let emojis: string[] = [];
-                let cycled = cloneArray(this.cycled);
-                cycled.filter((e) => !(e in rotation)).forEach((e) => (rotation[e] = 1)); // TODO default to 0
-                cycled = cycled.sort((a, b) => rotation[a] - rotation[b]);
-                // console.log(cycled);
-                // console.log(cycled.map((a) => rotation[a]));
-                // console.log(cycled);
-                let random = alea((await database.child("emojiRotation/timer/" + this.guildId).once("value")).val() || Date.now().valueOf(), {
-                    // entropy: true,
-                });
-                const addFromArray = (array: string[], limit: number) => {
-                    // console.log(limit, array.length);
-                    if (limit >= array.length) {
-                        emojis = cloneArray(array);
-                        array = [];
-                    } else
-                        while (emojis.length < limit) {
-                            if (array.length <= 0) break;
-                            let v = Math.floor(random.double() * emojis.length);
-                            let i = v;
-                            emojis.push(...array.splice(i, 1));
-                        }
-                };
+    private async getWeight() {
+        let emojis = this.cycled.map((emoji) => {
+            return { weight: 100, emoji };
+        });
+        let stored = (await database.child("emojiRotation/" + this.guildId).once("value")).val() as { [name: string]: number };
+        if (stored) {
+            for (let emoji of emojis) {
+                let s = stored[removeExtension(emoji.emoji)];
+                if (s) emoji.weight = s;
+            }
+        }
+        return emojis;
+    }
 
-                if (emojiLimit >= cycled.length) emojis = cloneArray(cycled);
-                else {
-                    while (cycled.length > 0 && emojis.length < emojiLimit && rotation[cycled[0]] === 0) emojis.push(...cycled.splice(0, 1));
+    private async getRandomEmojis(guild: Guild) {
+        const limit = this.getEmojiLimit(guild.premiumTier) - this.permanent.length;
+        // console.log(limit);
+        const weight = await this.getWeight();
+        // console.log(weight);
+        // console.log(limit, weight.length);
+        if (weight.length <= limit) return weight;
+        const emojis = [];
+        for (let emoji of weight) {
+            if (emoji.weight == 100) {
+                emojis.push(emoji);
+                weight.splice(weight.indexOf(emoji), 1);
+            }
+            if (emojis.length >= limit || weight.length == 0) return emojis;
+        }
 
-                    // console.log(emojis);
-                    // console.log(cycled.length);
-                    let halfCycled = cycled.splice(0, cycled.length / 2);
-                    // console.log(halfCycled.length, cycled.length);
-                    addFromArray(halfCycled, emojiLimit / 2);
-                    cycled = halfCycled?.concat(cycled) || [];
-                    addFromArray(cycled, emojiLimit);
-                    // while (emojis.length < emojiLimit && (cycled = addFromArray(cycled)).length > 0) {}
+        while (emojis.length < limit && emojis.length < this.cycled.length && weight.length > 0) {
+            const index = weightedRandom(weight)() as number;
+            const emoji = weight[index];
+            if (emojis.includes(emoji)) continue;
+            emojis.push(emoji);
+            weight.splice(index, 1);
+        }
+
+        return emojis;
+        // console.log(random);
+    }
+
+    public async cycle() {
+        console.log("Cycling emojis...");
+        const guild = await d20.guilds.fetch(this.guildId);
+
+        let emojis = await this.getRandomEmojis(guild);
+        await database.child("emojiRotation/data/" + this.guildId).set({ timer: Date.now().valueOf(), current: emojis.map((e) => e.emoji) });
+
+        let newWeight: { [name: string]: number } = {};
+        for (let emoji of emojis)
+            newWeight[
+                emoji.emoji.replace(/^(.*)\..*$/, (_, $1) => {
+                    return $1;
+                })
+            ] = emoji.weight - 1;
+        await database.child("emojiRotation/" + this.guildId).update(newWeight);
+
+        await this.updateEmojis(guild, emojis);
+    }
+
+    private async updateEmojis(guild: Guild, emojis: { emoji: string }[]) {
+        let guildEmojis = await guild.emojis.fetch();
+        const missingPermanent = this.permanent.filter((e) => !guildEmojis.find((_e) => _e.name == removeExtension(e))).map((e) => ({ emoji: e }));
+        if (missingPermanent.length > 0) {
+            console.log("Adding missing permanent emojis");
+            await this.addEmojis(guild, missingPermanent, permPath);
+            await wait(2000);
+        }
+
+        let names = emojis.map((e) => e.emoji);
+        let toDelete = guildEmojis.filter((e) => !this.permanent.includes(e.name + ".png") && !names.includes(e.name + ".png"));
+
+        let channel = await d20.channels.fetch(this.announcementChannelId);
+        if (toDelete.size > 0 && channel?.isText()) {
+            await channel.send(":tada: Emojis are being cycled! :tada:\nThe following emojis will be removed:\n");
+            let nextMessage = "";
+            {
+                let deleteArray = toDelete.map((e) => e);
+                for (let i = 0; i < deleteArray.length; i++) {
+                    nextMessage += "<:" + deleteArray[i].identifier + "> ";
+                    if ((i + 1) % 10 == 0) {
+                        await channel.send(nextMessage);
+                        nextMessage = "";
+                    }
                 }
-
-                // console.log(emojis);
-
-                this.addEmojiRotation(emojis);
-                // console.log(emojis);
-
-                return resolve(emojis);
-            } catch (err) {
-                reject(err);
             }
-        });
+            if (nextMessage != "") await channel.send(nextMessage);
+        }
 
-    public cycle = (announce?: string) =>
-        new Promise(async (resolve, reject) => {
+        await this.removeEmojis(toDelete);
+
+        await wait(2000);
+
+        let toAdd = emojis.filter((e) => !guildEmojis.find((_e) => removeExtension(e.emoji) == _e.name));
+        await this.addEmojis(guild, toAdd, cycPath);
+
+        guildEmojis = await guild.emojis.fetch();
+        console.log(toAdd.length, emojis.length);
+
+        if (toAdd.length > 0 && channel?.isText()) {
+            await channel.send(":tada: The emojis have been cycled! :tada:\nNew emojis:\n");
+
+            let nextMessage = "";
+            for (let i = 0; i < toAdd.length; i++) {
+                nextMessage += "<:" + guildEmojis.find((_e) => removeExtension(toAdd[i].emoji) == _e.name)?.identifier + "> ";
+                if ((i + 1) % 10 == 0) {
+                    await channel.send(nextMessage);
+                    nextMessage = "";
+                }
+            }
+            if (nextMessage != "") await channel.send(nextMessage);
+        }
+
+        let lastTimer = this.data ? this.data.timer : Date.now().valueOf();
+
+        setTimeout(() => this.testCycle(), lastTimer + TIME.WEEKS * 1 - Date.now().valueOf());
+        console.log("Next cycle in " + (lastTimer + TIME.WEEKS * 1 - Date.now().valueOf()) / 1000 / 60 / 60 + " hours");
+
+        return { toAdd, toDelete };
+    }
+
+    private async addEmojis<T extends { emoji: string }>(guild: Guild, toAdd: T[], path: string) {
+        // console.log("Would add");
+        // console.log(toAdd.map((e) => e.emoji));
+        console.log("Adding " + toAdd.length + " emojis...");
+        for (const emoji of toAdd) {
             try {
-                if (!this.guild) this.guild = await d20.guilds.fetch(this.guildId);
-                let emojiLimit = this.getEmojiLimit(this.guild.premiumTier) - this.permanent.length;
-                let emojiManager = this.guild.emojis;
-                let emojis = await emojiManager.fetch();
-                let newCycled = await this.getRandomEmojis(emojiLimit);
-
-                let emojiNames = emojis.map((emoji) => emoji.name);
-                const addEmoji = (path: string, emojiName: string, reason?: string) => {
-                    // console.log(emojiName);
-                    // return new Promise<undefined>((resolve) => resolve(undefined));
-                    if (!emojiNames.includes(emojiName)) {
-                        return emojiManager.create(path, emojiName, {
-                            reason,
-                        });
-                    } else return new Promise<undefined>((resolve) => resolve(undefined));
-                };
-
-                const deleteEmoji = (toBeDeleted: GuildEmoji[], i = 0) =>
-                    new Promise<void>(async (resolve) => {
-                        // console.log(toBeDeleted[i].name);
-                        await toBeDeleted[i].delete("Cycling");
-                        await wait(5000);
-                        resolve();
-                    });
-
-                const addPerm = async (perm: string[], i: number) => {
-                    let emoji = perm[i];
-                    await addEmoji(`${permPath}/${emoji}`, parse(emoji).name, "Permanent");
-                    await wait(5000);
-                    return;
-                };
-
-                let added_emojis = [] as GuildEmoji[];
-                const addCycled = async (cycled: string[], i: number) => {
-                    let emoji = cycled[i];
-                    let em = await addEmoji(`${cycPath}/${emoji}`, parse(emoji).name, "Cycling");
-                    if (em instanceof GuildEmoji) added_emojis.push(em);
-                    await wait(5000);
-                    return;
-                };
-
-                let tbd = cloneArray(
-                    emojis.filter((emoji) => !(this.permanent.includes(`${emoji.name}.png`) || newCycled.includes(`${emoji.name}.png`)))
-                );
-
-                await asyncForEach(tbd, deleteEmoji);
-                await asyncForEach(this.permanent, addPerm);
-                await asyncForEach(newCycled, addCycled);
-
-                if (announce)
-                    d20.channels.fetch(announce).then((channel) => {
-                        if (channel && channel?.isText())
-                            channel
-                                .send(`These emojis have just been rotated into discord!\n${added_emojis.map((e) => e.toString()).join(" ")}`)
-                                .then(async (m) => {
-                                    for (let emoji of added_emojis) {
-                                        await m.react(emoji);
-                                        await wait(1000);
-                                    }
-                                });
-                    });
-
-                database.child("emojiRotation/timer/" + this.guildId).set(Date.now().valueOf());
-            } catch (err) {
-                reject(err);
+                console.log("Adding " + emoji.emoji + "...");
+                await guild.emojis.create(path + "/" + emoji.emoji, removeExtension(emoji.emoji), { reason: "Emoji rotation" });
+                console.log("Added " + emoji.emoji + "\n");
+                await wait(BASE_TIME + Math.random() * MAX_ADDED_TIME);
+            } catch (e) {
+                console.error("Failed to add " + emoji.emoji);
+                console.error(e);
             }
-        });
+        }
+    }
+
+    private async removeEmojis(toDelete: Collection<Snowflake, GuildEmoji>) {
+        // console.log("Would delete");
+        // console.log(toDelete.map((e) => e.name));
+        console.log("Deleting " + toDelete.size + " emojis...");
+        for (const emoji of toDelete.values()) {
+            try {
+                console.log("Deleting " + emoji.name + "...");
+                await emoji.delete("Emoji rotation");
+                console.log("Deleted " + emoji.name + "\n");
+                await wait(BASE_TIME + Math.random() * MAX_ADDED_TIME);
+            } catch (e) {
+                console.error("Failed to delete " + emoji.name);
+                console.error(e);
+            }
+        }
+    }
 }
 
 // setInterval(() => {
