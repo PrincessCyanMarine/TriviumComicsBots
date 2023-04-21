@@ -29,7 +29,6 @@ import { krystal_activities } from "../krystal/activities";
 import { greet } from "../krystal/functions";
 import { ray_activities } from "../ray/activities";
 import { sadie_activities } from "../sadie/activities";
-import emojis from "./emojis";
 import { Harem } from "./harem";
 import { disturb_channels, ignore_channels, testChannelId, triviumGuildId } from "./variables";
 
@@ -398,4 +397,14 @@ export function getCharacterEmoji(character?: string) {
     // });
     // if (res != "") return res;
     // return emojis[random_from_array(Object.keys(emojis))];
+}
+
+export function weightedRandom<T extends { weight: number } | number>(spec: { [key: string | number]: T } | T[]) {
+    let table: (string | number)[] = [];
+    for (const i in spec) {
+        let item = spec[i];
+        let weight = typeof item == "number" ? item : item.weight;
+        for (let j = 0; j < weight; j++) table.push(i);
+    }
+    return () => random_from_array(table);
 }
