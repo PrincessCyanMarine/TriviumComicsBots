@@ -490,7 +490,7 @@ export function nonowords(msg: Message) {
             msg.channel,
             `God f\\*\\*\\*\\*\\*\\* d\\*\\*\\*\\*\\*, ${userMention(
                 msg.author.id
-            )}. You f\\*\\*\\*\\*\\*\\* dumb piece of r\\*\\*\\*\\*\\*\\*\\* s\\*\\*\\*`
+            )}. You f\\*\\*\\*\\*\\*\\* dumb piece of f\\*\\*\\*\\*\\*\\* s\\*\\*\\*`
         );
         await say(krystal, msg.channel, { files: [inhale] });
         await say(sadie, msg.channel, "KRYSTAL, NO!!", 300);
