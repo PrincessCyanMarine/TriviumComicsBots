@@ -1,6 +1,7 @@
 import {
     AnyChannel,
     BaseMessageComponentOptions,
+    Client,
     Collection,
     GuildMember,
     Message,
@@ -741,13 +742,13 @@ d20.on("messageCreate", async (msg) => {
                 if (msg.author.id != marineId) return;
                 // console.log(options);
                 let channelId = options[1];
-                let messageId = options[2];
+                // let messageId = options[2];
 
                 let channel = await krystal.channels.fetch(channelId);
                 if (!channel?.isText()) return;
-                let message = await channel.messages.fetch(messageId);
+                // let message = await channel.messages.fetch(messageId);
 
-                message.edit({
+                channel.send({
                     components: [
                         new MessageActionRow().addComponents([
                             new MessageButton()
@@ -766,6 +767,106 @@ d20.on("messageCreate", async (msg) => {
                         "To get a free Role that notifies you when there are new episodes or announcements, please click on one of the buttons bellow\nIf you already have a role and want to remove it, click on the button again",
                 });
                 break;
+            }
+            case "rules": {
+                if (![marineId].includes(msg.author.id)) return;
+                //                 let messages = [
+                //                     [
+                //                         sadie,
+                //                         `- **<:GMSadieExcited:566414391193370638> - Be Polite & Civil**
+                // Don't insult or name call anyone in mean spirit - Sarcasm can be accepted in some situations.
+                // No arguments either, Though civil and sophisticated bouts like "Who's best waifu" are fine.`,
+                //                     ],
+                //                     [
+                //                         eli,
+                //                         `- **<:GMEliAngry:1001202159049773066> - No racism, sexism or any form of hate speech**
+                // Everyone should feel welcome, No matter their skin color, religion, height or weight.
+                // We accept everyone here, So long as they follow the rules.`,
+                //                     ],
+                //                     [
+                //                         ray,
+                //                         `- **<:GMRayUninterested:1098064201689333922> - Don't spam**
+                // If you're taking up most of the screen with just your messages or posts, You're probably spamming. Sending an image or two in a row is fine, But don't overdo it either.
+                // We understand we have the best emoji's ever created, So spamming those in appropriate or hype moments is A-Okay!
+                // <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283> <:GMEliPopcorn3:1005611420274143283>
+                // <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031> <:GMEliPopcorn2:1001202163621581031>
+                // <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286> <:GMEliPopcorn1:1000039316728328286>`,
+                //                     ],
+                //                     [
+                //                         krystal,
+                //                         `- **<:GMKrystalDevious:621756101070946305> - No talk of Politics or Religion**
+                // While we accept everyone here, We also believe in keeping more sensitive opinions and topics to yourself as to avoid any possible arguments.`,
+                //                     ],
+                //                     [
+                //                         cerby,
+                //                         `- **<:GMCerberusSmile:1001202151340654622> - Keep it (Mostly) clean**
+                // We have users of all ages in our community, So don't post any messages, images or links that shouldn't be viewed by our younger ones. Cursing is fine in moderation, It's not like if they haven't heard their parents say naughty words before.`,
+                //                     ],
+                //                     [
+                //                         d20,
+                //                         `- **<:GTAngelNervous:1000039352908398602> - Stay on topic**
+                // All Fan Art not related to Trivium Comics and links to other Discord servers can be posted in the ⁠general channel, But not to any of the other channels.`,
+                //                     ],
+                //                 ] as [Client, string][];
+                //                 let channel = options[1];
+                //                 // krystal.channels
+                //                 //     .fetch(channel)
+                //                 //     .then(async (channel) => {
+                //                 // if (!channel?.isText()) return console.error("Channel " + channel + " is not a text channel");
+                //                 for (const [bot, message] of messages) {
+                //                     let channel = await bot.channels.fetch(options[1]);
+                //                     if (!channel?.isText()) continue;
+                //                     await channel.send(message);
+                //                 }
+                //                 await say(
+                //                     ray,
+                //                     options[1],
+                //                     {
+                //                         components: [
+                //                             new MessageActionRow().addComponents([
+                //                                 new MessageButton()
+                //                                     .setEmoji("<:GMBelleNotification:724792043880055094>")
+                //                                     .setCustomId("gamemastersfanrole")
+                //                                     .setLabel("Game masters")
+                //                                     .setStyle("PRIMARY"),
+                //                                 new MessageButton()
+                //                                     .setEmoji("<:GTHariAnnoyed:1000039329621618799>")
+                //                                     .setCustomId("geminitwilightfanrole")
+                //                                     .setLabel("Gemini twilight")
+                //                                     .setStyle("PRIMARY"),
+                //                             ]),
+                //                         ],
+                //                         content:
+                //                             "To get a free Role that notifies you when there are new episodes or announcements, please click on one of the buttons bellow\nIf you already have a role and want to remove it, click on the button again",
+                //                     },
+                //                     0
+                //                 );
+
+                //                 let components = [];
+                //                 for (let [name, color, roleId, emoji, necessaryIds] of colors) {
+                //                     if (!components[components.length - 1] || components[components.length - 1]?.components.length >= 5)
+                //                         components.push(new MessageActionRow());
+                //                     components[components.length - 1]?.addComponents(
+                //                         new MessageButton()
+                //                             .setLabel(name)
+                //                             .setStyle("PRIMARY")
+                //                             .setEmoji(emoji)
+                //                             .setCustomId(`colors?id=${roleId}&necessary=${necessaryIds.join(",")}`)
+                //                     );
+                //                 }
+                //                 await say(
+                //                     krystal,
+                //                     options[1],
+                //                     {
+                //                         content: "What color do you want your name to be displayed as? (You need to have the role that corresponds to that color)",
+                //                         components,
+                //                     },
+                //                     0
+                //                 );
+                //                 // })
+                //                 // .catch(console.error);
+                //                 // say(krystal, channel, message).catch((e) => console.log(e));
+                //                 break;
             }
             case "rotate": {
                 if (![marineId, dodoId].includes(msg.author.id)) {
@@ -798,7 +899,7 @@ krystal.on("guildMemberAdd", async (member: GuildMember) => {
     let channel = testing ? testChannelId : member.guild.systemChannel;
     await welcome_functions[Math.floor(Math.random() * welcome_functions.length)](member, channel);
     if (member.guild.id == triviumGuildId)
-        await say(krystal, channel, `Get a free Role for reading the ${channelMention("611572782832287754")} channel!`);
+        await say(krystal, channel, `Get a free Role for reading the ${channelMention("1048619197518848121")} channel!`);
 });
 const welcome_functions = [
     (member: GuildMember, channel: TextChannel | string): Promise<Message> =>
