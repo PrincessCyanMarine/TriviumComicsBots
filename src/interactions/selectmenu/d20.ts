@@ -31,7 +31,7 @@ d20.on("interactionCreate", async (interaction) => {
         if (msg.type == "APPLICATION_COMMAND") {
             msg.edit({
                 components: [],
-                content: 'Warning "' + warning.val() + '" removed by ' + userMention(interaction.user.id),
+                content: 'Warning "' + warning.val() + '" removed from ' + userMention(userId) + " by " + userMention(interaction.user.id),
             });
         }
         // let components = msg.components
