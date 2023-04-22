@@ -104,7 +104,9 @@ d20.on("interactionCreate", async (interaction) => {
                 return;
             }
 
-            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val();
+            let warnings = (await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val()) ?? [];
+            if (!Array.isArray(warnings)) warnings = Object.values(warnings);
+
             if (!warnings || typeof warnings != "object") {
                 warnings = [];
                 database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
