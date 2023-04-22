@@ -18,7 +18,7 @@ d20.on("interactionCreate", async (interaction) => {
         let match = interaction.customId.match(/unwarn\?guild=(.+?)&user=(.+?)&key=(.+)/);
         if (!match) return;
         let [_, guildId, userId, key] = match;
-        console.log(interaction.customId, guildId, userId, key);
+        // console.log(interaction.customId, guildId, userId, key);
         await database.child("warnings").child(guildId).child(userId).child(key).remove();
 
         let msg = interaction.message;

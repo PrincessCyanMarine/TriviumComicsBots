@@ -21,13 +21,13 @@ d20.on("interactionCreate", async (interaction) => {
 
         let key = interaction.values[0];
 
-        console.log(interaction.customId, guildId, userId, key);
+        // console.log(interaction.customId, guildId, userId, key);
         let warning = await database.child("warnings").child(guildId).child(userId).child(key).once("value");
-        console.log(warning.val());
+        // console.log(warning.val());
         await database.child("warnings").child(guildId).child(userId).child(key).remove();
 
         let msg = interaction.message;
-        console.log(msg.type);
+        // console.log(msg.type);
         if (msg.type == "APPLICATION_COMMAND") {
             msg.edit({
                 components: [],
