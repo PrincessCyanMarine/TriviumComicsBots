@@ -32,7 +32,6 @@ async function nitro(msg: Message) {
     console.log(key);
     let embeds = msg2embed(msg);
     embeds[embeds.length - 1].setColor("RED");
-    if (key) embeds[embeds.length - 1].addFields({ name: "Warning key", value: key });
     mod_alert_webhook(testing).send({
         content: `<@&${alert_role_id}> please confirm the message below isn\'t a free nitro scam`,
         username: "Mod alert - Free nitro!",
@@ -44,7 +43,7 @@ async function nitro(msg: Message) {
                 new MessageButton()
                     .setStyle("DANGER")
                     .setLabel("Remove warning")
-                    .setCustomId(`remove_warning?guild=${msg.guildId}&user=${msg.author.id}&key=${key}`)
+                    .setCustomId(`unwarn?guild=${msg.guildId}&user=${msg.author.id}&key=${key}`)
                     .setDisabled(!key)
             ),
         ],

@@ -1,4 +1,4 @@
-import { Channel, GuildMember, MessageActionRow, MessageEmbed } from "discord.js";
+import { Channel, GuildMember, MessageActionRow, MessageEmbed, Permissions } from "discord.js";
 import { database, testing } from "../..";
 import { d20, krystal, mod_alert_webhook } from "../../clients";
 import { colors, triviumGuildId } from "../../common/variables";
@@ -11,8 +11,11 @@ d20.on("interactionCreate", async (interaction) => {
     else if (!testing && interaction.channelId == "892800588469911663") return;
     // console.log(interaction.customId);
 
-    if (interaction.customId.startsWith("remove_warning")) {
-        let match = interaction.customId.match(/remove_warning\?guild=(.+?)&user=(.+?)&key=(.+)/);
+    if (interaction.customId.startsWith("unwarn")) {
+        if (!interaction.member) return interaction.reply("You must be in a server to use this button");
+        // if (!interaction.memberPermissions?.has(Permissions.FLAGS.KICK_MEMBERS))
+        //     return interaction.reply("You must have kick members permission to use this button");
+        let match = interaction.customId.match(/unwarn\?guild=(.+?)&user=(.+?)&key=(.+)/);
         if (!match) return;
         let [_, guildId, userId, key] = match;
         console.log(interaction.customId, guildId, userId, key);
@@ -38,6 +41,6 @@ d20.on("interactionCreate", async (interaction) => {
             components,
             embeds,
         });
-        interaction.reply(`${userMention(interaction.user.id)} removed warning with key "${key}"`);
+        interaction.reply(`${userMention(interaction.user.id)} removed this warning`);
     }
 });

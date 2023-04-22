@@ -1,4 +1,4 @@
-require('./button');
-// require('./selectmenu');
-require('./slash');
-require('./contextmenu');
+require("./button");
+require("./selectmenu");
+require("./slash");
+require("./contextmenu");

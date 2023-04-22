@@ -1,4 +1,4 @@
-import { GuildMember, Message } from "discord.js";
+import { GuildMember, Message, MessageActionRow, MessageButton, MessageSelectMenu } from "discord.js";
 import { database, testing } from "../..";
 import { clients, d20 } from "../../clients";
 import { say } from "../../common/functions";
@@ -78,63 +78,77 @@ d20.on("interactionCreate", async (interaction) => {
             warn(player, interaction.guildId, reason, interaction);
             break;
         }
-        case "unwarn":
-            let start = interaction.options.get("warning_start")?.value;
-            let end = interaction.options.get("warning_end")?.value;
-            let player = interaction.options.get("player")?.member;
-            if (typeof start == "number") start--;
-            else start = -1;
-            if (typeof end == "number") end--;
-            else end = start;
-
+        case "unwarn": {
             if (!(interaction.member instanceof GuildMember)) return;
             if (!interaction.member.permissions.has("KICK_MEMBERS")) {
                 reply(interaction, "You can' do that", true);
                 return;
             }
-            if (
-                !player ||
-                !(player instanceof GuildMember) ||
-                !(typeof start == "number") ||
-                !(typeof end == "number") ||
-                !interaction.guildId ||
-                !interaction.channel
-            ) {
+
+            let player = interaction.options.get("player")?.member;
+
+            if (!player || !(player instanceof GuildMember) || !interaction.guildId || !interaction.channel) {
                 reply(interaction, "Something went wrong", true);
                 return;
             }
 
-            let warnings = (await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val()) ?? [];
-            if (!Array.isArray(warnings)) warnings = Object.values(warnings);
-
-            if (!warnings || typeof warnings != "object") {
-                warnings = [];
-                database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+            let warnings = (await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val()) ?? {};
+            if (Array.isArray(warnings)) warnings = Object.fromEntries(warnings.map((v, i) => [i, v]));
+            let keys = Object.keys(warnings);
+            if (keys.length == 0) {
                 reply(interaction, "This player has no warnings!", true);
                 return;
             }
 
-            let i;
-            let reason = "";
-            for (i = 0; i <= end - start; i++) {
-                // console.log(warnings, start, warnings[start]);
-                reason += warnings.splice(start, 1) + "\n";
-            }
+            // console.log(warnings);
+            let components = [
+                new MessageActionRow().addComponents(
+                    new MessageSelectMenu()
+                        .setCustomId(`unwarn?guild=${interaction.guildId}&user=${player.id}`)
+                        .setOptions(keys.slice(0, 25).map((v) => ({ label: warnings[v], value: v })))
+                ),
+            ];
+            if (keys.length > 25)
+                components.push(
+                    new MessageActionRow().addComponents(new MessageButton().setCustomId("next_unwarn?page=2").setLabel("More").setStyle("PRIMARY"))
+                );
 
-            database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
-            interaction.reply(
-                `Removed ${i} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`
-            );
+            interaction.reply({
+                components,
+                content: "Select the warnings to remove",
+                // ephemeral: true,
+            });
+
+            // if (!warnings || typeof warnings != "object") {
+            //     warnings = [];
+            //     database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+            //     reply(interaction, "This player has no warnings!", true);
+            //     return;
+            // }
+
+            // let i;
+            // let reason = "";
+            // for (i = 0; i <= end - start; i++) {
+            //     // console.log(warnings, start, warnings[start]);
+            //     reason += warnings.splice(start, 1) + "\n";
+            // }
+
+            // database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+            // interaction.reply(
+            //     `Removed ${i} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`
+            // );
 
             break;
+        }
         case "warnings": {
             let player = interaction.options.get("player")?.member;
             if (!player || !(player instanceof GuildMember)) {
                 reply(interaction, "Something went wrong", true);
                 return;
             }
-            let warnings = await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val();
-            if (!warnings || typeof warnings != "object") warnings = [];
+            let warnings = (await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val()) ?? [];
+            // if (!warnings || typeof warnings != "object") warnings = {};
+            if (!Array.isArray(warnings)) warnings = Object.values(warnings);
             let text = `${player.user.username} has ${warnings.length} warnings`;
             if (warnings.length > 0) {
                 text += "```";
