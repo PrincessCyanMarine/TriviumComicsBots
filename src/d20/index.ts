@@ -1,3 +1,4 @@
+import { BaseGuildTextChannel } from "discord.js";
 import { testing } from "..";
 import { d20 } from "../clients";
 import { ignore_message } from "../common/functions";

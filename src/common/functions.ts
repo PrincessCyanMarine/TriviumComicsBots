@@ -208,7 +208,7 @@ export function changeActivity(
 
 export const msg2embed = (msg: Message) => {
     let embed = new MessageEmbed()
-        .setAuthor(msg.author.username, msg.author.displayAvatarURL(), msg.url)
+        .setAuthor({ name: msg.author.username, iconURL: msg.author.displayAvatarURL(), url: msg.url })
         .setTitle("Go to original")
         .setURL(msg.url)
         .setDescription(msg.content)

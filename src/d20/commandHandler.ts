@@ -7,13 +7,10 @@ import { warn } from "./functions";
 
 export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;
-    let args = msg.content.toLowerCase().replace(/\s/g, '');
+    let args = msg.content.toLowerCase().replace(/\s/g, "");
     // console.log(args);
-    if (args.match(/nitro/gi) && (args.match(/free/gi) || args.match(/(.+?\..+?)|(http)/gi)))
-        nitro(msg);
-    else for (let { title, description } of msg.embeds)
-        if (title?.includes("nitro") || description?.includes("nitro"))
-            nitro(msg);
+    if (args.match(/nitro/gi) && (args.match(/free/gi) || args.match(/(.+?\..+?)|(http)/gi))) nitro(msg);
+    else for (let { title, description } of msg.embeds) if (title?.includes("nitro") || description?.includes("nitro")) nitro(msg);
 
     /* let slur_detection = args.match(/n(e|ig)g[re]?[orae]|fag|nip/gi);
     if (slur_detection) {
@@ -26,19 +23,32 @@ export function testCommands(msg: Message) {
                 avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",
             });
     } */
-
 }
 
-function nitro(msg: Message) {
+async function nitro(msg: Message) {
+    let key;
+    if (msg.member && msg.member instanceof GuildMember && msg.guild)
+        key = await warn(msg.member, msg.guild.id, "Possible free nitro scam", msg.channel);
+    console.log(key);
+    let embeds = msg2embed(msg);
+    embeds[embeds.length - 1].setColor("RED");
+    if (key) embeds[embeds.length - 1].addFields({ name: "Warning key", value: key });
     mod_alert_webhook(testing).send({
         content: `<@&${alert_role_id}> please confirm the message below isn\'t a free nitro scam`,
         username: "Mod alert - Free nitro!",
         avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",
-        embeds: msg2embed(msg)
+        embeds,
+        components: [
+            new MessageActionRow().addComponents(
+                button_message_link(msg.url),
+                new MessageButton()
+                    .setStyle("DANGER")
+                    .setLabel("Remove warning")
+                    .setCustomId(`remove_warning?guild=${msg.guildId}&user=${msg.author.id}&key=${key}`)
+                    .setDisabled(!key)
+            ),
+        ],
     });
-
-    if (msg.member && msg.member instanceof GuildMember && msg.guild)
-        warn(msg.member, msg.guild.id, "Possible free nitro scam", msg.channel);
 }
 
 const button_message_link = (url: string) => new MessageButton().setStyle("LINK").setURL(url).setLabel("Go to message");

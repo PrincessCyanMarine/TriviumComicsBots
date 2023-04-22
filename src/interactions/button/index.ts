@@ -1,2 +1,3 @@
-import "./krystal"
-import "./ray"
+import "./krystal";
+import "./ray";
+import "./d20";

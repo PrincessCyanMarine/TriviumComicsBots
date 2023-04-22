@@ -475,7 +475,8 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
 
 export async function warn(player: GuildMember, guildId: string, reason: string, replyMethod: TextBasedChannel | CommandInteraction) {
     if (replyMethod instanceof CommandInteraction) await replyMethod.deferReply();
-    let warnings = await (await database.child(`warnings/${guildId}/${player.id}`).once("value")).val();
+    let warnings = (await (await database.child(`warnings/${guildId}/${player.id}`).once("value")).val()) ?? [];
+    if (!Array.isArray(warnings)) warnings = Object.values(warnings);
     if (!warnings || typeof warnings != "object") warnings = [];
     warnings.push(reason);
     let works = !player.permissions.has("KICK_MEMBERS");
@@ -488,7 +489,7 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
                 : "The next warning will result on them getting muted"
             : "They are a Queensblade and therefore this is useless"
     }${works ? "\nIf you think this warning was undeserved, talk to a Queensblade" : ""}`;
-    database.child(`warnings/${guildId}/${player.id}`).set(warnings);
+    let key = (await database.child(`warnings/${guildId}/${player.id}`).push(reason)).key;
     if (works)
         if (warnings.length == 2 && [triviumGuildId, testGuildId].includes(guildId)) {
             player.timeout(TIME.DAYS, reason);
@@ -512,6 +513,8 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
         replyMethod.editReply(text);
         // if (replyMethod.channel) say(d20, replyMethod.channel, text);
     } else say(d20, replyMethod, text);
+
+    return key;
 }
 
 export const mute_unmute = async (interaction: CommandInteraction | ContextMenuInteraction) => {
