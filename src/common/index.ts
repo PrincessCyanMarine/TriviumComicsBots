@@ -23,8 +23,10 @@ import {
     command_list,
     dodoId,
     ignore_channels,
+    isRestarting,
     marineId,
     notificationChannel,
+    setRestarting,
     testChannelId,
     testGuildId,
     triviumGuildId,
@@ -376,6 +378,11 @@ d20.on("messageCreate", async (msg) => {
                     killing(msg, msg.author, undefined, "That's not a command");
                     break;
                 }
+                if (isRestarting()) {
+                    say(d20, msg.channel, "The bots are already restarting");
+                    return;
+                }
+                setRestarting(true);
                 console.log("Restarting...");
                 await say(d20, msg.channel, "Restarting...", 0);
                 await spawnAsync("pm2", ["restart", "all"]);
@@ -897,6 +904,12 @@ d20.on("messageCreate", async (msg) => {
                     say(d20, msg.channel, "You don't have permission to use that command");
                     break;
                 }
+
+                if (isRestarting()) {
+                    say(d20, msg.channel, "The bots are already restarting");
+                    return;
+                }
+                setRestarting(true);
                 console.log("Updating...");
                 await say(d20, msg.channel, "Updating...", 0);
                 try {

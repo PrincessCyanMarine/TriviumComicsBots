@@ -107,3 +107,12 @@ export const colors = [
 ] as [name: string, color: string, roleId: string, emoji: string, necessaryIds: string[]][];
 
 export const queensbladeRoleId = "609593848448155668";
+var restarting = false;
+
+export const setRestarting = (value: boolean) => {
+    restarting = value;
+};
+
+export const isRestarting = () => {
+    return restarting;
+};
