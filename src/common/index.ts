@@ -369,10 +369,16 @@ d20.on("messageCreate", async (msg) => {
                 });
                 break;
             case "restart": {
-                let channel = await krystal.channels.fetch(msg.channel.id);
-                if (!(channel instanceof TextChannel)) return;
-                channel.sendTyping();
-                killing(msg, msg.author, undefined, "That's not a command");
+                if (![marineId, dodoId].includes(msg.author.id)) {
+                    let channel = await krystal.channels.fetch(msg.channel.id);
+                    if (!(channel instanceof TextChannel)) return;
+                    channel.sendTyping();
+                    killing(msg, msg.author, undefined, "That's not a command");
+                    break;
+                }
+                console.log("Restarting...");
+                say(d20, msg.channel, "Restarting...", 0);
+                await spawnAsync("pm2", ["restart", "all"]);
                 break;
             }
             case "calculator": {
@@ -903,16 +909,6 @@ d20.on("messageCreate", async (msg) => {
                     say(d20, msg.channel, "Something went wrong while updating");
                 }
 
-                break;
-            }
-            case "restart": {
-                if (![marineId, dodoId].includes(msg.author.id)) {
-                    say(d20, msg.channel, "You don't have permission to use that command");
-                    break;
-                }
-                console.log("Restarting...");
-                say(d20, msg.channel, "Restarting...", 0);
-                await spawnAsync("pm2", ["restart", "all"]);
                 break;
             }
         }
