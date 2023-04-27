@@ -895,9 +895,6 @@ d20.on("messageCreate", async (msg) => {
                 say(d20, msg.channel, "Updating...", 0);
                 try {
                     await spawnAsync("git", ["pull"]);
-                    try {
-                        await spawnAsync("git", ["push"]);
-                    } catch (err) {}
                     await spawnAsync("npm", ["install"]);
                     await spawnAsync("tsc");
                     await spawnAsync("pm2", ["restart", "all"]);
