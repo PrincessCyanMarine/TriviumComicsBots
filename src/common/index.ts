@@ -377,7 +377,7 @@ d20.on("messageCreate", async (msg) => {
                     break;
                 }
                 console.log("Restarting...");
-                say(d20, msg.channel, "Restarting...", 0);
+                await say(d20, msg.channel, "Restarting...", 0);
                 await spawnAsync("pm2", ["restart", "all"]);
                 break;
             }
@@ -898,7 +898,7 @@ d20.on("messageCreate", async (msg) => {
                     break;
                 }
                 console.log("Updating...");
-                say(d20, msg.channel, "Updating...", 0);
+                await say(d20, msg.channel, "Updating...", 0);
                 try {
                     await spawnAsync("git", ["pull"]);
                     await spawnAsync("npm", ["install"]);
@@ -906,7 +906,7 @@ d20.on("messageCreate", async (msg) => {
                     await spawnAsync("pm2", ["restart", "all"]);
                 } catch (err) {
                     console.log("Something went wrong while updating");
-                    say(d20, msg.channel, "Something went wrong while updating");
+                    await say(d20, msg.channel, "Something went wrong while updating");
                 }
 
                 break;
