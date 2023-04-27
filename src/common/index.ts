@@ -42,6 +42,7 @@ import { Help } from "./help";
 import { Harem } from "./harem";
 import axios from "axios";
 import { EmojiCycler } from "../d20/EmojiCycler";
+import { spawn } from "child_process";
 
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
@@ -883,6 +884,28 @@ d20.on("messageCreate", async (msg) => {
                     //say(d20, msg.channel, "You don't have permission to use that command");
                 }
                 notificationCult(msg.channel.id);
+                break;
+            }
+            case "update": {
+                if (![marineId, dodoId].includes(msg.author.id)) {
+                    say(d20, msg.channel, "You don't have permission to use that command");
+                    break;
+                }
+                console.log("Updating...");
+                say(d20, msg.channel, "Updating...", 0);
+                spawn("git", ["pull"]).stdout.on("data", (data) => {
+                    console.log(data.toString());
+                    spawn("git", ["push"]).stdout.on("data", (data) => {
+                        console.log(data.toString());
+                        spawn("npm", ["install"]).stdout.on("data", (data) => {
+                            console.log(data.toString());
+                            spawn("tsc", []).stdout.on("data", (data) => {
+                                console.log(data.toString());
+                                spawn("pm2", ["restart", "all"]);
+                            });
+                        });
+                    });
+                });
                 break;
             }
         }
