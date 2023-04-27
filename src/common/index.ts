@@ -905,6 +905,16 @@ d20.on("messageCreate", async (msg) => {
 
                 break;
             }
+            case "restart": {
+                if (![marineId, dodoId].includes(msg.author.id)) {
+                    say(d20, msg.channel, "You don't have permission to use that command");
+                    break;
+                }
+                console.log("Restarting...");
+                say(d20, msg.channel, "Restarting...", 0);
+                await spawnAsync("pm2", ["restart", "all"]);
+                break;
+            }
         }
     }
 });
