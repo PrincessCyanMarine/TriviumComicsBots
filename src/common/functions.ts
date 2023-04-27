@@ -31,6 +31,7 @@ import { ray_activities } from "../ray/activities";
 import { sadie_activities } from "../sadie/activities";
 import { Harem } from "./harem";
 import { disturb_channels, ignore_channels, testChannelId, triviumGuildId } from "./variables";
+import { spawn } from "child_process";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");
@@ -407,4 +408,17 @@ export function weightedRandom<T extends { weight: number } | number>(spec: { [k
         for (let j = 0; j < weight; j++) table.push(i);
     }
     return () => random_from_array(table);
+}
+
+export function spawnAsync(command: string, args: string[] = []) {
+    console.log(command, args.join(" "));
+    let spawned = spawn(command, args);
+    spawned.stdout.on("data", (data) => console.log(data.toString()));
+    spawned.stderr.on("data", (data) => console.error(data.toString()));
+    return new Promise<number>((resolve, reject) => {
+        spawned.on("close", (code) => {
+            if (code == 0) resolve(code);
+            else reject(code);
+        });
+    });
 }

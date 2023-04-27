@@ -17,7 +17,7 @@ import { database, testing } from "..";
 import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, notificationCult, random_from_array, say, wait } from "./functions";
+import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, notificationCult, random_from_array, say, spawnAsync, wait } from "./functions";
 import {
     colors,
     command_list,
@@ -893,24 +893,11 @@ d20.on("messageCreate", async (msg) => {
                 }
                 console.log("Updating...");
                 say(d20, msg.channel, "Updating...", 0);
-                console.log("git pull");
-                spawn("git", ["pull"]).stdout.on("data", (data) => {
-                    console.log(data.toString());
-                    console.log("git push");
-                    spawn("git", ["push"]).stdout.on("data", (data) => {
-                        console.log(data.toString());
-                        console.log("npm install");
-                        spawn("npm", ["install"]).stdout.on("data", (data) => {
-                            console.log(data.toString());
-                            console.log("tsc");
-                            spawn("tsc", []).stdout.on("data", (data) => {
-                                console.log(data.toString());
-                                console.log("pm2 restart all");
-                                spawn("pm2", ["restart", "all"]);
-                            });
-                        });
-                    });
-                });
+                await spawnAsync("git", ["pull"]);
+                await spawnAsync("git", ["push"]);
+                await spawnAsync("npm", ["install"]);
+                await spawnAsync("tsc");
+                await spawnAsync("pm2", ["restart", "all"]);
                 break;
             }
         }
