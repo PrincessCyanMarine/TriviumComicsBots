@@ -893,14 +893,19 @@ d20.on("messageCreate", async (msg) => {
                 }
                 console.log("Updating...");
                 say(d20, msg.channel, "Updating...", 0);
+                console.log("git pull");
                 spawn("git", ["pull"]).stdout.on("data", (data) => {
                     console.log(data.toString());
+                    console.log("git push");
                     spawn("git", ["push"]).stdout.on("data", (data) => {
                         console.log(data.toString());
+                        console.log("npm install");
                         spawn("npm", ["install"]).stdout.on("data", (data) => {
                             console.log(data.toString());
+                            console.log("tsc");
                             spawn("tsc", []).stdout.on("data", (data) => {
                                 console.log(data.toString());
+                                console.log("pm2 restart all");
                                 spawn("pm2", ["restart", "all"]);
                             });
                         });
