@@ -924,6 +924,24 @@ d20.on("messageCreate", async (msg) => {
 
                 break;
             }
+            case "warnings": {
+                let player = msg.mentions.members?.first();
+                if (!player || !(player instanceof GuildMember)) {
+                    say(d20, msg.channel, "Something went wrong", undefined, { messageReference: msg });
+                    return;
+                }
+                let warnings = (await (await database.child(`warnings/${msg.guildId}/${player.id}`).once("value")).val()) ?? [];
+                // if (!warnings || typeof warnings != "object") warnings = {};
+                if (!Array.isArray(warnings)) warnings = Object.values(warnings);
+                let text = `${player.user.username} has ${warnings.length} warnings`;
+                if (warnings.length > 0) {
+                    text += "```";
+                    for (let w in warnings) text += `\n${parseInt(w) + 1}: ${warnings[parseInt(w)]}`;
+                    text += "```";
+                }
+                say(d20, msg.channel, text, undefined, { messageReference: msg });
+                break;
+            }
         }
     }
 });
