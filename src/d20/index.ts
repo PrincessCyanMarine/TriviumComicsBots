@@ -24,7 +24,7 @@ d20.on("messageCreate", (msg) => {
 
 d20.on("messageDelete", (msg) => {
     if (msg.author?.bot) return;
-    if (!testing && msg.channelId != triviumGuildId) return;
+    if (!testing && msg.guildId != triviumGuildId) return;
     if (testing && msg.channelId != testChannelId) return;
     let webhook = logwebhook(testing);
     webhook.send({
@@ -34,9 +34,9 @@ d20.on("messageDelete", (msg) => {
 });
 
 d20.on("messageUpdate", (oldMessage, newMessage) => {
-    console.log(testing, oldMessage.channelId != triviumGuildId, oldMessage.author?.bot);
+    console.log(testing, oldMessage.guildId != triviumGuildId, oldMessage.author?.bot);
     if (oldMessage.author?.bot) return;
-    if (!testing && oldMessage.channelId != triviumGuildId) return;
+    if (!testing && oldMessage.guildId != triviumGuildId) return;
     if (testing && oldMessage.channelId != testChannelId) return;
     let webhook = logwebhook(testing);
     console.log(webhook);
