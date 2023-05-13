@@ -12,6 +12,7 @@ import {
     MessageEditOptions,
     MessageEmbed,
     MessageOptions,
+    PartialMessage,
     PresenceStatusData,
     ReplyOptions,
     TextBasedChannel,
@@ -207,12 +208,12 @@ export function changeActivity(
     database.child("activities/" + bot.user?.username).set(name);
 }
 
-export const msg2embed = (msg: Message) => {
+export const msg2embed = (msg: Message | PartialMessage) => {
     let embed = new MessageEmbed()
-        .setAuthor({ name: msg.author.username, iconURL: msg.author.displayAvatarURL(), url: msg.url })
+        .setAuthor({ name: msg.author?.username || "UNKNOWN", iconURL: msg.author?.displayAvatarURL(), url: msg.url })
         .setTitle("Go to original")
         .setURL(msg.url)
-        .setDescription(msg.content)
+        .setDescription(msg.content ?? "MISSING_CONTENT")
         .setTimestamp(msg.createdTimestamp)
         .setColor(msg.member?.displayHexColor || "WHITE");
     let img = msg.attachments.first()?.url;

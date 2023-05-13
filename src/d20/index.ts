@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel } from "discord.js";
+import { BaseGuildTextChannel, MessageEmbed } from "discord.js";
 import { testing } from "..";
 import { d20, mod_alert_webhook } from "../clients";
 import { ignore_message } from "../common/functions";
@@ -6,15 +6,10 @@ import { ignore_channels, testChannelId, testGuildId, TIME, triviumGuildId } fro
 import { EmojiCycler } from "./EmojiCycler";
 import { testCommands } from "./commandHandler";
 import { countMessages, d20TimedFunction } from "./functions";
+import { msg2embed } from "../common/functions";
+import { hyperlink } from "@discordjs/builders";
 
 d20.on("ready", () => {
-    d20.guilds.fetch(triviumGuildId).then((guild) => {
-        guild.commands.fetch().then((commands) => {
-            for (const [id, command] of commands) {
-                console.log(command.name, id);
-            }
-        });
-    });
     if (testing) return;
     mod_alert_webhook(testing).send("Bots have restarted");
     new EmojiCycler("562429293364248587", "613507549085302796");
@@ -26,4 +21,41 @@ d20.on("messageCreate", (msg) => {
     if (ignore_message(msg, d20)) return;
     countMessages(msg);
     testCommands(msg);
+});
+
+d20.on("messageDelete", (msg) => {
+    console.log(msg.channelId);
+    if (msg.author?.bot) return;
+    if (!testing && msg.channelId != triviumGuildId) return;
+    if (testing && msg.channelId != testChannelId) return;
+    let webhook = mod_alert_webhook(testing);
+    webhook.send({
+        content: `Message removed in ${msg.url}`,
+        embeds: [msg2embed(msg)[0].setColor("RED")],
+    });
+});
+
+d20.on("messageUpdate", (oldMessage, newMessage) => {
+    console.log(oldMessage.channelId, newMessage.channelId);
+    if (oldMessage.author?.bot) return;
+    if (!testing && oldMessage.channelId != triviumGuildId) return;
+    if (testing && oldMessage.channelId != testChannelId) return;
+    console.log(oldMessage.content, newMessage.content);
+    let webhook = mod_alert_webhook(testing);
+
+    webhook.send({
+        content: `Message edited in ${oldMessage.url}`,
+        embeds: [
+            new MessageEmbed()
+                .setAuthor({ name: oldMessage.author?.username || "UNKNOWN", iconURL: oldMessage.author?.displayAvatarURL(), url: oldMessage.url })
+                .setTitle("Go to original")
+                .setURL(oldMessage.url)
+                .addFields(
+                    { name: "Old message", value: oldMessage.content ?? "MISSING_CONTENT" },
+                    { name: "New message", value: newMessage.content ?? "MISSING_CONTENT" }
+                )
+                .setTimestamp(newMessage.createdTimestamp)
+                .setColor("YELLOW"),
+        ],
+    });
 });
