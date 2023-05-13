@@ -50,6 +50,15 @@ export const mod_alert_webhook = (testing: boolean) =>
               url: process.env.WEBHOOK_ALERT_CHANNEL || "",
           });
 
+export const logwebhook = (testing: boolean) =>
+    testing
+        ? new WebhookClient({
+              url: process.env.WEBHOOK_TESTING_CHANNEL || "",
+          })
+        : new WebhookClient({
+              url: process.env.WEBHOOK_LOGGING_CHANNEL || "",
+          });
+
 export const clients: { [bot: string]: Client } = {
     d20: d20,
     sadie: sadie,

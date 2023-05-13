@@ -1,13 +1,12 @@
-import { BaseGuildTextChannel, MessageEmbed } from "discord.js";
+import { MessageEmbed } from "discord.js";
 import { testing } from "..";
-import { d20, mod_alert_webhook } from "../clients";
+import { d20, logwebhook, mod_alert_webhook } from "../clients";
 import { ignore_message } from "../common/functions";
-import { ignore_channels, testChannelId, testGuildId, TIME, triviumGuildId } from "../common/variables";
+import { testChannelId, TIME, triviumGuildId } from "../common/variables";
 import { EmojiCycler } from "./EmojiCycler";
 import { testCommands } from "./commandHandler";
 import { countMessages, d20TimedFunction } from "./functions";
 import { msg2embed } from "../common/functions";
-import { hyperlink } from "@discordjs/builders";
 
 d20.on("ready", () => {
     if (testing) return;
@@ -24,11 +23,10 @@ d20.on("messageCreate", (msg) => {
 });
 
 d20.on("messageDelete", (msg) => {
-    console.log(msg.channelId);
     if (msg.author?.bot) return;
     if (!testing && msg.channelId != triviumGuildId) return;
     if (testing && msg.channelId != testChannelId) return;
-    let webhook = mod_alert_webhook(testing);
+    let webhook = logwebhook(testing);
     webhook.send({
         content: `Message removed in ${msg.url}`,
         embeds: [msg2embed(msg)[0].setColor("RED")],
@@ -36,13 +34,10 @@ d20.on("messageDelete", (msg) => {
 });
 
 d20.on("messageUpdate", (oldMessage, newMessage) => {
-    console.log(oldMessage.channelId, newMessage.channelId);
     if (oldMessage.author?.bot) return;
     if (!testing && oldMessage.channelId != triviumGuildId) return;
     if (testing && oldMessage.channelId != testChannelId) return;
-    console.log(oldMessage.content, newMessage.content);
-    let webhook = mod_alert_webhook(testing);
-
+    let webhook = logwebhook(testing);
     webhook.send({
         content: `Message edited in ${oldMessage.url}`,
         embeds: [
