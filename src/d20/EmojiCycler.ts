@@ -181,7 +181,7 @@ export class EmojiCycler {
         let lastTimer = this.data ? this.data.timer : Date.now().valueOf();
 
         setTimeout(() => this.testCycle(), lastTimer + TIME.WEEKS * 1 - Date.now().valueOf());
-        console.log("Next cycle in " + (lastTimer + TIME.WEEKS * 1 - Date.now().valueOf()) / 1000 / 60 / 60 + " hours");
+        // console.log("Next cycle in " + (lastTimer + TIME.WEEKS * 1 - Date.now().valueOf()) / 1000 / 60 / 60 + " hours");
 
         return { toAdd, toDelete };
     }
