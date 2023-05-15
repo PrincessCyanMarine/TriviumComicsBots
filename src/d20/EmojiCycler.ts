@@ -26,7 +26,7 @@ export class EmojiCycler {
         this.cycled = readdirSync(cycPath);
         this.permanent = readdirSync(permPath);
 
-        database.child("emojiRotation/data/" + this.guildId).on("value", async (snapshot) => {
+        database.child("emojiRotation/data/" + this.guildId).once("value", async (snapshot) => {
             this.data = snapshot.val() as { timer: number; current: string[] };
             this.testCycle();
         });
@@ -113,15 +113,19 @@ export class EmojiCycler {
         const guild = await d20.guilds.fetch(this.guildId);
 
         let emojis = await this.getRandomEmojis(guild);
-        await database.child("emojiRotation/data/" + this.guildId).set({ timer: Date.now().valueOf(), current: emojis.map((e) => e.emoji) });
+        this.data = { timer: Date.now().valueOf(), current: emojis.map((e) => e.emoji) };
+        await database.child("emojiRotation/data/" + this.guildId).set(this.data);
 
         let newWeight: { [name: string]: number } = {};
-        for (let emoji of emojis)
+        for (let emoji of emojis) {
+            let weight = emoji.weight - 1;
+            if (weight <= 0) weight = 99;
             newWeight[
                 emoji.emoji.replace(/^(.*)\..*$/, (_, $1) => {
                     return $1;
                 })
-            ] = emoji.weight - 1;
+            ] = weight;
+        }
         await database.child("emojiRotation/" + this.guildId).update(newWeight);
 
         await this.updateEmojis(guild, emojis);
