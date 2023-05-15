@@ -18,8 +18,7 @@ const MAX_ADDED_TIME = 5000;
 const removeExtension = (name: string) => name.replace(/^(.*)\..*$/, (_, $1) => $1);
 
 export class EmojiCycler {
-    constructor(private guildId: string, private announcementChannelId: string) {}
-    /*private permanent;
+    private permanent;
     private cycled;
     private data?: { timer: number; current: string[] };
 
@@ -27,7 +26,7 @@ export class EmojiCycler {
         this.cycled = readdirSync(cycPath);
         this.permanent = readdirSync(permPath);
 
-        database.child("emojiRotation/data/" + this.guildId).once("value", async (snapshot) => {
+        database.child("emojiRotation/data/" + this.guildId).on("value", async (snapshot) => {
             this.data = snapshot.val() as { timer: number; current: string[] };
             this.testCycle();
         });
@@ -43,11 +42,13 @@ export class EmojiCycler {
 
         console.log(Date.now().valueOf(), this.data.timer + TIME.WEEKS * 1);
         if (Date.now().valueOf() >= this.data.timer + TIME.WEEKS * 1) {
+            console.log("Time passed, cycling...");
             await this.cycle();
         } else {
             await this.updateEmojis(
                 guild,
-                this.data.current.map((e) => ({ emoji: e }))
+                this.data.current.map((e) => ({ emoji: e })),
+                false
             );
         }
     }
@@ -126,7 +127,7 @@ export class EmojiCycler {
         await this.updateEmojis(guild, emojis);
     }
 
-    private async updateEmojis(guild: Guild, emojis: { emoji: string }[]) {
+    private async updateEmojis(guild: Guild, emojis: { emoji: string }[], announce = true) {
         let guildEmojis = await guild.emojis.fetch();
         const missingPermanent = this.permanent.filter((e) => !guildEmojis.find((_e) => _e.name == removeExtension(e))).map((e) => ({ emoji: e }));
         if (missingPermanent.length > 0) {
@@ -139,21 +140,22 @@ export class EmojiCycler {
         let toDelete = guildEmojis.filter((e) => !this.permanent.includes(e.name + ".png") && !names.includes(e.name + ".png"));
 
         let channel = await d20.channels.fetch(this.announcementChannelId);
-        // if (toDelete.size > 0 && channel?.isText()) {
-        //     await channel.send(":tada: Emojis are being cycled! :tada:\nThe following emojis will be removed:\n");
-        //     let nextMessage = "";
-        //     {
-        //         let deleteArray = toDelete.map((e) => e);
-        //         for (let i = 0; i < deleteArray.length; i++) {
-        //             nextMessage += "<:" + deleteArray[i].identifier + "> ";
-        //             if ((i + 1) % 10 == 0) {
-        //                 await channel.send(nextMessage);
-        //                 nextMessage = "";
-        //             }
-        //         }
-        //     }
-        //     if (nextMessage != "") await channel.send(nextMessage);
-        // }
+        if (announce)
+            if (toDelete.size > 0 && channel?.isText()) {
+                await channel.send(":tada: Emojis are being cycled! :tada:\nThe following emojis will be removed:\n");
+                let nextMessage = "";
+                {
+                    let deleteArray = toDelete.map((e) => e);
+                    for (let i = 0; i < deleteArray.length; i++) {
+                        nextMessage += "<:" + deleteArray[i].identifier + "> ";
+                        if ((i + 1) % 10 == 0) {
+                            await channel.send(nextMessage);
+                            nextMessage = "";
+                        }
+                    }
+                }
+                if (nextMessage != "") await channel.send(nextMessage);
+            }
 
         await this.removeEmojis(toDelete);
 
@@ -164,25 +166,25 @@ export class EmojiCycler {
 
         guildEmojis = await guild.emojis.fetch();
         console.log(toAdd.length, emojis.length);
+        if (announce)
+            if (toAdd.length > 0 && channel?.isText()) {
+                await channel.send(":tada: The emojis have been cycled! :tada:\nNew emojis:\n");
 
-        // if (toAdd.length > 0 && channel?.isText()) {
-        //     await channel.send(":tada: The emojis have been cycled! :tada:\nNew emojis:\n");
-
-        //     let nextMessage = "";
-        //     for (let i = 0; i < toAdd.length; i++) {
-        //         nextMessage += "<:" + guildEmojis.find((_e) => removeExtension(toAdd[i].emoji) == _e.name)?.identifier + "> ";
-        //         if ((i + 1) % 10 == 0) {
-        //             await channel.send(nextMessage);
-        //             nextMessage = "";
-        //         }
-        //     }
-        //     if (nextMessage != "") await channel.send(nextMessage);
-        // }
+                let nextMessage = "";
+                for (let i = 0; i < toAdd.length; i++) {
+                    nextMessage += "<:" + guildEmojis.find((_e) => removeExtension(toAdd[i].emoji) == _e.name)?.identifier + "> ";
+                    if ((i + 1) % 10 == 0) {
+                        await channel.send(nextMessage);
+                        nextMessage = "";
+                    }
+                }
+                if (nextMessage != "") await channel.send(nextMessage);
+            }
 
         let lastTimer = this.data ? this.data.timer : Date.now().valueOf();
 
         setTimeout(() => this.testCycle(), lastTimer + TIME.WEEKS * 1 - Date.now().valueOf());
-        // console.log("Next cycle in " + (lastTimer + TIME.WEEKS * 1 - Date.now().valueOf()) / 1000 / 60 / 60 + " hours");
+        console.log("Next cycle in " + (lastTimer + TIME.WEEKS * 1 - Date.now().valueOf()) / 1000 / 60 / 60 + " hours");
 
         return { toAdd, toDelete };
     }
@@ -219,7 +221,7 @@ export class EmojiCycler {
                 console.error(e);
             }
         }
-    }*/
+    }
 }
 
 // setInterval(() => {

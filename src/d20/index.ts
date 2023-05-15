@@ -11,7 +11,7 @@ import { msg2embed } from "../common/functions";
 d20.on("ready", () => {
     if (testing) return;
     mod_alert_webhook(testing).send("Bots have restarted");
-    new EmojiCycler("562429293364248587", "613507549085302796");
+    // new EmojiCycler("562429293364248587", "613507549085302796");
     d20TimedFunction();
     setInterval(d20TimedFunction, TIME.MINUTES * 30);
 });
