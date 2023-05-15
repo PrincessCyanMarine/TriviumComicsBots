@@ -18,7 +18,8 @@ const MAX_ADDED_TIME = 5000;
 const removeExtension = (name: string) => name.replace(/^(.*)\..*$/, (_, $1) => $1);
 
 export class EmojiCycler {
-    private permanent;
+    constructor(private guildId: string, private announcementChannelId: string) {}
+    /*private permanent;
     private cycled;
     private data?: { timer: number; current: string[] };
 
@@ -218,7 +219,7 @@ export class EmojiCycler {
                 console.error(e);
             }
         }
-    }
+    }*/
 }
 
 // setInterval(() => {

@@ -17,7 +17,19 @@ import { database, testing } from "..";
 import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie } from "../clients";
 import { generatecard, get_rank_message, prestige } from "../d20/functions";
 import { eating, killing } from "../krystal/functions";
-import { changeActivity, detectEmoji, getCharacterEmoji, get_birds, notificationCult, random_from_array, say, spawnAsync, wait } from "./functions";
+import {
+    changeActivity,
+    detectEmoji,
+    getCharacterEmoji,
+    get_birds,
+    notificationCult,
+    random_from_array,
+    update,
+    say,
+    spawnAsync,
+    wait,
+    restart,
+} from "./functions";
 import {
     colors,
     command_list,
@@ -31,7 +43,7 @@ import {
     testGuildId,
     triviumGuildId,
 } from "./variables";
-import { channelMention, userMention } from "@discordjs/builders";
+import { ActionRowBuilder, channelMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
 import { summon, SUMMON_NAMES } from "../games/summon";
@@ -378,14 +390,7 @@ d20.on("messageCreate", async (msg) => {
                     killing(msg, msg.author, undefined, "That's not a command");
                     break;
                 }
-                if (isRestarting()) {
-                    say(d20, msg.channel, "The bots are already restarting");
-                    return;
-                }
-                setRestarting(true);
-                console.log("Restarting...");
-                await say(d20, msg.channel, "Restarting...", 0);
-                await spawnAsync("pm2", ["restart", "all"]);
+                restart(msg);
                 break;
             }
             case "calculator": {
@@ -887,8 +892,8 @@ d20.on("messageCreate", async (msg) => {
                     say(d20, msg.channel, "You don't have permission to use that command");
                     break;
                 }
-
-                new EmojiCycler(options[1], options[2]).cycle();
+                // TODO reactivate
+                // new EmojiCycler(options[1], options[2]).cycle();
                 break;
             }
             case "notification": {
@@ -904,24 +909,7 @@ d20.on("messageCreate", async (msg) => {
                     say(d20, msg.channel, "You don't have permission to use that command");
                     break;
                 }
-
-                if (isRestarting()) {
-                    say(d20, msg.channel, "The bots are already restarting");
-                    return;
-                }
-                setRestarting(true);
-                console.log("Updating...");
-                await say(d20, msg.channel, "Updating...", 0);
-                try {
-                    await spawnAsync("git", ["pull"]);
-                    await spawnAsync("npm", ["install"]);
-                    await spawnAsync("tsc");
-                    await spawnAsync("pm2", ["restart", "all"]);
-                } catch (err) {
-                    console.log("Something went wrong while updating");
-                    await say(d20, msg.channel, "Something went wrong while updating");
-                }
-
+                update(msg);
                 break;
             }
             case "warnings": {
@@ -941,6 +929,18 @@ d20.on("messageCreate", async (msg) => {
                 }
                 say(d20, msg.channel, text, undefined, { messageReference: msg });
                 break;
+            }
+            case "control": {
+                if (![marineId].includes(msg.author.id)) return;
+                let components = [] as (MessageActionRow | (Required<BaseMessageComponentOptions> & MessageActionRowOptions))[];
+                components.push(
+                    new MessageActionRow().addComponents([
+                        new MessageButton().setCustomId("stop").setLabel("STOP").setStyle("PRIMARY"),
+                        new MessageButton().setCustomId("restart").setLabel("RESTART").setStyle("PRIMARY"),
+                        new MessageButton().setCustomId("update").setLabel("UPDATE").setStyle("PRIMARY"),
+                    ])
+                );
+                say(krystal, msg.channel, { components });
             }
         }
     }

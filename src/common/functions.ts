@@ -31,7 +31,7 @@ import { greet } from "../krystal/functions";
 import { ray_activities } from "../ray/activities";
 import { sadie_activities } from "../sadie/activities";
 import { Harem } from "./harem";
-import { disturb_channels, ignore_channels, testChannelId, triviumGuildId } from "./variables";
+import { disturb_channels, ignore_channels, isRestarting, setRestarting, testChannelId, triviumGuildId } from "./variables";
 import { spawn } from "child_process";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
@@ -423,3 +423,43 @@ export function spawnAsync(command: string, args: string[] = []) {
         });
     });
 }
+export const update = async (msg?: Message) => {
+    if (isRestarting()) {
+        if (msg) say(d20, msg.channel, "The bots are already restarting");
+        return;
+    }
+    setRestarting(true);
+    console.log("Updating...");
+    if (msg) await say(d20, msg.channel, "Updating...", 0);
+    try {
+        await spawnAsync("git", ["pull"]);
+        await spawnAsync("npm", ["install"]);
+        await spawnAsync("tsc");
+        await spawnAsync("pm2", ["restart", "all"]);
+    } catch (err) {
+        console.log("Something went wrong while updating");
+        if (msg) await say(d20, msg.channel, "Something went wrong while updating");
+    }
+};
+
+export const restart = async (msg?: Message) => {
+    if (isRestarting()) {
+        if (msg) say(d20, msg.channel, "The bots are already restarting");
+        return;
+    }
+    setRestarting(true);
+    console.log("Restarting...");
+    if (msg) await say(d20, msg.channel, "Restarting...", 0);
+    await spawnAsync("pm2", ["restart", "all"]);
+};
+
+export const stop = async (msg?: Message) => {
+    if (isRestarting()) {
+        if (msg) say(d20, msg.channel, "The bots are already restarting");
+        return;
+    }
+    setRestarting(true);
+    console.log("Stopping...");
+    if (msg) await say(d20, msg.channel, "Stopping...", 0);
+    await spawnAsync("pm2", ["stop", "all"]);
+};

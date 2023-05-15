@@ -1,13 +1,27 @@
 import { GuildMember } from "discord.js";
 import { database, testing } from "../..";
 import { krystal } from "../../clients";
-import { colors, triviumGuildId } from "../../common/variables";
+import { colors, isRestarting, triviumGuildId } from "../../common/variables";
+import { restart, stop, update } from "../../common/functions";
 
 krystal.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
     if (testing && interaction.channelId != "892800588469911663") return;
     else if (!testing && interaction.channelId == "892800588469911663") return;
     // console.log(interaction.customId);
+    if (["restart", "update", "stop"].includes(interaction.customId)) {
+        if (isRestarting()) {
+            interaction.reply({ content: "Already restarting", ephemeral: true });
+            return;
+        }
+        interaction.reply({ content: { restart: "Restarting", update: "Updating", stop: "Stopping" }[interaction.customId], ephemeral: true });
+        let act = {
+            restart,
+            update,
+            stop,
+        };
+        act[interaction.customId as "restart" | "update" | "stop"]();
+    }
 
     if (interaction.customId.startsWith("colors")) {
         const match = interaction.customId.match(/colors\?id=([0-9]+)/);
