@@ -3,8 +3,8 @@ import e from "express";
 import { copyFile, copyFileSync, existsSync, readdirSync, readFileSync, unlinkSync } from "fs";
 import { parse } from "path";
 import { alea } from "seedrandom";
-import { database } from "..";
-import { d20 } from "../clients";
+import { database, testing } from "..";
+import { d20, logwebhook } from "../clients";
 import { asyncForEach, cloneArray } from "../common";
 import { random_from_array, say, wait, weightedRandom } from "../common/functions";
 import { TIME } from "../common/variables";
@@ -196,12 +196,17 @@ export class EmojiCycler {
     private async addEmojis<T extends { emoji: string }>(guild: Guild, toAdd: T[], path: string) {
         // console.log("Would add");
         // console.log(toAdd.map((e) => e.emoji));
-        console.log("Adding " + toAdd.length + " emojis...");
+        let webhook = logwebhook(testing);
+        const log = (text: string) => {
+            console.log(text);
+            webhook.send(text);
+        };
+        log("Adding " + toAdd.length + " emojis...");
         for (const emoji of toAdd) {
             try {
-                console.log("Adding " + emoji.emoji + "...");
+                log("Adding " + emoji.emoji + "...");
                 await guild.emojis.create(path + "/" + emoji.emoji, removeExtension(emoji.emoji), { reason: "Emoji rotation" });
-                console.log("Added " + emoji.emoji + "\n");
+                log("Added " + emoji.emoji + "\n");
                 await wait(BASE_TIME + Math.random() * MAX_ADDED_TIME);
             } catch (e) {
                 console.error("Failed to add " + emoji.emoji);
@@ -213,12 +218,17 @@ export class EmojiCycler {
     private async removeEmojis(toDelete: Collection<Snowflake, GuildEmoji>) {
         // console.log("Would delete");
         // console.log(toDelete.map((e) => e.name));
-        console.log("Deleting " + toDelete.size + " emojis...");
+        let webhook = logwebhook(testing);
+        const log = (text: string) => {
+            console.log(text);
+            webhook.send(text);
+        };
+        log("Deleting " + toDelete.size + " emojis...");
         for (const emoji of toDelete.values()) {
             try {
-                console.log("Deleting " + emoji.name + "...");
+                log("Deleting " + emoji.name + "...");
                 await emoji.delete("Emoji rotation");
-                console.log("Deleted " + emoji.name + "\n");
+                log("Deleted " + emoji.name + "\n");
                 await wait(BASE_TIME + Math.random() * MAX_ADDED_TIME);
             } catch (e) {
                 console.error("Failed to delete " + emoji.name);
