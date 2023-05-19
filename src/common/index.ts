@@ -893,7 +893,7 @@ d20.on("messageCreate", async (msg) => {
                     break;
                 }
                 // TODO reactivate
-                // new EmojiCycler(options[1], options[2]).cycle();
+                new EmojiCycler(options[1], options[2]).cycle();
                 break;
             }
             case "notification": {

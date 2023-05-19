@@ -34,12 +34,13 @@ d20.on("messageDelete", (msg) => {
 });
 
 d20.on("messageUpdate", (oldMessage, newMessage) => {
-    console.log(testing, oldMessage.guildId != triviumGuildId, oldMessage.author?.bot);
+    // console.log(testing, oldMessage.guildId != triviumGuildId, oldMessage.author?.bot);
+    if (!newMessage.editedAt) return;
     if (oldMessage.author?.bot) return;
     if (!testing && oldMessage.guildId != triviumGuildId) return;
     if (testing && oldMessage.channelId != testChannelId) return;
     let webhook = logwebhook(testing);
-    console.log(webhook);
+    // console.log(webhook);
     webhook.send({
         content: `Message edited in ${oldMessage.url}`,
         embeds: [
