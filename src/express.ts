@@ -18,8 +18,9 @@ import {
 import { marineId, triviumGuildId } from "./common/variables";
 import { d20 } from "./clients";
 import { get_birds } from "./common/functions";
-import { readFileSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import { Harem } from "./common/harem";
+import { cycPath, permPath } from "./d20/EmojiCycler";
 
 const express_app = express();
 const server = createServer(express_app);
@@ -382,6 +383,19 @@ express_app.post("/card/info", async (req, res) => {
     if (!style) return res.sendStatus(400);
     await database.child(`card/` + user.id).set(style);
     res.sendStatus(200);
+});
+
+express_app.get("/emoji", async (req, res) => {
+    const { tokenType, accessToken } = req.query;
+    let { user } = await getUser(tokenType as string, accessToken as string);
+    if (!user) return res.sendStatus(401);
+    let guild = await d20.guilds.fetch(triviumGuildId);
+    let guildMember = await guild.members.fetch(user.id);
+    if (!guildMember.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) return res.sendStatus(403);
+
+    let perm = readdirSync(permPath);
+    let cycled = readdirSync(cycPath);
+    res.json({ perm, cycled });
 });
 
 server.listen(port, () => {

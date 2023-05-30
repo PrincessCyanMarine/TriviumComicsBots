@@ -9,8 +9,8 @@ import { asyncForEach, cloneArray } from "../common";
 import { random_from_array, say, wait, weightedRandom } from "../common/functions";
 import { TIME } from "../common/variables";
 
-const permPath = "./assets/emojis/permanent";
-const cycPath = "./assets/emojis/cycled";
+export const permPath = "./assets/emojis/permanent";
+export const cycPath = "./assets/emojis/cycled";
 
 const BASE_TIME = 5000;
 const MAX_ADDED_TIME = 5000;
