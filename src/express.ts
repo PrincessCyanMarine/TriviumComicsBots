@@ -27,7 +27,7 @@ const server = createServer(express_app);
 
 const port = process.env.PORT || 8080;
 
-express_app.use(cors());
+express_app.use(cors({ origin: "*" }));
 express_app.use(
     bodyParser.urlencoded({
         extended: false,
