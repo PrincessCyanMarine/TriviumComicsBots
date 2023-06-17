@@ -1,6 +1,6 @@
 import { ActivityType, Client, Intents, ThreadChannel, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { changeActivities, random_from_array } from "./common/functions";
+import { changeActivities, random_from_array, wait } from "./common/functions";
 import { triviumGuildId } from "./common/variables";
 import { Message } from "discord.js";
 config();
@@ -34,7 +34,7 @@ sieg.on("ready", () => {
     sieg.user?.setStatus("invisible");
 });
 
-var client_list = [krystal, sadie, ray, eli, cerby, sieg];
+export var client_list = [krystal, sadie, ray, eli, cerby, sieg];
 client_list.forEach((client) => {
     client.on("ready", () => {
         // client.guilds.fetch(triviumGuildId).then(async (guild) => {
@@ -51,10 +51,11 @@ client_list.forEach((client) => {
         changeActivities();
     });
     try {
-        client.on("messageCreate", (msg) => {
+        client.on("messageCreate", async (msg) => {
             if (!msg.channel.isThread()) return;
             try {
-                warReact(msg);
+                await warReact(msg);
+                await wait(250);
             } catch (err) {
                 console.log("Error in war reaction: Inner");
             }
@@ -80,8 +81,7 @@ let warReact = (msg: Message) => {
                 return msg.react("🥚");
             default:
                 try {
-                    msg.react(random_from_array(["🍒", "🖌️", "🥭", "🍓", "🥚"]));
-                    return;
+                    return msg.react(random_from_array(["🍒", "🖌️", "🥭", "🍓", "🥚"]));
                 } catch (err) {
                     console.log("Error in war reaction: Default");
                 }
