@@ -60,7 +60,7 @@ export async function emojiReact(msg: Message) {
                 let emoji = guildEmojis.random();
                 if (emoji) {
                     try {
-                        await msg.react(emoji);
+                        await message.react(emoji);
                     } catch (err) {
                         console.error(err);
                     }
