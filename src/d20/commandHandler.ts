@@ -1,7 +1,7 @@
 import { Message, MessageActionRow, MessageButton, GuildMember } from "discord.js";
 import { testing } from "..";
-import { mod_alert_webhook } from "../clients";
-import { msg2embed } from "../common/functions";
+import { client_list, mod_alert_webhook } from "../clients";
+import { msg2embed, random_from_array, wait } from "../common/functions";
 import { alert_role_id, triviumGuildId } from "../common/variables";
 import { warn } from "./functions";
 
@@ -23,6 +23,52 @@ export function testCommands(msg: Message) {
                 avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",
             });
     } */
+}
+
+export async function emojiReact(msg: Message) {
+    if (msg.guild) {
+        let emojis = msg.content.match(
+            /(<:.+?:[0-9]+?>)|(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/gi
+        );
+        for (const client of client_list) {
+            let channel = await client.channels.fetch(msg.channelId);
+            if (!channel?.isText()) return;
+            let message = await channel.messages.fetch(msg.id);
+            if (emojis) {
+                if (Math.floor(Math.random() * 3) == 0) {
+                    try {
+                        await message.react(random_from_array(emojis));
+                    } catch (err) {
+                        console.error(err);
+                    }
+                    await wait(250 + Math.floor(Math.random() * 500));
+                }
+                if (Math.floor(Math.random() * 10) == 0) {
+                    let guildEmojis = await msg.guild.emojis.fetch();
+                    let emoji = guildEmojis.random();
+                    if (emoji) {
+                        try {
+                            await message.react(emoji);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                        await wait(250 + Math.floor(Math.random() * 500));
+                    }
+                }
+            } else if (Math.floor(Math.random() * 20) == 0) {
+                let guildEmojis = await msg.guild.emojis.fetch();
+                let emoji = guildEmojis.random();
+                if (emoji) {
+                    try {
+                        await msg.react(emoji);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                    await wait(250 + Math.floor(Math.random() * 500));
+                }
+            }
+        }
+    }
 }
 
 async function nitro(msg: Message) {
