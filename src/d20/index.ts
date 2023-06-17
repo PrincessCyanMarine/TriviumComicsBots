@@ -27,14 +27,22 @@ d20.on("messageCreate", async (msg) => {
                 if (!channel?.isText()) return;
                 let message = await channel.messages.fetch(msg.id);
                 if (Math.floor(Math.random() * 3) == 0) {
-                    await message.react(random_from_array(emojis));
+                    try {
+                        await message.react(random_from_array(emojis));
+                    } catch (err) {
+                        console.error(err);
+                    }
                     await wait(250 + Math.floor(Math.random() * 500));
                 }
                 if (Math.floor(Math.random() * 10) == 0) {
                     let guildEmojis = await msg.guild.emojis.fetch();
                     let emoji = guildEmojis.random();
                     if (emoji) {
-                        await message.react(emoji);
+                        try {
+                            await message.react(emoji);
+                        } catch (err) {
+                            console.error(err);
+                        }
                         await wait(250 + Math.floor(Math.random() * 500));
                     }
                 }
