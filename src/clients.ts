@@ -1,7 +1,8 @@
 import { ActivityType, Client, Intents, ThreadChannel, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { changeActivities } from "./common/functions";
+import { changeActivities, random_from_array } from "./common/functions";
 import { triviumGuildId } from "./common/variables";
+import { Message } from "discord.js";
 config();
 
 const intents = [
@@ -36,17 +37,58 @@ sieg.on("ready", () => {
 var client_list = [krystal, sadie, ray, eli, cerby, sieg];
 client_list.forEach((client) => {
     client.on("ready", () => {
+        // client.guilds.fetch(triviumGuildId).then(async (guild) => {
+        //     let channels = await guild.channels.fetchActiveThreads();
+        //     for (let channel of channels.threads.values()) {
+        //         if (!channel?.isThread()) continue;
+        //         await channel.join();
+        //         let msg = await channel.fetchStarterMessage();
+        //         msg?.react("🍒");
+        //     }
+        // });
         if (!client.user) throw "Something went wrong with client init";
         console.log(`${client.user.tag} is ready!!!`);
         changeActivities();
     });
-    client.on("messageCreate", (msg) => {
-        if (msg.channelId == "1103842715642384435") {
-            msg.react("🍒");
-            return;
-        }
-    });
+    try {
+        client.on("messageCreate", (msg) => {
+            try {
+                warReact(msg);
+            } catch (err) {
+                console.log("Error in war reaction: Inner");
+            }
+        });
+    } catch (err) {
+        console.log("Error in war reaction: Outer");
+    }
 });
+
+let warReact = (msg: Message) => {
+    try {
+        switch (msg.channel.id) {
+            case "1103842715642384435":
+                return msg.react("🍒");
+            case "1115738435752308807":
+                return msg.react("🖌️");
+            case "1115836693971476481":
+                return msg.react("🥭");
+
+            case "1116005403533258804":
+                return msg.react("🍓");
+            case "1115748763726790776":
+                return msg.react("🥚");
+            default:
+                try {
+                    msg.react(random_from_array(["🍒", "🖌️", "🥭", "🍓", "🥚"]));
+                    return;
+                } catch (err) {
+                    console.log("Error in war reaction: Default");
+                }
+        }
+    } catch (err) {
+        console.log("Error in war reaction: Switch");
+    }
+};
 
 export const mod_alert_webhook = (testing: boolean) =>
     testing
