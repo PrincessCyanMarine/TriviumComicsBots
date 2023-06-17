@@ -52,6 +52,7 @@ client_list.forEach((client) => {
     });
     try {
         client.on("messageCreate", (msg) => {
+            if (!msg.channel.isThread()) return;
             try {
                 warReact(msg);
             } catch (err) {
