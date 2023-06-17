@@ -55,7 +55,7 @@ export async function emojiReact(msg: Message) {
                         await wait(250 + Math.floor(Math.random() * 500));
                     }
                 }
-            } else if (Math.floor(Math.random() * 20) == 0) {
+            } else if (Math.floor(Math.random() * 30) == 0) {
                 let guildEmojis = await msg.guild.emojis.fetch();
                 let emoji = guildEmojis.random();
                 if (emoji) {
