@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { testing } from "..";
-import { d20, logwebhook, mod_alert_webhook } from "../clients";
+import { clients, d20, krystal, logwebhook, mod_alert_webhook } from "../clients";
 import { ignore_message } from "../common/functions";
 import { testChannelId, TIME, triviumGuildId } from "../common/variables";
 import { EmojiCycler } from "./EmojiCycler";

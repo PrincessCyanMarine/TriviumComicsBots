@@ -386,15 +386,22 @@ express_app.post("/card/info", async (req, res) => {
 });
 
 express_app.get("/emoji", async (req, res) => {
+    console.log("Looking for emoji");
     const { tokenType, accessToken } = req.query;
+    console.log(tokenType, accessToken);
     let { user } = await getUser(tokenType as string, accessToken as string);
+    console.log(user);
     if (!user) return res.sendStatus(401);
     let guild = await d20.guilds.fetch(triviumGuildId);
+    console.log(guild.id);
     let guildMember = await guild.members.fetch(user.id);
+    console.log(guildMember.id);
     if (!guildMember.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) return res.sendStatus(403);
 
     let perm = readdirSync(permPath);
     let cycled = readdirSync(cycPath);
+    console.log(perm);
+    console.log(cycled);
     res.json({ perm, cycled });
 });
 

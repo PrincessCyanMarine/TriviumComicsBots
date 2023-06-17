@@ -1,6 +1,7 @@
-import { ActivityType, Client, Intents, WebhookClient } from "discord.js";
+import { ActivityType, Client, Intents, ThreadChannel, WebhookClient } from "discord.js";
 import { config } from "dotenv";
 import { changeActivities } from "./common/functions";
+import { triviumGuildId } from "./common/variables";
 config();
 
 const intents = [
@@ -38,6 +39,12 @@ client_list.forEach((client) => {
         if (!client.user) throw "Something went wrong with client init";
         console.log(`${client.user.tag} is ready!!!`);
         changeActivities();
+    });
+    client.on("messageCreate", (msg) => {
+        if (msg.channelId == "1103842715642384435") {
+            msg.react("🍒");
+            return;
+        }
     });
 });
 
