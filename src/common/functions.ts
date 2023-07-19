@@ -2,19 +2,27 @@ import { formatEmoji, hyperlink } from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
 import {
     ActivityType,
+    ButtonInteraction,
     Client,
     Guild,
     GuildEmoji,
     GuildMember,
+    HexColorString,
+    InteractionUpdateOptions,
     Message,
+    MessageActionRow,
     MessageAttachment,
+    MessageButton,
     MessageComponent,
     MessageEditOptions,
     MessageEmbed,
     MessageOptions,
+    MessageSelectMenu,
+    ModalSubmitInteraction,
     PartialMessage,
     PresenceStatusData,
     ReplyOptions,
+    SelectMenuInteraction,
     TextBasedChannel,
     TextChannel,
     User,
@@ -33,6 +41,7 @@ import { sadie_activities } from "../sadie/activities";
 import { Harem } from "./harem";
 import { disturb_channels, ignore_channels, isRestarting, setRestarting, testChannelId, triviumGuildId } from "./variables";
 import { spawn } from "child_process";
+import { CardStyle, createXpBar, defaultstyle, generatecard } from "../d20/functions";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");
@@ -463,3 +472,141 @@ export const stop = async (msg?: Message) => {
     if (msg) await say(d20, msg.channel, "Stopping...", 0);
     await spawnAsync("pm2", ["stop", "all"]);
 };
+
+export async function getCardStyle(userId: string) {
+    return (await (await database.child(`card/` + userId).once("value")).val()) as CardStyle;
+}
+export async function setCardStyle(
+    userId: string,
+    style: {
+        type?: string;
+        color?: string;
+        color2?: string;
+        title?: string;
+    }
+) {
+    for (const key in style)
+        if (!style[key as "type" | "color" | "color2" | "title"]) {
+            delete style[key as "type" | "color" | "color2" | "title"];
+            await database.child(`card/` + userId + "/" + key).remove();
+        }
+    return database.child(`card/` + userId).update(style);
+}
+
+export async function sendCardCustomizationMessage(
+    moi: Message | SelectMenuInteraction | ModalSubmitInteraction | ButtonInteraction,
+    shouldReturn = false,
+    previous?: CardStyle,
+    previousText?: string,
+    isCard = !(moi instanceof Message ? moi.content.startsWith("!") : moi.message?.content.startsWith("!"))
+) {
+    if (isCard && !(moi instanceof Message)) await moi.deferUpdate({ fetchReply: true });
+    let id = moi instanceof Message ? moi.author.id : moi.user.id;
+    let style: CardStyle = await getCardStyle(id);
+    if (!style) style = defaultstyle;
+    else {
+        if (!style["type"]) style["type"] = defaultstyle["type"];
+        if (!style["color"]) style["color"] = defaultstyle["color"];
+        if (!style["color2"]) style["color2"] = defaultstyle["color2"];
+    }
+    let infoEmbed = new MessageEmbed();
+    if (!isCard) {
+        if (style["title"])
+            infoEmbed
+                .setColor((style.color || defaultstyle.color) as HexColorString)
+                .addFields([{ name: "TITLE", value: style["title"] ? style["title"] : "None" }]);
+        if (style["color"])
+            infoEmbed.addFields([
+                {
+                    name: "COLOR A",
+                    value: style["color"] ? style["color"] : "None",
+                    inline: true,
+                },
+            ]);
+        if (style["color2"])
+            infoEmbed.addFields([
+                {
+                    name: "COLOR B",
+                    value: style["color2"] ? style["color2"] : "None",
+                    inline: true,
+                },
+            ]);
+
+        if (style["type"])
+            infoEmbed.addFields([
+                {
+                    name: "XP BAR STYLE",
+                    value: style["type"]
+                        ? ({
+                              normal: "Default",
+                              stripes: "Striped",
+                              stripes2: "Striped (b)",
+                              dual: "Dual",
+                              dualb: "Dual (b)",
+                          }[style["type"]] as string)
+                        : "None",
+                    inline: false,
+                },
+            ]);
+    }
+    let embeds = isCard ? null : [infoEmbed];
+
+    let files = [];
+    if (isCard) files.push(await generatecard(moi));
+    else files.push((await createXpBar(style["type"], style["color"], style["color2"])).toBuffer());
+
+    let components: MessageActionRow[] = [];
+
+    let selectMenu = new MessageSelectMenu().setCustomId("card_xpbar").setPlaceholder("Choose a xp bar style");
+    let addStyle = (label: string, value: string, description: string) =>
+        selectMenu.addOptions([{ label, value, description, default: style["type"] == value }]);
+    addStyle("Default", "normal", "The default xp bar style");
+    addStyle("Striped", "stripes", "A striped version of the xp bar");
+    addStyle("Striped (b)", "stripes2", "Alternative version of the striped xp bar");
+    addStyle("Dual", "dual", "Multicolored version of the striped xp bar");
+    addStyle("Dual (b)", "dualb", "Alternative version of the multicolored striped xp bar");
+    let selectMenuRow = new MessageActionRow().addComponents(selectMenu);
+    let buttonRow = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("card_title").setLabel("Change title").setStyle("PRIMARY"),
+        new MessageButton().setCustomId("card_colors").setLabel("Change colors").setStyle("PRIMARY")
+    );
+    buttonRow.addComponents(
+        new MessageButton()
+            .setCustomId(isCard ? "xp_mode" : "card_mode")
+            .setLabel(isCard ? "XP bar mode (faster)" : "Card mode (slower)")
+            .setStyle("PRIMARY")
+    );
+
+    let previousButton = new MessageButton();
+    if (previous) {
+        let id = "card_previous?";
+        if (previous.type) id += `s=${previous.type}&`;
+        if (previous.color) id += `a=${previous.color}&`;
+        if (previous.color2) id += `b=${previous.color2}&`;
+        if (previous.title) id += `t=${previous.title}&`;
+        if (previousText) id += `p=&`;
+        if (id.substring(id.length - 1) == "&") id = id.substring(0, id.length - 1);
+        previousButton
+            .setCustomId(id)
+            .setLabel(previousText || "UNDO")
+            .setStyle("DANGER");
+        buttonRow.addComponents(previousButton);
+    }
+
+    components.push(selectMenuRow, buttonRow);
+    let info = {
+        content: `${isCard ? "" : "!"}<@${id}>'s card`,
+        embeds,
+        files,
+        components,
+    } as MessageOptions;
+    if (!(moi instanceof Message)) await (moi.message as Message).suppressEmbeds(isCard);
+
+    return shouldReturn
+        ? info
+        : moi instanceof Message
+        ? moi.channel?.send(info)
+        : isCard
+        ? moi.editReply(info)
+        : moi.update(info as InteractionUpdateOptions);
+}

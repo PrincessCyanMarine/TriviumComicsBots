@@ -29,6 +29,7 @@ import {
     spawnAsync,
     wait,
     restart,
+    sendCardCustomizationMessage,
 } from "./functions";
 import {
     colors,
@@ -76,19 +77,8 @@ d20.on("messageCreate", async (msg) => {
                 prestige(msg);
                 break;
             case "c":
-                say(d20, msg.channel, {
-                    content: "You can customize your card here",
-                    components: [
-                        new MessageActionRow().addComponents([
-                            {
-                                type: "BUTTON",
-                                label: "Customize",
-                                style: "LINK",
-                                url: "https://www.cyanmarine.net/tc/card/customize",
-                            },
-                        ]),
-                    ],
-                });
+                msg.channel.sendTyping();
+                sendCardCustomizationMessage(msg, false, undefined, undefined, ["slow", "card"].includes(options[1]));
                 break;
             case "profile":
                 let target = msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member;

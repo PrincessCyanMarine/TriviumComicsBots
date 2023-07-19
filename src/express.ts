@@ -6,6 +6,7 @@ import { createServer } from "http";
 import { get } from "https";
 import {
     accountForPrestige,
+    CardStyle,
     createCard,
     createXpBar,
     defaultstats,
@@ -125,12 +126,7 @@ express_app.get("/profile/:tokentype/:token", async (req, res) => {
         prestige: number;
         avatar: string;
         message_to_levelup: number;
-        style: {
-            type: string;
-            color: string;
-            colorb: string;
-            title: undefined | string;
-        };
+        style: CardStyle;
         stats: StatsObject;
         guild: string;
         messages_accounted_for_prestige: number;
@@ -185,7 +181,7 @@ express_app.get("/profile/:tokentype/:token", async (req, res) => {
     else {
         if (!profile.style["type"]) profile.style["type"] = defaultstyle["type"];
         if (!profile.style["color"]) profile.style["color"] = defaultstyle["color"];
-        if (!profile.style["colorb"]) profile.style["colorb"] = defaultstyle["colorb"];
+        if (!profile.style["color2"]) profile.style["color2"] = defaultstyle["color2"];
     }
 
     if (!profile.stats) profile.stats = defaultstats;
@@ -220,7 +216,7 @@ express_app.get("/profile/:tokentype/:token", async (req, res) => {
             xp_bar: {
                 style: profile.style["type"],
                 color_a: profile.style["color"],
-                color_b: profile.style["colorb"],
+                color_b: profile.style["color2"],
             },
             guild: profile.guild,
             prestige: profile.prestige,

@@ -15,6 +15,9 @@ import {
     Guild,
     MessageButton,
     PresenceStatus,
+    SelectMenuInteraction,
+    ModalSubmitInteraction,
+    ButtonInteraction,
 } from "discord.js";
 import { database } from "..";
 import assets from "../assetsIndexes";
@@ -137,6 +140,12 @@ export type CardOptions = {
     target: GuildMember;
     harem: Harem;
 };
+export interface CardStyle {
+    type: string;
+    color: string;
+    color2: string;
+    title?: string;
+}
 
 const gold_font_color = "#FFDF00";
 const silver_font_color = "#C0C0C0";
@@ -358,9 +367,9 @@ export async function bankick(interaction: CommandInteraction, type: "ban" | "ki
 export const defaultstyle = {
     type: "normal",
     color: "#00FFFF",
-    colorb: "#000000",
+    color2: "#000000",
     title: undefined,
-};
+} as CardStyle;
 
 export const defaultstats = {
     sleep: 0,
@@ -374,7 +383,9 @@ export const defaultstats = {
     kick: 0,
 };
 
-export function generatecard(msg: Message | CommandInteraction | ContextMenuInteraction): Promise<Buffer> {
+export function generatecard(
+    msg: Message | SelectMenuInteraction | ModalSubmitInteraction | ButtonInteraction | CommandInteraction | ContextMenuInteraction
+): Promise<Buffer> {
     return new Promise(async (resolve, reject) => {
         const errormessage = (msg: Message | Interaction) => {
             if (msg instanceof CommandInteraction) {
@@ -391,12 +402,14 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
                 ? msg.mentions.members?.first()
                     ? msg.mentions.members?.first()
                     : msg.member
-                : msg.options.get("player")
-                ? msg.options.get("player")?.user
-                : msg.options.getUser("user")
-                ? msg.options.getUser("user")
-                : msg.options.get("message")
-                ? msg.options.get("message")?.message?.author
+                : msg instanceof CommandInteraction || msg instanceof ContextMenuInteraction
+                ? msg.options.get("player")
+                    ? msg.options.get("player")?.user
+                    : msg.options.getUser("user")
+                    ? msg.options.getUser("user")
+                    : msg.options.get("message")
+                    ? msg.options.get("message")?.message?.author
+                    : msg.user
                 : msg.user;
         if (target instanceof User) target = await msg.guild.members.fetch(target.id);
         if (!target || !(target instanceof GuildMember)) return;
@@ -408,7 +421,7 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
         else messages = all_messages[target.id];
 
         let prestige = await (await database.child("prestige/" + msg.guildId + "/" + target.id).once("value")).val();
-        let style = await (await database.child(`card/` + target.id).once("value")).val();
+        let style = (await (await database.child(`card/` + target.id).once("value")).val()) as CardStyle;
         let stats = await (await database.child("stats/" + target.id).once("value")).val();
         let warnings_aux = await (await database.child("warnings/" + msg.guildId + "/" + target.id).once("value")).val();
         let guild = await (await database.child("guild/" + target.id).once("value")).val();
@@ -427,7 +440,7 @@ export function generatecard(msg: Message | CommandInteraction | ContextMenuInte
         else {
             if (!style["type"]) style["type"] = defaultstyle["type"];
             if (!style["color"]) style["color"] = defaultstyle["color"];
-            if (!style["colorb"]) style["colorb"] = defaultstyle["colorb"];
+            if (!style["color2"]) style["color2"] = defaultstyle["color2"];
         }
 
         if (!stats) stats = defaultstats;
@@ -663,4 +676,11 @@ export async function d20TimedFunction() {
             .filter((member) => !member.roles.cache.hasAny(...necessaryIds, queensbladeRoleId))
             .forEach((member) => member.roles.remove(roleId));
     });
+}
+export function isCardCustomizationMessageFromUser(interaction: ButtonInteraction | SelectMenuInteraction | ModalSubmitInteraction) {
+    if (interaction.message?.content.match(/!?<@(.+)>'s card/)?.[1] != interaction.user.id) {
+        interaction.reply({ content: "You can't change someone else's card!\nTo change your own, use !c", ephemeral: true });
+        return true;
+    }
+    return false;
 }
