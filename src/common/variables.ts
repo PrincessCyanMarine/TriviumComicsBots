@@ -6,6 +6,7 @@ import { testing } from "..";
 export const testGuildId: string = "620635349173010465";
 export const triviumGuildId: string = "562429293364248587";
 export const testChannelId: string = "892800588469911663";
+// export const testChannelId: string = "999917475342843924";
 
 export const sadieId: string = "622898538514350085";
 export const krystalId: string = "620634675454541844";

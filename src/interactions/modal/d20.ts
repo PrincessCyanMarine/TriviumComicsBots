@@ -1,4 +1,4 @@
-import { InteractionUpdateOptions } from "discord.js";
+import { CacheType, InteractionUpdateOptions, ModalSubmitInteraction } from "discord.js";
 import { testing } from "../..";
 import { d20 } from "../../clients";
 import { testChannelId } from "../../common/variables";
@@ -6,6 +6,14 @@ import { getCardStyle, sendCardCustomizationMessage, setCardStyle } from "../../
 import { MessageOptions } from "child_process";
 import { isCardCustomizationMessageFromUser } from "../../d20/functions";
 
+const _commands: { names: string[]; callback: (interaction: ModalSubmitInteraction<CacheType>) => Promise<void> }[] = [];
+export const addD20ModalCommand = (names: string | string[], callback: (interaction: ModalSubmitInteraction<CacheType>) => Promise<void>) => {
+    if (!Array.isArray(names)) names = [names];
+    _commands.push({
+        names,
+        callback,
+    });
+};
 d20.on("interactionCreate", async (interaction) => {
     if (!interaction.isModalSubmit()) return;
     if (testing && interaction.channelId != testChannelId) return;
@@ -41,6 +49,16 @@ d20.on("interactionCreate", async (interaction) => {
             let style = await getCardStyle(interaction.user.id);
             await setCardStyle(interaction.user.id, { color, color2 });
             (await sendCardCustomizationMessage(interaction, false, style)) as InteractionUpdateOptions;
+            break;
+        }
+        default: {
+            for (let { names, callback } of _commands) {
+                if (names.includes(interaction.customId.split("?")[0])) {
+                    await callback(interaction);
+                    return;
+                }
+            }
+            interaction.reply({ ephemeral: true, content: "The command " + interaction.customId.split("?")[0] + " has not been implemented" });
             break;
         }
     }

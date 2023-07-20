@@ -12,10 +12,11 @@ import {
     ModalActionRowComponent,
     ModalActionRowComponentResolvable,
     TextInputComponent,
+    ButtonInteraction,
 } from "discord.js";
 import { database, testing } from "../..";
 import { d20, krystal, mod_alert_webhook } from "../../clients";
-import { colors, triviumGuildId } from "../../common/variables";
+import { colors, testChannelId, triviumGuildId } from "../../common/variables";
 import {
     ActionRowBuilder,
     userMention,
@@ -29,10 +30,19 @@ import { getCardStyle, sendCardCustomizationMessage, setCardStyle } from "../../
 import { TextInputStyles } from "discord.js/typings/enums";
 import { defaultstyle, isCardCustomizationMessageFromUser } from "../../d20/functions";
 
+const _commands: { names: string[]; callback: (interaction: ButtonInteraction) => Promise<void> }[] = [];
+export const addD20ButtonCommand = (names: string | string[], callback: (interaction: ButtonInteraction) => Promise<void>) => {
+    if (!Array.isArray(names)) names = [names];
+    _commands.push({
+        names,
+        callback,
+    });
+};
+
 d20.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
-    if (testing && interaction.channelId != "892800588469911663") return;
-    else if (!testing && interaction.channelId == "892800588469911663") return;
+    if (testing && interaction.channelId != testChannelId) return;
+    else if (!testing && interaction.channelId == testChannelId) return;
     // console.log(interaction.customId);
 
     if (interaction.customId.startsWith("unwarn")) {
@@ -127,6 +137,15 @@ d20.on("interactionCreate", async (interaction) => {
             await sendCardCustomizationMessage(interaction, false, undefined, undefined, value);
             break;
         }
+        default:
+            for (let { names, callback } of _commands) {
+                if (names.includes(interaction.customId.split("?")[0])) {
+                    await callback(interaction);
+                    return;
+                }
+            }
+            interaction.reply({ ephemeral: true, content: "The command " + interaction.customId.split("?")[0] + " has not been implemented" });
+            break;
     }
 
     if (interaction.customId.startsWith("card_previous")) {

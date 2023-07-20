@@ -59,6 +59,15 @@ import axios from "axios";
 import { EmojiCycler } from "../d20/EmojiCycler";
 import { spawn } from "child_process";
 
+const _commands: { names: string[]; callback: (msg: Message, args: string[]) => Promise<void> }[] = [];
+export const addExclamationCommand = (names: string | string[], callback: (msg: Message, args: string[]) => Promise<void>) => {
+    if (!Array.isArray(names)) names = [names];
+    _commands.push({
+        names,
+        callback,
+    });
+};
+
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
     if (ignore_channels.includes(msg.channel.id)) return;
@@ -68,7 +77,8 @@ d20.on("messageCreate", async (msg) => {
     let options = args.split(" ");
     if (args.startsWith("!")) {
         args = args.replace(/!/, "");
-        switch (args.split(" ")[0]) {
+        let command = args.split(" ")[0];
+        switch (command) {
             case "card":
                 msg.channel.sendTyping();
                 msg.channel.send({ files: [await generatecard(msg)] });
@@ -877,15 +887,9 @@ d20.on("messageCreate", async (msg) => {
                 //                 // say(krystal, channel, message).catch((e) => console.log(e));
                 //                 break;
             }
-            case "rotate": {
-                if (![marineId, dodoId].includes(msg.author.id)) {
-                    say(d20, msg.channel, "You don't have permission to use that command");
-                    break;
-                }
-                // TODO reactivate
-                new EmojiCycler(options[1], options[2]).cycle();
-                break;
-            }
+            // case "rotate": {
+            //     break;
+            // }
             case "notification": {
                 if (![marineId, dodoId].includes(msg.author.id)) {
                     return;
@@ -920,18 +924,29 @@ d20.on("messageCreate", async (msg) => {
                 say(d20, msg.channel, text, undefined, { messageReference: msg });
                 break;
             }
-            case "control": {
-                if (![marineId].includes(msg.author.id)) return;
-                let components = [] as (MessageActionRow | (Required<BaseMessageComponentOptions> & MessageActionRowOptions))[];
-                components.push(
-                    new MessageActionRow().addComponents([
-                        new MessageButton().setCustomId("stop").setLabel("STOP").setStyle("PRIMARY"),
-                        new MessageButton().setCustomId("restart").setLabel("RESTART").setStyle("PRIMARY"),
-                        new MessageButton().setCustomId("update").setLabel("UPDATE").setStyle("PRIMARY"),
-                    ])
-                );
-                say(krystal, msg.channel, { components });
-            }
+            case "control":
+                {
+                    if (![marineId].includes(msg.author.id)) return;
+                    let components = [] as (MessageActionRow | (Required<BaseMessageComponentOptions> & MessageActionRowOptions))[];
+                    components.push(
+                        new MessageActionRow().addComponents([
+                            new MessageButton().setCustomId("stop").setLabel("STOP").setStyle("PRIMARY"),
+                            new MessageButton().setCustomId("restart").setLabel("RESTART").setStyle("PRIMARY"),
+                            new MessageButton().setCustomId("update").setLabel("UPDATE").setStyle("PRIMARY"),
+                        ])
+                    );
+                    say(krystal, msg.channel, { components });
+                }
+                break;
+            default:
+                for (let { names, callback } of _commands) {
+                    // console.log(command, names);
+                    if (names.includes(command)) {
+                        await callback(msg, options);
+                        break;
+                    }
+                }
+                break;
         }
     }
 });
