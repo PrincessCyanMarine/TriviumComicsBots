@@ -2,11 +2,10 @@ import { CacheType, CommandInteraction, Guild, GuildMember, Message, MessageActi
 import { database, testing } from "../..";
 import { clients, d20 } from "../../clients";
 import { say } from "../../common/functions";
-import { ignore_channels, testGuildId } from "../../common/variables";
+import { ignore_channels, marineId, setTestChannelId, testChannelId, testGuildId } from "../../common/variables";
 import { bankick, generatecard, mute_unmute, prestige, warn } from "../../d20/functions";
 import { followup, reply } from "./common";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { changeTestChannel } from "../../commands/Test";
 
 const _commands: { name: string; callback: (interaction: CommandInteraction<CacheType>) => Promise<void> }[] = [];
 
@@ -43,12 +42,21 @@ d20.on("interactionCreate", async (interaction) => {
     }
 
     if (interaction.commandName == "test") {
-        await changeTestChannel(interaction);
+        if (interaction.user.id != marineId) {
+            interaction.reply("You are not Marine");
+            return;
+        }
+        if (testChannelId == interaction.channelId) {
+            interaction.reply(`This is already the test channel (${testing ? "development" : "production"})`);
+            return;
+        }
+        setTestChannelId(interaction.channelId);
+        interaction.reply(`This is now the test channel (${testing ? "development" : "production"})`);
         return;
     }
 
-    if (testing && interaction.channelId != testGuildId) return;
-    else if (!testing && interaction.channelId == testGuildId) return;
+    if (testing && interaction.channelId != testChannelId) return;
+    else if (!testing && interaction.channelId == testChannelId) return;
 
     switch (interaction.commandName) {
         case "mute":
@@ -193,7 +201,7 @@ d20.on("interactionCreate", async (interaction) => {
         default:
             for (let { name, callback } of _commands) {
                 if (name == interaction.commandName) {
-                    await callback(interaction);
+                    callback(interaction);
                     return;
                 }
             }

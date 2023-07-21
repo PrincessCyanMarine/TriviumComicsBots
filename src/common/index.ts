@@ -942,8 +942,8 @@ d20.on("messageCreate", async (msg) => {
                 for (let { names, callback } of _commands) {
                     // console.log(command, names);
                     if (names.includes(command)) {
-                        msg.channel.sendTyping();
-                        await callback(msg, options);
+                        await msg.channel.sendTyping();
+                        callback(msg, options);
                         break;
                     }
                 }
