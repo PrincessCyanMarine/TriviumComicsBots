@@ -35,7 +35,7 @@ let fileOption = new SlashCommandAttachmentOption().setName("file").setDescripti
 let extensionOption = new SlashCommandStringOption()
     .setName("extension")
     .setDescription("The extension of the image")
-    .setChoices({ name: "png", value: "png" }, { name: "jpg", value: "jpg" }, { name: "gif", value: "gif" })
+    .setChoices({ name: "png", value: "png" }, { name: "jpeg", value: "jpeg" }, { name: "gif", value: "gif" })
     .setRequired(false);
 let rotationType = new SlashCommandStringOption()
     .setName("rotation")
