@@ -3,6 +3,7 @@ import { get } from "https";
 import { addD20SlashCommand } from "../interactions/slash/d20";
 import { SlashCommandAttachmentOption, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder } from "@discordjs/builders";
 import { gitAddAsync, gitCommitAsync, gitPushAsync, spawnAsync, wait } from "../common/functions";
+import { GuildMember } from "discord.js";
 
 // https://stackoverflow.com/a/11944984
 const download = (url: string, path: string) =>
@@ -38,7 +39,7 @@ let extensionOption = new SlashCommandStringOption()
 let rotationType = new SlashCommandStringOption()
     .setName("rotation")
     .setDescription("whether the emoji should be permanent or cycled")
-    .setChoices({ name: "permanent", value: "permanent" }, { name: "cycled", value: "cycled" }, { name: "test", value: "test" })
+    .setChoices({ name: "permanent", value: "permanent" }, { name: "cycled", value: "cycled" })
     .setRequired(false);
 
 let subcommands = [];
@@ -57,6 +58,10 @@ for (let subcommand of subcommands) {
 // command.addAttachmentOption((option) => option.setName("file").setDescription("The file of the emoji").setRequired(false));
 addD20SlashCommand(command, async (interaction) => {
     try {
+        if (!(interaction.member as GuildMember)?.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) {
+            interaction.reply({ content: "You must have the Manage Emojis and Stickers permission to use this command", ephemeral: true });
+            return;
+        }
         let name = interaction.options.getString("name", true);
         let url = interaction.options.getString("url", false);
         let file = interaction.options.getAttachment("file", false);
