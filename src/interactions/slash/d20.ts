@@ -1,4 +1,4 @@
-import { CacheType, CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton, MessageSelectMenu } from "discord.js";
+import { CacheType, CommandInteraction, Guild, GuildMember, Message, MessageActionRow, MessageButton, MessageSelectMenu } from "discord.js";
 import { database, testing } from "../..";
 import { clients, d20 } from "../../clients";
 import { say } from "../../common/functions";
@@ -8,15 +8,21 @@ import { followup, reply } from "./common";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 const _commands: { name: string; callback: (interaction: CommandInteraction<CacheType>) => Promise<void> }[] = [];
-export const addD20SlashCommand = (command: SlashCommandBuilder, callback: (interaction: CommandInteraction<CacheType>) => Promise<void>) => {
+
+const addCommandToGuild = async (guild: Guild, command: SlashCommandBuilder) => {
+    let commands = await guild.commands.fetch();
+    commands.delete(command.name);
+    guild.commands.create(command.toJSON());
+};
+
+export const addD20SlashCommand = async (command: SlashCommandBuilder, callback: (interaction: CommandInteraction<CacheType>) => Promise<void>) => {
     console.log("Adding " + command.name + " command");
     if (testing) {
-        d20.guilds.fetch(testGuildId).then((guild) =>
-            guild.commands.fetch().then((commands) => {
-                commands.delete(command.name);
-                guild.commands.create(command.toJSON());
-            })
-        );
+        let guild = await d20.guilds.fetch(testGuildId);
+        addCommandToGuild(guild, command);
+    } else {
+        let guilds = await d20.guilds.fetch();
+        for (let guild of guilds.values()) await addCommandToGuild(await guild.fetch(), command);
     }
 
     _commands.push({
