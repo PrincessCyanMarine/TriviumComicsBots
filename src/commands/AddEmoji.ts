@@ -1,5 +1,3 @@
-import { createCanvas, loadImage } from "canvas";
-import { addExclamationCommand } from "../common";
 import { createWriteStream } from "fs";
 import { get } from "https";
 import { addD20SlashCommand } from "../interactions/slash/d20";
@@ -27,7 +25,6 @@ const download = (url: string, path: string) =>
             reject(err);
         }
     });
-console.log("Adding emoji command");
 let command = new SlashCommandBuilder().setName("addemoji").setDescription("Adds an emoji to the emoji rotation");
 
 let nameOption = new SlashCommandStringOption().setName("name").setDescription("The name of the emoji").setRequired(true);
@@ -87,9 +84,6 @@ addD20SlashCommand(command, async (interaction) => {
         await gitAddAsync(path);
         await gitCommitAsync("Added emoji to rotation through slash command", [path]);
         await gitPushAsync("origin", "master");
-        // await spawnAsync("git", ["commit", "-m", "Added emoji to rotation through slash command", `--author=${interaction.user.username}`, path]);
-        // await spawnAsync("git", ["push", "origin", "main"]);
-        await spawnAsync("pwd");
         await interaction.editReply("Emoji added to rotation");
     } catch (err) {
         console.error(err);
