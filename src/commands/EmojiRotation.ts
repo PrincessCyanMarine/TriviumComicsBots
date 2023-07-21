@@ -5,7 +5,9 @@ import { say, wait, weightedRandom } from "../common/functions";
 import { announcementChannelId, dodoId, marineId, triviumGuildId } from "../common/variables";
 import {
     ButtonInteraction,
+    CacheType,
     Collection,
+    CommandInteraction,
     Emoji,
     Guild,
     GuildEmoji,
@@ -30,6 +32,8 @@ import { existsSync, readdirSync } from "fs";
 import { Image, createCanvas, loadImage } from "canvas";
 import { TextInputStyles } from "discord.js/typings/enums";
 import { addD20ModalCommand } from "../interactions/modal/d20";
+import { addD20SlashCommand } from "../interactions/slash/d20";
+import { SlashCommandBuilder } from "@discordjs/builders";
 
 const emptyMessage = {
     content: null,
@@ -159,7 +163,7 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
     return canvas.toBuffer();
 };
 
-const createMessage = async (moi: Message | ButtonInteraction): Promise<MessageOptions | string> => {
+const createMessage = async (moi: Message | ButtonInteraction | CommandInteraction): Promise<MessageOptions | string> => {
     let author = moi instanceof Message ? moi.author : moi.user;
     let channel = moi instanceof Message ? moi.channel : moi.channel;
     let guild = moi.guild;
@@ -203,20 +207,22 @@ const createMessage = async (moi: Message | ButtonInteraction): Promise<MessageO
     return { content, components, embeds, files } as MessageOptions;
 };
 
-addExclamationCommand("rotate", async (msg, options) => {
-    if (tryDeny(msg)) return;
-    let dots = 3;
-    let message = await say(d20, msg.channel, "Fetching emoji rotation data" + "".padEnd(dots, "."), 0);
-    let interval = setInterval(async () => {
-        process.nextTick(() => {
-            dots = (dots + 1) % 4;
-            message.edit("Fetching emoji rotation data" + "".padEnd(dots, "."));
-        });
-    }, 500);
-    let content = (await createMessage(msg)) as MessageEditOptions;
-    clearInterval(interval);
-    await message.edit(content);
-});
+const _activate = async (moi: Message | CommandInteraction<CacheType>) => {
+    if (tryDeny(moi)) return;
+    if (!moi.channel) {
+        (moi as CommandInteraction).reply("Something went wrong...");
+        return;
+    }
+    let text = "Fetching emoji rotation data...";
+    let message: Message | undefined;
+    if (_isMessage(moi)) message = await say(d20, moi.channel, text, 0);
+    else await moi.reply(text);
+    let content = (await createMessage(moi)) as MessageEditOptions;
+    if (_isMessage(moi)) await message!.edit(content);
+    else await moi.editReply(content as InteractionReplyOptions);
+};
+addExclamationCommand("rotate", _activate);
+addD20SlashCommand(new SlashCommandBuilder().setName("rotate").setDescription("Opens the emoji rotation configuration menu"), _activate);
 
 addD20ButtonCommand("rotation_roll", async (interaction) => {
     if (tryDeny(interaction)) return;
@@ -516,8 +522,8 @@ const getURLs = (guildEmojis: GuildEmoji[]) => {
     });
 };
 
-const _isMessage = (moi: Message<boolean> | ButtonInteraction | ModalSubmitInteraction): moi is Message => moi instanceof Message;
-const tryDeny = (moi: ButtonInteraction | ModalSubmitInteraction | Message) => {
+const _isMessage = (moi: any): moi is Message => moi instanceof Message;
+const tryDeny = (moi: ButtonInteraction | ModalSubmitInteraction | Message | CommandInteraction) => {
     if (_isMessage(moi) ? moi.member?.permissions.has("MANAGE_EMOJIS_AND_STICKERS") : moi.memberPermissions?.has("MANAGE_EMOJIS_AND_STICKERS"))
         return false;
     let message = { content: "You must have manage emojis and stickers permission to use this button" };

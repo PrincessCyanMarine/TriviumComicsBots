@@ -4,6 +4,8 @@ import { addD20SlashCommand } from "../interactions/slash/d20";
 import { SlashCommandAttachmentOption, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder } from "@discordjs/builders";
 import { gitAddAsync, gitCommitAsync, gitPushAsync, spawnAsync, wait } from "../common/functions";
 import { cycPath, permPath } from "../d20/EmojiCycler";
+import { GuildMember } from "discord.js";
+import { triviumGuildId } from "../common/variables";
 
 let command = new SlashCommandBuilder().setName("removeemoji").setDescription("Removes an emoji from the emoji rotation");
 
@@ -27,13 +29,23 @@ command.addStringOption(emojiOption);
 // command.addAttachmentOption((option) => option.setName("file").setDescription("The file of the emoji").setRequired(false));
 
 const findEmoji = async (name: string) => {
-    return readdirSync(permPath)
-        .concat(readdirSync(cycPath))
-        .find((emoji) => emoji.match(new RegExp(name + ".((png)|(jpeg)|(gif))", "i")));
+    let res = readdirSync(permPath).find((emoji) => emoji.match(new RegExp(name + ".((png)|(jpeg)|(gif))", "i")));
+    if (res) return permPath + "/" + res;
+    res = readdirSync(cycPath).find((emoji) => emoji.match(new RegExp(name + ".((png)|(jpeg)|(gif))", "i")));
+    if (res) return cycPath + "/" + res;
+    return null;
 };
 
 addD20SlashCommand(command, async (interaction) => {
     try {
+        if (interaction.guildId != triviumGuildId) {
+            interaction.reply({ content: "This command can only be used in the Trivium Comics' server", ephemeral: true });
+            return;
+        }
+        if (!(interaction.member as GuildMember)?.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) {
+            interaction.reply({ content: "You must have the Manage Emojis and Stickers permission to use this command", ephemeral: true });
+            return;
+        }
         let emoji = interaction.options.getString("emoji", true);
         console.log(emoji);
         let match = emoji.match(/<:(.+?):[0-9]+?>/g);
@@ -42,24 +54,26 @@ addD20SlashCommand(command, async (interaction) => {
             return;
         }
         let any_found = false;
+        await interaction.reply("Removing emojis");
         for (let emoji of match) {
             let emojiName = emoji.match(/<:(.+?):[0-9]+?>/)![1];
-            await interaction.reply("Looking for " + emojiName);
+            await interaction.editReply("Looking for " + emojiName);
             let path = await findEmoji(emojiName);
+            console.log(path);
             if (path && existsSync(path)) {
                 await interaction.editReply("Removing " + emojiName);
                 console.log("Removing " + path);
                 any_found = true;
                 rmSync(path);
                 // await gitAddAsync(path);
-                await gitCommitAsync("Removed " + path);
-                await gitPushAsync("remote", "master");
-                await interaction.editReply("Removed " + path);
+                await gitCommitAsync("Removed " + path, path);
+                await gitPushAsync("origin", "master");
+                await interaction.editReply("Removed " + emojiName);
             } else await interaction.editReply("Couldn't find " + emojiName);
         }
-        const r = interaction.replied || interaction.deferred ? interaction.editReply : interaction.reply;
-        if (!any_found) await r("Couldn't find any emojis");
-        else await r("Done!");
+        // const r = interaction.replied || interaction.deferred ? interaction.editReply : interaction.reply;
+        // if (!any_found) await r("Couldn't find any emojis");
+        // else await r("Done!");
     } catch (err) {
         console.error(err);
         if (interaction.replied || interaction.deferred) interaction.editReply("Something went wrong...");
