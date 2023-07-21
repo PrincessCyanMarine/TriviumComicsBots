@@ -50,6 +50,7 @@ export interface EmojiRotationData {
     timer: number;
     removed?: string[];
     added?: string[];
+    brandNew?: string[];
 }
 
 export const removeExtension = (name: string) => name.replace(/^(.*)\..*$/, (_, $1) => $1);
@@ -75,6 +76,31 @@ const getNew = (guildEmojiKeys: string[], rotation: EmojiRotationData) => {
     return rotation.toBeAdded.filter((e) => !guildEmojiKeys.includes(removeExtension(e)));
 };
 
+const _getPath = (emoji: string): [string | undefined, boolean] => {
+    if (existsSync(permanentPath + "/" + emoji)) {
+        return [permanentPath + "/" + emoji, true];
+    } else if (existsSync(cycledPath + "/" + emoji)) return [cycledPath + "/" + emoji, false];
+    else return [undefined, false];
+};
+
+const getPath = (emoji: string): [string | undefined, boolean] => {
+    let extensions = ["png", "jpeg", "gif"];
+    if (!emoji.match(/.+\..+/)) {
+        for (let extension of extensions) {
+            let path = _getPath(emoji + "." + extension);
+            if (path[0]) return path;
+        }
+        return [undefined, false];
+    }
+    return _getPath(emoji);
+};
+
+const isPerm = (emoji: string) => {
+    let [path, perm] = getPath(emoji);
+    // console.log(path, perm);
+    return perm;
+};
+
 const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji }, rotation: EmojiRotationData, guild: Guild) => {
     const MAX_PER_LINE = 10;
     const SIZE = 128;
@@ -83,6 +109,15 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
     let guildEmojiKeys = Object.keys(guildEmojis);
     let duplicates = getDuplicates((await guild.emojis.fetch()).map((e) => e));
     let toBeRemoved = getRemovedURLs(guildEmojis, rotation);
+    let _toBeAdded = rotation.toBeAdded.filter((e) => !rotation.added?.includes(removeExtension(e)));
+    let staying = _toBeAdded
+        .filter((e) => guildEmojiKeys.includes(removeExtension(e)))
+        .map((e) => getPath(e)[0]!)
+        .filter((e) => !!e);
+    let beingAdded = _toBeAdded
+        .filter((e) => !guildEmojiKeys.includes(removeExtension(e)))
+        .map((e) => getPath(e)[0]!)
+        .filter((e) => !!e);
     let length = rotation.toBeAdded.length + toBeRemoved.length + (rotation.removed?.length || 0) + duplicates.length;
     let legend = await loadImage("./assets/d20/emoji_rotation/legend.png");
     let canvas = createCanvas(
@@ -97,20 +132,14 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
     let addedIcon = await loadImage("./assets/d20/emoji_rotation/added.png");
     let removedIcon = await loadImage("./assets/d20/emoji_rotation/removed.png");
     let lockIcon = await loadImage("./assets/d20/emoji_rotation/lock.png");
+    let addIcon = await loadImage("./assets/d20/emoji_rotation/add.png");
     let newIcon = await loadImage("./assets/d20/emoji_rotation/new.png");
     let removeIcon = await loadImage("./assets/d20/emoji_rotation/remove.png");
-    const drawEmoji = async (index: number, icons: ("lock" | "remove" | "removed" | "added" | "new")[] = [], url?: string) => {
+
+    const drawEmoji = async (index: number, url: string, icons: ("lock" | "remove" | "removed" | "added" | "add" | "new")[] = []) => {
         let perm = false;
-        let emoji;
         let img;
-        if (!url) {
-            emoji = rotation.toBeAdded[index];
-            if (existsSync(permanentPath + "/" + emoji)) {
-                img = await loadImage(permanentPath + "/" + emoji);
-                perm = true;
-            } else if (existsSync(cycledPath + "/" + emoji)) img = await loadImage(cycledPath + "/" + emoji);
-            else return;
-        } else img = await loadImage(url);
+        img = await loadImage(url);
         if (!img) return;
         let width = img.width > img.height ? SIZE : (SIZE * img.width) / img.height;
         let height = img.width > img.height ? (SIZE * img.height) / img.width : SIZE;
@@ -121,45 +150,47 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
         await ctx.drawImage(img, x, y, width, height);
         const drawIcon = (icon: Image) => ctx.drawImage(icon, _x, _y, SIZE, SIZE);
         if (perm || icons.includes("lock")) await drawIcon(lockIcon);
-        if (emoji) {
-            if (icons.includes("new") || !guildEmojiKeys.includes(removeExtension(emoji))) await drawIcon(newIcon);
-            if (icons.includes("added") || rotation.added?.includes(removeExtension(emoji))) await drawIcon(addedIcon);
-        } else {
-            if (icons.includes("removed")) await drawIcon(removedIcon);
-            else if (icons.includes("remove")) await drawIcon(removeIcon);
-            else if (url && rotation.removed?.includes(url)) await drawIcon(removedIcon);
-            else await drawIcon(removeIcon);
-        }
+        if (perm || icons.includes("new")) await drawIcon(newIcon);
+        if (icons.includes("added")) await drawIcon(addedIcon);
+        else if (icons.includes("add")) await drawIcon(addIcon);
+        else if (icons.includes("removed")) await drawIcon(removedIcon);
+        else if (icons.includes("remove")) await drawIcon(removeIcon);
     };
 
-    console.time("drawEmoji");
+    // console.time("drawEmoji");
     let drawings = [];
     let index = 0;
-    for (let i in rotation.toBeAdded) {
-        drawings.push(drawEmoji(index));
-        index++;
-    }
 
-    for (let i in toBeRemoved) {
-        drawings.push(drawEmoji(index, ["remove"], toBeRemoved[i]));
-        index++;
-    }
-
-    for (let duplicate of getURLs(duplicates)) {
-        drawings.push(drawEmoji(index, ["remove"], duplicate));
-        index++;
-    }
-
-    if (rotation.removed) {
-        for (let i in rotation.removed) {
-            drawings.push(drawEmoji(index, ["removed"], rotation.removed[i]));
-            index++;
+    for (let category of [
+        [staying, [], true],
+        [rotation.added?.map((e) => getPath(e)[0]), ["added"], true],
+        [beingAdded, ["add"], true],
+        [toBeRemoved, ["remove"], false],
+        [getURLs(duplicates), ["remove"], false],
+        [rotation.removed, ["removed"], false],
+    ] as [string[], ("lock" | "remove" | "removed" | "added" | "add" | "new")[], boolean][]) {
+        if (category[0]) {
+            for (let url of category[0]) {
+                let icons = category[1];
+                let emoji;
+                // console.log(url);
+                if (category[2]) emoji = url.match("/") ? url.split("/").pop()! : url;
+                let perm = category[2] && isPerm(emoji!);
+                if (perm) icons = ["lock", ...icons];
+                if (
+                    category[2] &&
+                    (rotation.brandNew?.includes(emoji!.split("/").pop()!) || (perm && (icons.includes("add") || icons.includes("added"))))
+                )
+                    icons = ["new", ...icons];
+                drawings.push(drawEmoji(index, url, icons));
+                index++;
+            }
         }
     }
 
     await Promise.all(drawings);
     ctx.drawImage(legend, (canvas.width - legend.width) / 2, canvas.height - legend.height);
-    console.timeEnd("drawEmoji");
+    // console.timeEnd("drawEmoji");
     return canvas.toBuffer();
 };
 
@@ -203,6 +234,7 @@ const createMessage = async (moi: Message | ButtonInteraction | CommandInteracti
     }
     buttons.addComponents(new MessageButton().setCustomId("rotation_announce_request").setLabel("ANNOUNCE").setStyle("DANGER").setEmoji("📢"));
     buttons.addComponents(new MessageButton().setCustomId("rotation_message_reload").setLabel("RELOAD").setStyle("SECONDARY").setEmoji("🔄"));
+    buttons.addComponents(new MessageButton().setCustomId("rotation_message_lock").setLabel("LOCK").setStyle("SECONDARY").setEmoji("🔒"));
     components.push(buttons);
     return { content, components, embeds, files } as MessageOptions;
 };
@@ -269,6 +301,9 @@ const addRequestButton = (command: string, content: string, callback: (interacti
 };
 
 addD20ButtonCommand("rotation_message_reload", async (interaction) => _reloadMessage(interaction, undefined, true));
+addD20ButtonCommand("rotation_message_lock", async (interaction) => {
+    interaction.update({ components: [] });
+});
 addD20ButtonCommand("rotation_announce_request", async (interaction) => {
     if (tryDeny(interaction)) return;
     let modal = new Modal().setTitle("ANNOUNCE").setCustomId("rotation_announce_confirm");
@@ -399,6 +434,20 @@ addRequestButton("add", 'Are you sure you want to add the emojis marked with an 
         await interaction.editReply({ ...((await createMessage(interaction)) as MessageOptions), components: [] });
         await wait(1000 + Math.random() * 1000);
     }
+
+    let weight: { [key: string]: number } = {};
+
+    for (let w of await getWeight(readdirSync(cycledPath), interaction.guild.id)) weight[w["emoji"]] = w["weight"];
+
+    for (let emoji of rotation.toBeAdded.filter((e) => !isPerm(e))) weight[emoji] = weight[emoji] || 100;
+
+    await updateWeights(
+        interaction.guild,
+        Object.entries(weight).map(([emoji, weight]) => ({
+            emoji,
+            weight,
+        }))
+    );
     _reloadMessage(interaction, "All new emojis added\nReloading message...");
 });
 
@@ -408,6 +457,7 @@ const rollRotation = async (guild: Guild): Promise<EmojiRotationData> => {
     let rotation: EmojiRotationData = {
         toBeAdded: [],
         timer: Date.now().valueOf(),
+        brandNew: [],
     };
 
     const permanent = readdirSync(permanentPath);
@@ -425,9 +475,9 @@ const rollRotation = async (guild: Guild): Promise<EmojiRotationData> => {
 
     let randomCycled = await getRandomCycledEmojis(guild, permanent, cycled);
     emojis.push(...randomCycled.map((emoji) => emoji.emoji));
+    rotation.brandNew = randomCycled.filter((emoji) => emoji.weight == 100).map((emoji) => emoji.emoji);
     rotation.toBeAdded = emojis;
     await database.child(`emojiRotation/data/${guild.id}`).set(rotation);
-    await updateWeights(guild, randomCycled);
     return rotation;
 };
 
@@ -452,9 +502,12 @@ const getRandomCycledEmojis = async (guild: Guild, permanent: string[], cycled: 
     }[] = [];
     const weight = await getWeight(cycled, guild.id);
     if (weight.length <= limit) return weight;
-    // for (let emoji of weight) {
-    //     if (emoji.weight == 100) weight.splice(weight.indexOf(emoji), 1);
-    // }
+    for (let emoji of weight) {
+        if (emoji.weight == 100) {
+            emojis.push(emoji);
+            weight.splice(weight.indexOf(emoji), 1);
+        }
+    }
 
     while (emojis.length < limit && emojis.length < cycled.length && weight.length > 0) {
         const index = weightedRandom(weight)() as number;

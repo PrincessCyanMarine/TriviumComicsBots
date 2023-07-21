@@ -5,7 +5,7 @@ import { SlashCommandAttachmentOption, SlashCommandBuilder, SlashCommandStringOp
 import { gitAddAsync, gitCommitAsync, gitPushAsync, spawnAsync, wait } from "../common/functions";
 import { cycPath, permPath } from "../d20/EmojiCycler";
 import { GuildMember } from "discord.js";
-import { triviumGuildId } from "../common/variables";
+import { marineId, triviumGuildId } from "../common/variables";
 
 let command = new SlashCommandBuilder().setName("removeemoji").setDescription("Removes an emoji from the emoji rotation");
 
@@ -38,13 +38,15 @@ const findEmoji = async (name: string) => {
 
 addD20SlashCommand(command, async (interaction) => {
     try {
-        if (interaction.guildId != triviumGuildId) {
-            interaction.reply({ content: "This command can only be used in the Trivium Comics' server", ephemeral: true });
-            return;
-        }
-        if (!(interaction.member as GuildMember)?.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) {
-            interaction.reply({ content: "You must have the Manage Emojis and Stickers permission to use this command", ephemeral: true });
-            return;
+        if (interaction.user.id != marineId) {
+            if (interaction.guildId != triviumGuildId) {
+                interaction.reply({ content: "This command can only be used in the Trivium Comics' server", ephemeral: true });
+                return;
+            }
+            if (!(interaction.member as GuildMember)?.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) {
+                interaction.reply({ content: "You must have the Manage Emojis and Stickers permission to use this command", ephemeral: true });
+                return;
+            }
         }
         let emoji = interaction.options.getString("emoji", true);
         console.log(emoji);

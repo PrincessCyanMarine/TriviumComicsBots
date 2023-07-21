@@ -43,17 +43,15 @@ d20.on("interactionCreate", async (interaction) => {
 
     if (interaction.commandName == "test") {
         if (interaction.user.id != marineId) {
-            if (!interaction.replied) interaction.reply("You are not Marine");
+            if (!testing) interaction.reply("You are not Marine");
             return;
         }
         if (testChannelId == interaction.channelId) {
-            if (interaction.replied) interaction.followUp(`This is already the test channel (${testing ? "development" : "production"})`);
-            else interaction.reply(`This is already the test channel (${testing ? "development" : "production"})`);
+            if (!testing) interaction.reply(`This is already the test channel`);
             return;
         }
         setTestChannelId(interaction.channelId);
-        if (interaction.replied) interaction.followUp(`This is now the test channel (${testing ? "development" : "production"})`);
-        else interaction.reply(`This is now the test channel (${testing ? "development" : "production"})`);
+        if (!testing) interaction.reply(`This is now the test channel`);
         return;
     }
 

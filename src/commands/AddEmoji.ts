@@ -4,7 +4,7 @@ import { addD20SlashCommand } from "../interactions/slash/d20";
 import { SlashCommandAttachmentOption, SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandBuilder } from "@discordjs/builders";
 import { gitAddAsync, gitCommitAsync, gitPushAsync, spawnAsync, wait } from "../common/functions";
 import { GuildMember } from "discord.js";
-import { triviumGuildId } from "../common/variables";
+import { marineId, triviumGuildId } from "../common/variables";
 
 // https://stackoverflow.com/a/11944984
 const download = (url: string, path: string) =>
@@ -59,13 +59,15 @@ for (let subcommand of subcommands) {
 // command.addAttachmentOption((option) => option.setName("file").setDescription("The file of the emoji").setRequired(false));
 addD20SlashCommand(command, async (interaction) => {
     try {
-        if (interaction.guildId != triviumGuildId) {
-            interaction.reply({ content: "This command can only be used in the Trivium Comics' server", ephemeral: true });
-            return;
-        }
-        if (!(interaction.member as GuildMember)?.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) {
-            interaction.reply({ content: "You must have the Manage Emojis and Stickers permission to use this command", ephemeral: true });
-            return;
+        if (interaction.user.id != marineId) {
+            if (interaction.guildId != triviumGuildId) {
+                interaction.reply({ content: "This command can only be used in the Trivium Comics' server", ephemeral: true });
+                return;
+            }
+            if (!(interaction.member as GuildMember)?.permissions.has("MANAGE_EMOJIS_AND_STICKERS")) {
+                interaction.reply({ content: "You must have the Manage Emojis and Stickers permission to use this command", ephemeral: true });
+                return;
+            }
         }
         let name = interaction.options.getString("name", true);
         let url = interaction.options.getString("url", false);
