@@ -29,7 +29,6 @@ import "./eli/index";
 import "./ray/index";
 import "./interactions/index";
 import "./games/index";
-import "./commands";
 
 export const testing = process.env.TESTING == "true";
 console.log("Testing: " + testing);

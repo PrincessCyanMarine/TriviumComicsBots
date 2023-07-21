@@ -1,10 +1,29 @@
-import { GuildMember, Message, MessageActionRow, MessageButton, MessageSelectMenu } from "discord.js";
+import { CacheType, CommandInteraction, GuildMember, Message, MessageActionRow, MessageButton, MessageSelectMenu } from "discord.js";
 import { database, testing } from "../..";
 import { clients, d20 } from "../../clients";
 import { say } from "../../common/functions";
-import { ignore_channels } from "../../common/variables";
+import { ignore_channels, testGuildId } from "../../common/variables";
 import { bankick, generatecard, mute_unmute, prestige, warn } from "../../d20/functions";
 import { followup, reply } from "./common";
+import { SlashCommandBuilder } from "@discordjs/builders";
+
+const _commands: { name: string; callback: (interaction: CommandInteraction<CacheType>) => Promise<void> }[] = [];
+export const addD20SlashCommand = (command: SlashCommandBuilder, callback: (interaction: CommandInteraction<CacheType>) => Promise<void>) => {
+    console.log("Adding " + command.name + " command");
+    if (testing) {
+        d20.guilds.fetch(testGuildId).then((guild) =>
+            guild.commands.fetch().then((commands) => {
+                commands.delete(command.name);
+                guild.commands.create(command.toJSON());
+            })
+        );
+    }
+
+    _commands.push({
+        name: command.name,
+        callback,
+    });
+};
 
 d20.on("ready", async () => {
     console.log("D20 is processing slash commands");
@@ -159,7 +178,13 @@ d20.on("interactionCreate", async (interaction) => {
             break;
         }
         default:
-            reply(interaction, "Sorry, I don't know that command", true);
+            for (let { name, callback } of _commands) {
+                if (name == interaction.commandName) {
+                    await callback(interaction);
+                    return;
+                }
+            }
+            interaction.reply({ ephemeral: true, content: "The command /" + interaction.commandName + " has not been implemented" });
             break;
     }
 });

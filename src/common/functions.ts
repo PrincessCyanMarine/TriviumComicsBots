@@ -42,6 +42,7 @@ import { Harem } from "./harem";
 import { disturb_channels, ignore_channels, isRestarting, setRestarting, testChannelId, triviumGuildId } from "./variables";
 import { spawn } from "child_process";
 import { CardStyle, createXpBar, defaultstyle, generatecard } from "../d20/functions";
+import simpleGit from "simple-git";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");
@@ -610,3 +611,10 @@ export async function sendCardCustomizationMessage(
         ? moi.editReply(info)
         : moi.update(info as InteractionUpdateOptions);
 }
+
+export const gitAddAsync = (paths: string | string[]) =>
+    new Promise((resolve, reject) => simpleGit().add(paths, (err, result) => (err ? reject(err) : resolve(result))));
+export const gitCommitAsync = (message: string | string[], files?: string | string[], options?: { [key: string]: string }) =>
+    new Promise((resolve, reject) => simpleGit().commit(message, files, options, (err, result) => (err ? reject(err) : resolve(result))));
+export const gitPushAsync = (remote: string, branch: string, options?: { [key: string]: string }) =>
+    new Promise((resolve, reject) => simpleGit().push(remote, branch, options, (err, result) => (err ? reject(err) : resolve(result))));

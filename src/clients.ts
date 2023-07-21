@@ -34,6 +34,11 @@ sieg.on("ready", () => {
     sieg.user?.setStatus("invisible");
 });
 
+const all_clients_ready = () => {
+    for (let client of client_list) if (!client.isReady()) return false;
+    return true;
+};
+
 export var client_list = [krystal, sadie, ray, eli, cerby, sieg];
 client_list.forEach((client) => {
     client.on("ready", () => {
@@ -49,6 +54,10 @@ client_list.forEach((client) => {
         if (!client.user) throw "Something went wrong with client init";
         console.log(`${client.user.tag} is ready!!!`);
         changeActivities();
+        if (all_clients_ready()) {
+            console.log("All clients ready");
+            require("./commands");
+        }
     });
     try {
         client.on("messageCreate", async (msg) => {
