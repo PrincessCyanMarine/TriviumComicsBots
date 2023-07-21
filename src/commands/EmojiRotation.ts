@@ -118,7 +118,17 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
         .filter((e) => !guildEmojiKeys.includes(removeExtension(e)))
         .map((e) => getPath(e)[0]!)
         .filter((e) => !!e);
-    let length = rotation.toBeAdded.length + toBeRemoved.length + (rotation.removed?.length || 0) + duplicates.length;
+
+    let categories = [
+        [staying, [], true],
+        [rotation.added?.map((e) => getPath(e)[0]), ["added"], true],
+        [beingAdded, ["add"], true],
+        [toBeRemoved, ["remove"], false],
+        [getURLs(duplicates), ["remove"], false],
+        [rotation.removed, ["removed"], false],
+    ] as [string[], ("lock" | "remove" | "removed" | "added" | "add" | "new")[], boolean][];
+    let length = 0;
+    for (let category of categories) if (category[0]) length += category[0].length;
     let legend = await loadImage("./assets/d20/emoji_rotation/legend.png");
     let canvas = createCanvas(
         Math.max(legend.width, GAP * 2 + (SIZE + GAP) * Math.min(MAX_PER_LINE, length)),
@@ -161,25 +171,22 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
     let drawings = [];
     let index = 0;
 
-    for (let category of [
-        [staying, [], true],
-        [rotation.added?.map((e) => getPath(e)[0]), ["added"], true],
-        [beingAdded, ["add"], true],
-        [toBeRemoved, ["remove"], false],
-        [getURLs(duplicates), ["remove"], false],
-        [rotation.removed, ["removed"], false],
-    ] as [string[], ("lock" | "remove" | "removed" | "added" | "add" | "new")[], boolean][]) {
+    for (let category of categories) {
         if (category[0]) {
             for (let url of category[0]) {
                 let icons = category[1];
                 let emoji;
                 // console.log(url);
+                if (!url) {
+                    index++;
+                    continue;
+                }
                 if (category[2]) emoji = url.match("/") ? url.split("/").pop()! : url;
-                let perm = category[2] && isPerm(emoji!);
+                let perm = category[2] && emoji && isPerm(emoji);
                 if (perm) icons = ["lock", ...icons];
                 if (
                     category[2] &&
-                    (rotation.brandNew?.includes(emoji!.split("/").pop()!) || (perm && (icons.includes("add") || icons.includes("added"))))
+                    (rotation.brandNew?.includes(emoji?.split("/").pop()!) || (perm && (icons.includes("add") || icons.includes("added"))))
                 )
                     icons = ["new", ...icons];
                 drawings.push(drawEmoji(index, url, icons));
