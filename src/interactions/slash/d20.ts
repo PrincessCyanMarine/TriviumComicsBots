@@ -6,6 +6,7 @@ import { ignore_channels, testGuildId } from "../../common/variables";
 import { bankick, generatecard, mute_unmute, prestige, warn } from "../../d20/functions";
 import { followup, reply } from "./common";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { changeTestChannel } from "../../commands/Test";
 
 const _commands: { name: string; callback: (interaction: CommandInteraction<CacheType>) => Promise<void> }[] = [];
 
@@ -40,8 +41,14 @@ d20.on("interactionCreate", async (interaction) => {
         reply(interaction, "Try another channel", true);
         return;
     }
-    if (testing && interaction.channelId != "892800588469911663") return;
-    else if (!testing && interaction.channelId == "892800588469911663") return;
+
+    if (interaction.commandName == "test") {
+        await changeTestChannel(interaction);
+        return;
+    }
+
+    if (testing && interaction.channelId != testGuildId) return;
+    else if (!testing && interaction.channelId == testGuildId) return;
 
     switch (interaction.commandName) {
         case "mute":
