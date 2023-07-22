@@ -132,7 +132,7 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
     let legend = await loadImage("./assets/d20/emoji_rotation/legend.png");
     let canvas = createCanvas(
         Math.max(legend.width, GAP * 2 + (SIZE + GAP) * Math.min(MAX_PER_LINE, length)),
-        GAP + (SIZE + GAP) * Math.ceil(length / MAX_PER_LINE) + legend.height
+        GAP + (SIZE + GAP) * Math.ceil(length / MAX_PER_LINE) + legend.height + GAP
     );
     let ctx = canvas.getContext("2d");
     // ctx.fillStyle = "#36393f";
@@ -196,7 +196,7 @@ const createEmojiMessageImage = async (guildEmojis: { [name: string]: GuildEmoji
     }
 
     await Promise.all(drawings);
-    ctx.drawImage(legend, (canvas.width - legend.width) / 2, canvas.height - legend.height);
+    ctx.drawImage(legend, (canvas.width - legend.width) / 2, canvas.height - legend.height - GAP);
     // console.timeEnd("drawEmoji");
     return canvas.toBuffer();
 };
