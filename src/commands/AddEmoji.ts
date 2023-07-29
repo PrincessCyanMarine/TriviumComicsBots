@@ -69,7 +69,7 @@ addD20SlashCommand(command, async (interaction) => {
                 return;
             }
         }
-        let name = interaction.options.getString("name", true);
+        let name = interaction.options.getString("name", true).replace(/\s/g, "");
         let url = interaction.options.getString("url", false);
         let file = interaction.options.getAttachment("file", false);
         let extension = interaction.options.getString("extension", false);
