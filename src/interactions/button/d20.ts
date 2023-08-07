@@ -45,6 +45,9 @@ d20.on("interactionCreate", async (interaction) => {
     else if (!testing && interaction.channelId == testChannelId) return;
     // console.log(interaction.customId);
 
+    let ignore = ["play-against"];
+    for (let command of ignore) if (interaction.customId.startsWith(command)) return;
+
     if (interaction.customId.startsWith("unwarn")) {
         if (!interaction.member) return interaction.reply("You must be in a server to use this button");
         // if (!interaction.memberPermissions?.has(Permissions.FLAGS.KICK_MEMBERS))
