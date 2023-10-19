@@ -1,4 +1,5 @@
 {
+    "dataType": "variable",
     "value": [
         [
             "D20 of perfect rolls",
@@ -9,7 +10,7 @@
             "The holder of this item will always roll perfectly"
         ]
     ],
-    "name": "Shop Items",
+    "name": "shopItems",
     "description": "The items available in the shop",
     "version": "1.0.0"
 }

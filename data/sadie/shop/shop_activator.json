@@ -1,4 +1,5 @@
 {
+    "dataType": "activator",
     "name": "shop",
     "version": "1.0.0",
     "description": "Activates the shop command",

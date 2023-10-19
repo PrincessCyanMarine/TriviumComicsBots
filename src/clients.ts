@@ -49,6 +49,7 @@ export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus",
 export type BotNames = (typeof botNames)[number];
 
 export type CommandType<T = any, V extends any[] = any[]> = {
+    dataType?: "command";
     name?: string;
     description?: string;
     version?: string;
@@ -85,11 +86,9 @@ export type CommandType<T = any, V extends any[] = any[]> = {
           ifTrue: CommandType<any>;
           ifFalse: CommandType<any>;
       }
-    | {
+    | ({
           type: "get-variable";
-          variable: string | VariableType<T>;
-          bot: BotNames;
-      }
+      } & ({ variable: string; bot: BotNames } | { variable: VariableType<T> }))
     | {
           type: "set-variable";
           variable: string;
@@ -104,6 +103,7 @@ export type CommandType<T = any, V extends any[] = any[]> = {
 );
 
 export type ActivatorType = {
+    dataType?: "activator";
     name?: string;
     description?: string;
     version?: string;
@@ -125,6 +125,7 @@ export type ActivatorType = {
     };
 
 export type VariableType<T = any> = {
+    dataType?: "variable";
     name?: string;
     description?: string;
     version?: string;
@@ -214,20 +215,19 @@ export var botData: Record<
                 bot: "d20",
                 command: {
                     type: "text",
-                    text: "{command:d20:reload-data}",
+                    text: "{command:this}",
+                    command: {
+                        type: "function",
+                        function: async () => {
+                            require("./commands");
+                            await readAllBotData();
+                            return "Data reloaded";
+                        },
+                    },
                 },
             },
         },
-        command: {
-            "reload-data": {
-                type: "function",
-                function: async () => {
-                    require("./commands");
-                    await readAllBotData();
-                    return "Reloaded data";
-                },
-            },
-        },
+        command: {},
         variable: {},
     },
     cerberus: {

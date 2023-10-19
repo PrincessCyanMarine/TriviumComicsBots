@@ -3,13 +3,13 @@
     "activator": "my-xp",
     "type": "command",
     "bot": "d20",
+    "name": "my-xp",
+    "description": "Shows your XP",
     "command": {
         "type": "text",
         "text": "Your XP is {command:this}",
         "command": {
-            "bot": "d20",
             "type": "get-variable",
-            "name": "my-xp",
             "variable": {
                 "name": "xp",
                 "databaseKey": "lvl",

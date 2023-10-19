@@ -1,4 +1,5 @@
 {
+    "dataType": "command",
     "name": "shop",
     "version": "1.0.0",
     "description": "Shows a selection of potentially cursed items",

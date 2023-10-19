@@ -285,40 +285,49 @@ export function readAllBotData() {
                 console.error(err);
             }
         }
-        // console.log(JSON.stringify(botData, null, 4));
+        console.log(JSON.stringify(botData, null, 4));
         clearAllData();
         resolve("Loaded all data");
     });
 }
 function readData(bot: keyof typeof botData) {
     return new Promise<string>((resolve, reject) => {
-        let path = `./data/${bot}/`;
+        let path = `./data/${bot}`;
         if (!existsSync(path)) {
             reject("No data folder found for " + bot);
             return;
         }
-        let dirs = readdirSync(path, { withFileTypes: true })
-            .map((d) => parse(path + d.name))
-            .map((d) => ({ ...d, path: d.dir + "/" + d.base }));
-        // console.log(dirs);
-        for (let dir of dirs) {
-            if (!isDataTypeKey(dir.name)) {
-                reject(`(${bot}) Invalid data type: ${dir.name}`);
-                return;
+        const readDir = (path: string, currentDirType?: string) => {
+            // console.log(`Entering ${path}`);
+            let dirs = readdirSync(path, { withFileTypes: true })
+                .map((d) => parse(path + "/" + d.name))
+                .map((d) => ({ ...d, path: d.dir + "/" + d.base }));
+            // console.log(dirs);
+            for (let dir of dirs) {
+                // console.log(`Reading ${dir.path}`);
+                if (isDataTypeKey(dir.name)) currentDirType = dir.name;
+                if (lstatSync(dir.path).isDirectory()) {
+                    readDir(dir.path, currentDirType);
+                    continue;
+                }
+                // let files = readdirSync(dir.path, { withFileTypes: true })
+                //     .map((f) => dir.path + "/" + f.name)
+                //     .filter((f) => f.endsWith(".json"));
+                // for (let file of files) {
+                // console.log(`Reading ${dir.path}`);
+                let content = readFileSync(dir.path, "utf-8");
+                let data = JSON.parse(content) as VariableType | CommandType | ActivatorType;
+                if (!data.dataType && !currentDirType) {
+                    throw new Error(`File ${dir.path} is not in a data type folder and has no dataType key`);
+                }
+                // if (dir.name == "command") data = clearCommand(data as CommandType<any>);
+                // else if (dir.name == "variable") data = new DataVariable(data as VariableType<any>);
+                // else data = clearActivator(data as ActivatorType);
+                (botData as any)[bot][(data.dataType || currentDirType)!][data.name || dir.name] = data;
+                // }
             }
-            if (!lstatSync(dir.path).isDirectory()) continue;
-            let files = readdirSync(dir.path, { withFileTypes: true })
-                .map((f) => dir.path + "/" + f.name)
-                .filter((f) => f.endsWith(".json"));
-            for (let file of files) {
-                let content = readFileSync(file, "utf-8");
-                let data = JSON.parse(content) as BotTypeNameToType<typeof dir.name>;
-                if (dir.name == "command") data = clearCommand(data as CommandType<any>);
-                else if (dir.name == "variable") data = new DataVariable(data as VariableType<any>);
-                else data = clearActivator(data as ActivatorType);
-                (botData as any)[bot][dir.name][parse(file).name] = data;
-            }
-        }
+        };
+        readDir(path);
 
         resolve(`Loaded data for ${bot}`);
     });
@@ -432,7 +441,7 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                 try {
                     let args = (await command.args?.map((c) => runDataCommand(c, moi))) || [];
                     args = await Promise.all(args);
-                    let res = await command.function(...args);
+                    let res = await command.function(...args, moi, command);
                     resolve(res);
                 } catch (err) {
                     reject(err);
@@ -467,7 +476,12 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                 resolve(newValue);
                 return;
             case "get-variable":
-                (typeof command.variable == "string" ? botData[command.bot]["variable"][command.variable] : new DataVariable(command.variable))
+                let variable: DataVariable;
+                if (typeof command.variable == "string") {
+                    if (!("bot" in command) || !command.bot) throw new Error("No bot provided");
+                    variable = botData[command.bot]["variable"][command.variable];
+                } else variable = new DataVariable(command.variable);
+                variable
                     .get(moi?.guild, moi instanceof Message ? moi.author : moi?.user)
                     .then(resolve)
                     .catch(reject);
