@@ -286,7 +286,7 @@ export function readAllBotData() {
                 console.error(err);
             }
         }
-        console.log(JSON.stringify(botData, null, 4));
+        // console.log(JSON.stringify(botData, null, 4));
         clearAllData();
         resolve("Loaded all data");
     });

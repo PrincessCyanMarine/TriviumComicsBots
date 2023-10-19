@@ -915,6 +915,22 @@ d20.on("messageCreate", async (msg) => {
                     say(krystal, msg.channel, { components });
                 }
                 break;
+            case "delete_all": {
+                if (![marineId].includes(msg.author.id) || !["1164622025969639565"].includes(msg.channel.id)) return;
+                console.log("Deleting all messages on channel");
+                let messages: [string, Message][];
+                do {
+                    messages = Array.from(await msg.channel.messages.fetch());
+                    if (messages.length <= 0) break;
+                    for (let i = 0; i < messages.length; i++) {
+                        await messages[i][1].delete();
+                        if (i != 0 && i % 5 == 0) await wait(5000);
+                    }
+                } while (true);
+                console.log("Deleted all messages on channel");
+
+                break;
+            }
             default:
                 for (let { names, callback } of _commands) {
                     // console.log(command, names);
