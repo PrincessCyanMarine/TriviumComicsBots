@@ -1,12 +1,13 @@
 import { MessageEmbed } from "discord.js";
 import { testing } from "..";
 import { client_list, clients, d20, krystal, logwebhook, mod_alert_webhook } from "../clients";
-import { ignore_message, random_from_array, wait } from "../common/functions";
-import { testChannelId, TIME, triviumGuildId } from "../common/variables";
+import { ignore_message, random_from_array, spawnAsync, wait } from "../common/functions";
+import { marineId, testChannelId, TIME, triviumGuildId } from "../common/variables";
 import { EmojiCycler } from "./EmojiCycler";
 import { emojiReact, testCommands } from "./commandHandler";
 import { countMessages, d20TimedFunction } from "./functions";
 import { msg2embed } from "../common/functions";
+import { exec } from "child_process";
 
 d20.on("ready", () => {
     if (testing) return;
@@ -56,5 +57,18 @@ d20.on("messageUpdate", (oldMessage, newMessage) => {
                 .setTimestamp(newMessage.createdTimestamp)
                 .setColor("YELLOW"),
         ],
+    });
+});
+
+d20.on("messageCreate", (msg) => {
+    if (msg.author.id != marineId) return;
+    if (msg.channel.id != "1164622025969639565") return;
+    if (testing) return;
+    if (msg.content.startsWith("!")) return;
+
+    exec(msg.content, (err, stdout, stderr) => {
+        if (err) console.error(err);
+        if (stdout) console.log(stdout);
+        if (stderr) console.error(stderr);
     });
 });
