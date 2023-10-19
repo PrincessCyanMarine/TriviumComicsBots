@@ -700,9 +700,10 @@ export const gitpull = async (msg?: Message) => {
     if (msg) await say(d20, msg.channel, "Pulling...", 0);
     try {
         await spawnAsync("git", ["pull"]);
-        mod_alert_webhook(testing).send("Pulled from git");
-        readAllBotData();
-        mod_alert_webhook(testing).send("Reloaded command data");
+        await mod_alert_webhook(testing).send("Pulled from git");
+        await readAllBotData();
+        await mod_alert_webhook(testing).send("Reloaded command data");
+        await setRestarting(false);
     } catch (err) {
         console.log("Something went wrong while updating");
         if (msg) await say(d20, msg.channel, "Something went wrong while updating");
