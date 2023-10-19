@@ -8,6 +8,26 @@
         [
             "The Elder Scroll",
             "The holder of this item will always roll perfectly"
+        ],
+        [
+            "Ring of Frost",
+            "Chills beverages while held (possible curse: the drink becomes ice)"
+        ],
+        [
+            "Slice of Life",
+            "Pizza slice that regenerates every bite you take (possible curse: its sardine and pineapple)"
+        ],
+        [
+            "Cloak of Sight",
+            "A coat improving your vision to a full 360 view (possible curse: the eyes make noises when they blink)"
+        ],
+        [
+            "Lightning Dagger",
+            "Shocks opponent when stabbing (possible curse: also shocks user)"
+        ],
+        [
+            "Dragon Egg",
+            "Most expensive item, show off to your friends! (Curse: it's fake/doesn't hatch)"
         ]
     ],
     "name": "shopItems",
