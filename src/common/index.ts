@@ -30,6 +30,7 @@ import {
     wait,
     restart,
     sendCardCustomizationMessage,
+    gitpull,
 } from "./functions";
 import {
     colors,
@@ -873,6 +874,14 @@ d20.on("messageCreate", async (msg) => {
                 update(msg);
                 break;
             }
+            case "gitpull": {
+                if (![marineId, dodoId].includes(msg.author.id)) {
+                    say(d20, msg.channel, "You don't have permission to use that command");
+                    break;
+                }
+                gitpull(msg);
+                break;
+            }
             case "warnings": {
                 let player = msg.mentions.members?.first();
                 if (!player || !(player instanceof GuildMember)) {
@@ -900,6 +909,7 @@ d20.on("messageCreate", async (msg) => {
                             new MessageButton().setCustomId("stop").setLabel("STOP").setStyle("PRIMARY"),
                             new MessageButton().setCustomId("restart").setLabel("RESTART").setStyle("PRIMARY"),
                             new MessageButton().setCustomId("update").setLabel("UPDATE").setStyle("PRIMARY"),
+                            new MessageButton().setCustomId("gitpull").setLabel("PULL").setStyle("PRIMARY"),
                         ])
                     );
                     say(krystal, msg.channel, { components });

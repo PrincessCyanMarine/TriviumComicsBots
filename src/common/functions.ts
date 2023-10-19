@@ -49,6 +49,7 @@ import {
     eli,
     isDataTypeKey,
     krystal,
+    mod_alert_webhook,
     ray,
     sadie,
     setBotData,
@@ -688,6 +689,24 @@ export function spawnAsync(command: string, args: string[] = []) {
         });
     });
 }
+
+export const gitpull = async (msg?: Message) => {
+    if (isRestarting()) {
+        if (msg) say(d20, msg.channel, "The bots are restarting");
+        return;
+    }
+    setRestarting(true);
+    console.log("Pulling...");
+    if (msg) await say(d20, msg.channel, "Pulling...", 0);
+    try {
+        await spawnAsync("git", ["pull"]);
+        mod_alert_webhook(testing).send("Pulled from git");
+    } catch (err) {
+        console.log("Something went wrong while updating");
+        if (msg) await say(d20, msg.channel, "Something went wrong while updating");
+    }
+};
+
 export const update = async (msg?: Message) => {
     if (isRestarting()) {
         if (msg) say(d20, msg.channel, "The bots are already restarting");
