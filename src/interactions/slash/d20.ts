@@ -4,31 +4,11 @@ import { clients, d20 } from "../../clients";
 import { say } from "../../common/functions";
 import { ignore_channels, marineId, setTestChannelId, testChannelId, testGuildId } from "../../common/variables";
 import { bankick, generatecard, mute_unmute, prestige, warn } from "../../d20/functions";
-import { followup, reply } from "./common";
+import { addCommandToGuild, addSlashCommand, followup, reply, slash_commands } from "./common";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
-const _commands: { name: string; callback: (interaction: CommandInteraction<CacheType>) => Promise<void> }[] = [];
-
-const addCommandToGuild = async (guild: Guild, command: SlashCommandBuilder) => {
-    let commands = await guild.commands.fetch();
-    commands.delete(command.name);
-    guild.commands.create(command.toJSON());
-};
-
 export const addD20SlashCommand = async (command: SlashCommandBuilder, callback: (interaction: CommandInteraction<CacheType>) => Promise<void>) => {
-    console.log("Adding " + command.name + " command");
-    if (testing) {
-        let guild = await d20.guilds.fetch(testGuildId);
-        addCommandToGuild(guild, command);
-    } else {
-        let guilds = await d20.guilds.fetch();
-        for (let guild of guilds.values()) await addCommandToGuild(await guild.fetch(), command);
-    }
-
-    _commands.push({
-        name: command.name,
-        callback,
-    });
+    addSlashCommand("d20", command, callback);
 };
 
 d20.on("ready", async () => {
@@ -42,6 +22,7 @@ d20.on("interactionCreate", async (interaction) => {
     }
 
     if (interaction.commandName == "test") {
+        console.log(interaction.commandName);
         if (interaction.user.id != marineId) {
             if (!testing) interaction.reply("You are not Marine");
             return;
@@ -199,7 +180,7 @@ d20.on("interactionCreate", async (interaction) => {
             break;
         }
         default:
-            for (let { name, callback } of _commands) {
+            for (let { name, callback } of slash_commands["d20"]) {
                 if (name == interaction.commandName) {
                     callback(interaction);
                     return;

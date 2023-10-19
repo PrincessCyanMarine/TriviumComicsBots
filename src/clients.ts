@@ -1,8 +1,9 @@
-import { ActivityType, Client, Intents, ThreadChannel, WebhookClient } from "discord.js";
+import { ActivityType, Client, Guild, GuildMember, Intents, ThreadChannel, User, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { changeActivities, random_from_array, wait } from "./common/functions";
+import { changeActivities, random_from_array, readAllBotData, wait } from "./common/functions";
 import { triviumGuildId } from "./common/variables";
 import { Message } from "discord.js";
+import { database } from ".";
 config();
 
 const intents = [
@@ -39,6 +40,233 @@ const all_clients_ready = () => {
     return true;
 };
 
+export const botDataTypes = ["activator", "command", "variable"] as const;
+export type BotDataTypes = (typeof botDataTypes)[number];
+export function isDataTypeKey(key: string): key is BotDataTypes {
+    return botDataTypes.includes(key as any);
+}
+export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus", "siegfried", "d20"] as const;
+export type BotNames = (typeof botNames)[number];
+
+export type CommandType<T = any, V extends any[] = any[]> = {
+    name?: string;
+    description?: string;
+    version?: string;
+    bot?: BotNames;
+} & (
+    | {
+          type: "text";
+          ephemeral?: boolean;
+          text?: string;
+          command?: CommandType;
+      }
+    | {
+          type: "sequence";
+          commands: CommandType<T>[];
+      }
+    | {
+          type: "command";
+          command: {
+              name: string;
+              bot: BotNames;
+          };
+      }
+    | {
+          type: "random";
+          commands: CommandType<T>[];
+      }
+    | {
+          type: "random-weighted";
+          commands: { command: CommandType<T>; weight: number }[];
+      }
+    | {
+          type: "conditional";
+          condition: CommandType<boolean>;
+          ifTrue: CommandType<any>;
+          ifFalse: CommandType<any>;
+      }
+    | {
+          type: "get-variable";
+          variable: string | VariableType<T>;
+          bot: BotNames;
+      }
+    | {
+          type: "set-variable";
+          variable: string;
+          newValue: CommandType<T>;
+          bot: BotNames;
+      }
+    | {
+          type: "function";
+          function: (...args: V) => T;
+          args?: CommandType<V[number]>[];
+      }
+);
+
+export type ActivatorType = {
+    name?: string;
+    description?: string;
+    version?: string;
+    guilds?: string[];
+    bot: BotNames;
+} & (
+    | {
+          method: "slash";
+          activator: string;
+          args?: any[];
+      }
+    | {
+          method: "message";
+          match: string;
+      }
+) & {
+        type: "command";
+        command: CommandType<any>;
+    };
+
+export type VariableType<T = any> = {
+    name?: string;
+    description?: string;
+    version?: string;
+    perGuild?: boolean;
+    perUser?: boolean;
+    // perChannel?: boolean;
+    // perRole?: boolean;
+    // perMessage?: boolean;
+    // perActivator?: boolean;
+    // perCommand?: boolean;
+    databaseKey?: string;
+    value?: T;
+    defaultValue?: T;
+    bot?: BotNames;
+};
+
+export class DataVariable<T = any> {
+    constructor(private variable: VariableType<T>) {
+        this.variable.value = this.variable.value || this.variable.defaultValue;
+        if (this.variable.databaseKey && !this.variable.perGuild && !this.variable.perUser) {
+            database.child(this.getPath()).on("value", (snap) => {
+                let val = snap.val();
+                if (val) this.variable.value = val;
+            });
+        }
+    }
+
+    private getPath(guild?: Guild | string | null, user?: User | GuildMember | string | null) {
+        if (!this.variable.databaseKey) throw new Error(`No database key for variable ${this.variable.name} in bot ${this.variable.bot}`);
+        let _path = "";
+        if (this.variable.bot) _path += `${this.variable.bot}/`;
+        _path += `${this.variable.databaseKey}/`;
+        if (this.variable.perGuild) {
+            if (!guild) throw new Error(`No guild for variable ${this.variable.name} in bot ${this.variable.bot}`);
+            _path += `${typeof guild == "string" ? guild : guild.id}/`;
+        }
+        if (this.variable.perUser) {
+            if (!user) throw new Error(`No user for variable ${this.variable.name} in bot ${this.variable.bot}`);
+            _path += `${typeof user == "string" ? user : user.id}/`;
+        }
+        console.log(this.variable, _path);
+        return _path;
+    }
+
+    public async get(guild?: Guild | string | null, user?: User | GuildMember | string | null): Promise<T> {
+        if (!this.variable.perGuild && !this.variable.perUser) return (this.variable.value || this.variable.defaultValue)! as T;
+        let val = (await database.child(this.getPath(guild, user)).once("value")).val() || this.variable.value || this.variable.defaultValue;
+        console.log(val);
+        return val;
+    }
+
+    public async set(value: T, guild?: Guild | string, user?: User | GuildMember | string): Promise<T> {
+        if (this.variable.databaseKey) await database.child(this.getPath(guild, user)).set(value);
+        return (this.variable.value = value);
+    }
+}
+
+export function isBotNameKey(key: string): key is BotNames {
+    return botNames.includes(key as any);
+}
+
+export type BotTypeNameToType<T extends BotDataTypes> = T extends "activator"
+    ? ActivatorType
+    : T extends "command"
+    ? CommandType<any>
+    : T extends "variable"
+    ? DataVariable<any>
+    : any;
+
+export function setBotData(newBotData: typeof botData) {
+    botData = newBotData;
+}
+export var botData: Record<
+    BotNames,
+    {
+        [key in BotDataTypes]: {
+            [name: string]: BotTypeNameToType<key>;
+        };
+    }
+> = {
+    d20: {
+        activator: {
+            "reload-data": {
+                activator: "reload-data",
+                method: "slash",
+                type: "command",
+                bot: "d20",
+                command: {
+                    type: "text",
+                    text: "{command:d20:reload-data}",
+                },
+            },
+        },
+        command: {
+            "reload-data": {
+                type: "function",
+                function: async () => {
+                    require("./commands");
+                    await readAllBotData();
+                    return "Reloaded data";
+                },
+            },
+        },
+        variable: {},
+    },
+    cerberus: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
+    common: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
+    eli: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
+    krystal: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
+    ray: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
+    sadie: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
+    siegfried: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
+};
+
 export var client_list = [krystal, sadie, ray, eli, cerby, sieg];
 client_list.forEach((client) => {
     client.on("ready", () => {
@@ -57,6 +285,7 @@ client_list.forEach((client) => {
         if (all_clients_ready()) {
             console.log("All clients ready");
             require("./commands");
+            readAllBotData().then(console.log);
         }
     });
     try {

@@ -1,0 +1,8 @@
+{
+    "name": "shop",
+    "version": "1.0.0",
+    "description": "Shows a selection of potentially cursed items",
+    "type": "text",
+    "bot": "sadie",
+    "text": "Non-cursed items for sale! Totally curse free! I triple checked I swear!\n```{command:sadie:getShopItems}```"
+}

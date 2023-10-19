@@ -1,0 +1,22 @@
+{
+    "method": "slash",
+    "activator": "my-xp",
+    "type": "command",
+    "bot": "d20",
+    "command": {
+        "type": "text",
+        "text": "Your XP is {command:this}",
+        "command": {
+            "bot": "d20",
+            "type": "get-variable",
+            "name": "my-xp",
+            "variable": {
+                "name": "xp",
+                "databaseKey": "lvl",
+                "perUser": true,
+                "perGuild": true,
+                "defaultValue": 0
+            }
+        }
+    }
+}

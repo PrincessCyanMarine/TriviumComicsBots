@@ -1,0 +1,12 @@
+{
+    "bot": "sadie",
+    "type": "function",
+    "function": "(items) => items.map((item) => `${item[0]}\n- ${item[1]}`).join(\"\\n\\n\")",
+    "args": [
+        {
+            "type": "get-variable",
+            "variable": "shopItems",
+            "bot": "sadie"
+        }
+    ]
+}

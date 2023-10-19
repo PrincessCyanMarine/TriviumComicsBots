@@ -1,13 +1,15 @@
-import { formatEmoji, hyperlink } from "@discordjs/builders";
+import { SlashCommandBuilder, formatEmoji, hyperlink } from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
 import {
     ActivityType,
     ButtonInteraction,
     Client,
+    CommandInteraction,
     Guild,
     GuildEmoji,
     GuildMember,
     HexColorString,
+    InteractionReplyOptions,
     InteractionUpdateOptions,
     Message,
     MessageActionRow,
@@ -27,12 +29,32 @@ import {
     TextChannel,
     User,
 } from "discord.js";
-import { readFileSync } from "fs";
+import { existsSync, lstatSync, readFileSync, readdir, readdirSync } from "fs";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database, testing } from "..";
 import assets from "../assetsIndexes";
-import { cerby, clients, CustomActivity, d20, eli, krystal, ray, sadie, sieg } from "../clients";
+import {
+    ActivatorType,
+    botData,
+    BotDataTypes,
+    botNames,
+    BotTypeNameToType,
+    cerby,
+    clients,
+    CommandType,
+    CustomActivity,
+    d20,
+    DataVariable,
+    eli,
+    isDataTypeKey,
+    krystal,
+    ray,
+    sadie,
+    setBotData,
+    sieg,
+    VariableType,
+} from "../clients";
 import { eli_activities } from "../eli/activities";
 import { krystal_activities } from "../krystal/activities";
 import { greet } from "../krystal/functions";
@@ -43,6 +65,8 @@ import { disturb_channels, ignore_channels, isRestarting, setRestarting, testCha
 import { spawn } from "child_process";
 import { CardStyle, createXpBar, defaultstyle, generatecard } from "../d20/functions";
 import simpleGit from "simple-git";
+import { parse } from "path";
+import { addSlashCommand } from "../interactions/slash/common";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");
@@ -237,6 +261,223 @@ export const random_from_array = <Item>(array: Item[]): Item => array[Math.floor
 export const capitalize = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 export const randomchance = (percentage: number = 10): boolean => Math.floor(Math.random() * 100) < percentage;
 
+function clearAllData() {
+    // console.log(botData);
+    for (let bot of botNames) {
+        for (let key in botData[bot].command) botData[bot].command[key] = clearCommand(botData[bot].command[key]);
+        for (let key in botData[bot].variable)
+            if (!(botData[bot].variable[key] instanceof DataVariable))
+                botData[bot].variable[key] = new DataVariable(botData[bot].variable[key] as any);
+        for (let key in botData[bot].activator) botData[bot].activator[key] = clearActivator(botData[bot].activator[key]);
+    }
+}
+
+var defaultData: typeof botData | undefined = undefined;
+export function readAllBotData() {
+    return new Promise(async (resolve, reject) => {
+        if (!defaultData) defaultData = botData;
+        else setBotData(defaultData);
+
+        for (let name of botNames) {
+            try {
+                console.log(await readData(name));
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        // console.log(JSON.stringify(botData, null, 4));
+        clearAllData();
+        resolve("Loaded all data");
+    });
+}
+function readData(bot: keyof typeof botData) {
+    return new Promise<string>((resolve, reject) => {
+        let path = `./data/${bot}/`;
+        if (!existsSync(path)) {
+            reject("No data folder found for " + bot);
+            return;
+        }
+        let dirs = readdirSync(path, { withFileTypes: true })
+            .map((d) => parse(path + d.name))
+            .map((d) => ({ ...d, path: d.dir + "/" + d.base }));
+        // console.log(dirs);
+        for (let dir of dirs) {
+            if (!isDataTypeKey(dir.name)) {
+                reject(`(${bot}) Invalid data type: ${dir.name}`);
+                return;
+            }
+            if (!lstatSync(dir.path).isDirectory()) continue;
+            let files = readdirSync(dir.path, { withFileTypes: true })
+                .map((f) => dir.path + "/" + f.name)
+                .filter((f) => f.endsWith(".json"));
+            for (let file of files) {
+                let content = readFileSync(file, "utf-8");
+                let data = JSON.parse(content) as BotTypeNameToType<typeof dir.name>;
+                if (dir.name == "command") data = clearCommand(data as CommandType<any>);
+                else if (dir.name == "variable") data = new DataVariable(data as VariableType<any>);
+                else data = clearActivator(data as ActivatorType);
+                (botData as any)[bot][dir.name][parse(file).name] = data;
+            }
+        }
+
+        resolve(`Loaded data for ${bot}`);
+    });
+}
+
+function clearActivator(activator: ActivatorType) {
+    switch (activator.method) {
+        case "slash":
+            addSlashCommand(
+                activator.bot,
+                new SlashCommandBuilder().setName(activator.activator).setDescription(activator.description || "NO DESCRIPTION"),
+                async (interaction) =>
+                    // console.log("Running command " + activator.activator);
+                    await runDataCommand(activator.command, interaction)
+            );
+            break;
+    }
+    return activator;
+}
+
+function clearCommand<T>(command: CommandType<T>) {
+    switch (command.type) {
+        case "function":
+            if (typeof command.function == "string") command.function = eval(command.function as unknown as string);
+            command.args = command.args?.map(clearCommand) || [];
+            break;
+        case "sequence":
+        case "random":
+            command.commands = command.commands.map(clearCommand);
+            break;
+        case "random-weighted":
+            command.commands = command.commands.map((c) => ({ command: clearCommand(c.command), weight: c.weight }));
+            break;
+        case "conditional":
+            command.condition = clearCommand<boolean>(command.condition);
+            command.ifTrue = clearCommand(command.ifTrue);
+            command.ifFalse = clearCommand(command.ifFalse);
+            break;
+    }
+    return command;
+}
+
+async function commandTextConverter(text: string, command: CommandType, moi?: Message | CommandInteraction) {
+    // console.log(text);
+    let m = text.match(/\{[^{}]+?\}/gi);
+    if (!m) return text;
+    for (let match of m) {
+        let keys = match.match(/(?<=[{:])([^{:}]+?)(?=[:}])/gi);
+        // console.log(keys);
+        if (!keys) continue;
+        switch (keys[0]) {
+            case "variable":
+                {
+                    let bot = keys[1];
+                    let variable = keys[2];
+                    if (!(bot in botData)) return text;
+                    let value = await (botData as any)[bot]["variable"][variable].get();
+                    text = text.replace(match, value || "MISSING_VALUE");
+                }
+                break;
+            case "command": {
+                let bot = keys[1];
+                let _command = keys[2];
+                // if (!(bot in botData)) return text;
+
+                let value = `${await runDataCommand(
+                    (_command == "this" || bot == "this") && "command" in command && command.command
+                        ? command.command
+                        : (botData as any)[bot]["command"][_command],
+                    moi
+                )}`;
+                // console.log(value);
+                text = text.replace(match, value || "MISSING_VALUE");
+            }
+        }
+    }
+    return text;
+}
+
+function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInteraction) {
+    return new Promise<T>(async (resolve, reject) => {
+        if (!command) return reject("No command provided");
+        // console.log(command);
+        switch (command.type) {
+            case "text":
+                if (!moi) return reject("No message or interaction provided");
+                if (moi instanceof Message) moi.channel.sendTyping();
+                let text: Promise<string> | string;
+                if ("text" in command && command.text) text = command.text;
+                else if ("command" in command && command.command) text = `${await runDataCommand(command.command, moi)}`;
+                else throw new Error("No text or command provided");
+                text = commandTextConverter(text, command, moi);
+                let res = {
+                    ...(moi instanceof CommandInteraction
+                        ? ({
+                              ephemeral: command.ephemeral,
+                          } as InteractionReplyOptions)
+                        : ({
+                              messageReference: moi,
+                              failIfNotExists: false,
+                          } as ReplyOptions)),
+                };
+                moi.reply({ ...res, content: await text } as any)
+                    .then((r) => resolve(r as T))
+                    .catch(reject);
+                return;
+            case "command":
+                runDataCommand(botData[command.command.bot]["command"][command.command.name], moi).then(resolve).catch(reject);
+                return;
+            case "function":
+                try {
+                    let args = (await command.args?.map((c) => runDataCommand(c, moi))) || [];
+                    args = await Promise.all(args);
+                    let res = await command.function(...args);
+                    resolve(res);
+                } catch (err) {
+                    reject(err);
+                }
+                return;
+            case "sequence":
+                try {
+                    let res = [];
+                    for (let _command of command.commands) res.push(await runDataCommand(_command, moi));
+                    resolve(res as T);
+                } catch (err) {
+                    reject(err);
+                }
+                return;
+            case "random":
+                await runDataCommand(random_from_array(command.commands), moi).then(resolve).catch(reject);
+                return;
+            case "random-weighted":
+                let _command = command.commands[weightedRandom(command.commands)()] as {
+                    command: CommandType<T>;
+                    weight: number;
+                };
+                runDataCommand(_command.command, moi).then(resolve).catch(reject);
+                return;
+            case "conditional":
+                if (await runDataCommand(command.condition, moi)) runDataCommand(command.ifTrue, moi).then(resolve).catch(reject);
+                else runDataCommand(command.ifFalse, moi).then(resolve).catch(reject);
+                return;
+            case "set-variable":
+                let newValue = runDataCommand(command.newValue, moi);
+                botData[command.bot]["variable"][command.variable].set(newValue);
+                resolve(newValue);
+                return;
+            case "get-variable":
+                (typeof command.variable == "string" ? botData[command.bot]["variable"][command.variable] : new DataVariable(command.variable))
+                    .get(moi?.guild, moi instanceof Message ? moi.author : moi?.user)
+                    .then(resolve)
+                    .catch(reject);
+                return;
+            default:
+                throw new Error("Invalid command type: " + (command as any).type);
+        }
+    });
+}
+
 export function changeActivities() {
     if (testing) return;
     if (!(ray.isReady() && krystal.isReady() && sadie.isReady() && eli.isReady() && cerby.isReady() && sieg.isReady() && d20.isReady())) return;
@@ -411,10 +652,10 @@ export function getCharacterEmoji(character?: string) {
     // return emojis[random_from_array(Object.keys(emojis))];
 }
 
-export function weightedRandom<T extends { weight: number } | number>(spec: { [key: string | number]: T } | T[]) {
-    let table: (string | number)[] = [];
+export function weightedRandom<T extends { weight: number } | number, S extends Record<string | number, T> | T[]>(spec: S) {
+    let table: (keyof S)[] = [];
     for (const i in spec) {
-        let item = spec[i];
+        let item = spec[i] as T;
         let weight = typeof item == "number" ? item : item.weight;
         for (let j = 0; j < weight; j++) table.push(i);
     }

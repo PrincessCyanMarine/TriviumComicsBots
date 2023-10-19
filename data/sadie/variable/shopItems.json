@@ -1,0 +1,15 @@
+{
+    "value": [
+        [
+            "D20 of perfect rolls",
+            "A magical D20 that guarantees only the best of rolls"
+        ],
+        [
+            "The Elder Scroll",
+            "The holder of this item will always roll perfectly"
+        ]
+    ],
+    "name": "Shop Items",
+    "description": "The items available in the shop",
+    "version": "1.0.0"
+}

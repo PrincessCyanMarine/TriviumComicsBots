@@ -1,0 +1,20 @@
+{
+    "name": "shop",
+    "version": "1.0.0",
+    "description": "Activates the shop command",
+    "type": "command",
+    "bot": "sadie",
+    "command": {
+        "type": "command",
+        "command": {
+            "name": "shop",
+            "bot": "sadie"
+        },
+        "bot": "sadie"
+    },
+    "method": "slash",
+    "activator": "shop",
+    "guilds": [
+        "620635349173010465"
+    ]
+}
