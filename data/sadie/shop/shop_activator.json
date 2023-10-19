@@ -2,7 +2,7 @@
     "dataType": "activator",
     "name": "shop",
     "version": "1.0.0",
-    "description": "Activates the shop command",
+    "description": "Show items for sale",
     "type": "command",
     "bot": "sadie",
     "command": {
