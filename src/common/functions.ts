@@ -445,10 +445,34 @@ async function createImage(image: ImageType, command: CommandType, moi?: Message
 
     let canvas = createCanvas(width, height);
     let ctx = canvas.getContext("2d");
+
     if (img) ctx.drawImage(img, 0, 0, width, height);
     else {
         ctx.fillStyle = image.color || "black";
         ctx.fillRect(0, 0, width, height);
+    }
+
+    for (let action of image.actions || []) {
+        if (action.type == "rotate") {
+            let rotationCanvas = createCanvas(width, height);
+            let rotationCtx = rotationCanvas.getContext("2d");
+            rotationCtx.translate(width / 2, height / 2);
+            rotationCtx.rotate((action.angle || 0) * (Math.PI / 180));
+            rotationCtx.translate(-width / 2, -height / 2);
+            rotationCtx.drawImage(canvas, 0, 0, width, height);
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(rotationCanvas, 0, 0, width, height);
+        } else if (action.type == "crop") {
+            if (action.style == "in") {
+                let cropCanvas = createCanvas(action.width, action.height);
+                let cropCtx = cropCanvas.getContext("2d");
+                cropCtx.drawImage(canvas, action.x, action.y, action.width, action.height, 0, 0, action.width, action.height);
+                ctx.clearRect(0, 0, width, height);
+                ctx.drawImage(cropCanvas, action.x, action.y, action.width, action.height);
+            } else {
+                ctx.clearRect(action.x, action.y, action.width, action.height);
+            }
+        }
     }
 
     if (image.composite) {
@@ -785,7 +809,7 @@ export const update = async (msg?: Message) => {
     if (msg) await say(d20, msg.channel, "Updating...", 0);
     try {
         await spawnAsync("git", ["pull"]);
-        await spawnAsync("npm", ["install"]);
+        await spawnAsync("pnpm", ["install"]);
         await spawnAsync("tsc");
         await spawnAsync("pm2", ["restart", "all"]);
     } catch (err) {

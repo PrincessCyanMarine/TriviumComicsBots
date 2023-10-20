@@ -16,18 +16,30 @@
             "color": "#00ffff",
             "composite": [
                 {
-                    "url": "./assets/krystal/glitch.png"
+                    "url": "./assets/krystal/glitch.png",
+                    "actions": [
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 50,
+                            "y": 50,
+                            "width": 883,
+                            "height": 559
+                        }
+                    ]
                 },
                 {
-                    "url": "{author:displayAvatar}",
-                    "position": {
-                        "x": 900,
-                        "y": 200
-                    },
-                    "size": {
-                        "width": 600,
-                        "height": 600
-                    }
+                    "url": "./assets/krystal/glitch.png",
+                    "actions": [
+                        {
+                            "type": "crop",
+                            "style": "in",
+                            "x": 300,
+                            "y": 293,
+                            "width": 176,
+                            "height": 174
+                        }
+                    ]
                 },
                 {
                     "color": "#00ff00",
@@ -39,6 +51,71 @@
                         "x": 1100,
                         "y": 600
                     }
+                },
+                {
+                    "url": "{author:displayAvatar}",
+                    "position": {
+                        "x": 900,
+                        "y": 200
+                    },
+                    "size": {
+                        "width": 600,
+                        "height": 600
+                    },
+                    "actions": [
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 350,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 450,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 550,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "rotate",
+                            "angle": 90
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 50,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 150,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 250,
+                            "width": 600,
+                            "height": 50
+                        }
+                    ]
                 },
                 {
                     "color": "#ffff00",

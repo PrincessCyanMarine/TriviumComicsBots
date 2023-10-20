@@ -48,19 +48,21 @@ export function isDataTypeKey(key: string): key is BotDataTypes {
 export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus", "siegfried", "d20"] as const;
 export type BotNames = (typeof botNames)[number];
 
+let image: ImageType = {
+    url: "./assets/krystal/glitch.png",
+    size: {
+        width: 500,
+        height: 500,
+    },
+    actions: [{ type: "crop", style: "in", x: 0, y: 0, width: 500, height: 100 }],
+};
+
 export type ImageType = {
     url?: string;
     size?: {
         width: number;
         height: number;
     };
-    cut?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    rotate?: number;
     composite?: ImageType[];
     position?: {
         x: number;
@@ -68,6 +70,20 @@ export type ImageType = {
     };
     opacity?: number;
     color?: string;
+    actions: (
+        | {
+              type: "crop";
+              style: "out" | "in";
+              x: number;
+              y: number;
+              width: number;
+              height: number;
+          }
+        | {
+              type: "rotate";
+              angle: number;
+          }
+    )[];
 } & (
     | {
           url: string;
