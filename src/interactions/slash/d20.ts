@@ -60,7 +60,6 @@ d20.on("interactionCreate", async (interaction) => {
         case "prestige":
             prestige(interaction);
             break;
-        case "help":
         case "announce":
             let channel = interaction.options.get("target-channel")?.channel?.id;
             if (!channel) channel = "624774782180917278";

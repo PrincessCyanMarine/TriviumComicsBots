@@ -54,7 +54,7 @@ import { sadie_activities } from "../sadie/activities";
 import { eli_activities } from "../eli/activities";
 import { ray_activities } from "../ray/activities";
 import { Calculator } from "../games/calculator";
-import { Help } from "./help";
+// import { Help } from "./help";
 import { Harem } from "./harem";
 import axios from "axios";
 import { EmojiCycler } from "../d20/EmojiCycler";
@@ -395,10 +395,10 @@ d20.on("messageCreate", async (msg) => {
                         });
                 }
             }
-            case "help": {
-                new Help(msg);
-                break;
-            }
+            // case "help": {
+            //     new Help(msg);
+            //     break;
+            // }
 
             case "colors": {
                 if (msg.author.id != marineId) return;

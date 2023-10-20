@@ -39,7 +39,7 @@ import {
 } from "./functions";
 
 export function testCommands(msg: Message) {
-    if (testing) return;
+    // if (testing) return;
     let args = msg.content;
 
     let tip = argClean(args).match(/(\S+?)s tip of the day/i);
@@ -79,8 +79,9 @@ export function testCommands(msg: Message) {
         else if (testWord(args, "speak", "talk")) talking(msg);
         else if (testWord(args, "drown", "sink")) drowning(msg);
         else if (testWord(args, "despacito")) despacito(msg);
-        else if (testWord(args, "not (an|the) enemy", "spare")) sparing(msg);
-        else if (testWord(args, "expired", "dead", "died")) dead(msg);
+        else if (testWord(args, "not (an|the) enemy", "spare")) {
+            // sparing(msg);
+        } else if (testWord(args, "expired", "dead", "died")) dead(msg);
         else if (testWord(args, "support", "patr(e?)on")) patron(msg);
         else if (testWord(args, "rebel")) rebel(msg, true);
         else if (testWord(args, "ping")) pong(msg);

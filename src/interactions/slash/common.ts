@@ -1,5 +1,15 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CacheType, CommandInteraction, Guild, GuildMember, Interaction, InteractionReplyOptions, MessagePayload, TextChannel } from "discord.js";
+import {
+    CacheType,
+    Client,
+    CommandInteraction,
+    Guild,
+    GuildMember,
+    Interaction,
+    InteractionReplyOptions,
+    MessagePayload,
+    TextChannel,
+} from "discord.js";
 import { BotNames, clients } from "../../clients";
 import { testing } from "../..";
 import { testGuildId } from "../../common/variables";
@@ -31,6 +41,11 @@ export function followup(interaction: CommandInteraction, message: string, exclu
         interaction.followUp({ content: message, ephemeral: exclusive }).then(resolve).catch(reject);
     });
 }
+
+export const removeCommandFromAllGuilds = async (bot: Client, command: SlashCommandBuilder) => {
+    let commands = await bot.application?.commands.fetch();
+    commands?.delete(command.name);
+};
 
 export const addCommandToGuild = async (guild: Guild, command: SlashCommandBuilder) => {
     let commands = await guild.commands.fetch();

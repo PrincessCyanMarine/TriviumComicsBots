@@ -2,6 +2,7 @@ import { SlashCommandBuilder, formatEmoji, hyperlink, userMention } from "@disco
 import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
 import {
     ActivityType,
+    AllowedImageSize,
     ButtonInteraction,
     Client,
     CommandInteraction,
@@ -200,7 +201,7 @@ export function detectEmoji(content: string, channel: TextChannel) {
 }
 
 export function getTarget(msg: Message): User | undefined {
-    if (msg.mentions.users.first()) return msg.mentions.users.first();
+    if (msg?.mentions.users.first()) return msg.mentions.users.first();
     if (testWord(msg.content, "me", "I", "Im", "my")) return msg.author;
     return undefined;
 }
@@ -272,7 +273,9 @@ function clearAllData() {
         for (let key in botData[bot].variable)
             if (!(botData[bot].variable[key] instanceof DataVariable))
                 botData[bot].variable[key] = new DataVariable(botData[bot].variable[key] as any);
-        for (let key in botData[bot].activator) botData[bot].activator[key] = clearActivator(botData[bot].activator[key]);
+        for (let key in botData[bot].activator) {
+            botData[bot].activator[key] = clearActivator(botData[bot].activator[key]);
+        }
     }
 }
 
@@ -338,6 +341,7 @@ function readData(bot: keyof typeof botData) {
 }
 
 function clearActivator(activator: ActivatorType) {
+    if (!activator.dataType) activator.dataType = "activator";
     switch (activator.method) {
         case "slash":
             addSlashCommand(
@@ -359,6 +363,7 @@ function clearActivator(activator: ActivatorType) {
 }
 
 function clearCommand<T>(command: CommandType<T>) {
+    if (!command.dataType) command.dataType = "command";
     switch (command.type) {
         case "function":
             if (typeof command.function == "string") command.function = eval(command.function as unknown as string);
@@ -430,6 +435,11 @@ async function commandTextConverter(text: string, command: CommandType, moi?: Me
                         replace();
                         return;
                     }
+                    let displaySize: AllowedImageSize = 2048;
+                    if (keys[1] == "displayAvatar") {
+                        let _ds = parseInt(keys[2]);
+                        if ([16, 32, 64, 128, 256, 512, 1024, 2048, 4096].includes(_ds)) displaySize = _ds as AllowedImageSize;
+                    }
                     replace(
                         {
                             displayName: player instanceof GuildMember ? player.displayName : player.nick || player.user.username,
@@ -438,10 +448,10 @@ async function commandTextConverter(text: string, command: CommandType, moi?: Me
                             mention: userMention(player instanceof GuildMember ? player.id : player.user.id),
                             displayAvatar:
                                 player instanceof GuildMember
-                                    ? player.displayAvatarURL({ size: 2048, format: "png" })
+                                    ? player.displayAvatarURL({ size: displaySize, format: "png" })
                                     : `https://cdn.discordapp.com/avatars/${player instanceof GuildMember ? player.id : player.user.id}/${
                                           player.user.avatar
-                                      }.webp?size=2048`,
+                                      }.webp?size=${displaySize}`,
                             exists: player ? "true" : "false",
                         }[keys[1]]
                     );
@@ -542,9 +552,10 @@ async function createImage(image: ImageType, command: CommandType, moi?: Message
 }
 
 function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInteraction, args: any[] = [], startTime = Date.now()) {
-    return new Promise<T>(async (resolve, reject) => {
+    return new Promise<any>(async (resolve, reject) => {
         // console.log(command);
         if (!command) return reject("No command provided");
+        if (command.clearArgs) args = [];
         if (command.args)
             args = [...args, ...(await Promise.all((await command.args?.map(async (c) => runDataCommand(c, moi, args, startTime))) || []))];
 
@@ -559,8 +570,8 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                 // else throw new Error("No text or command provided");
 
                 text = await text;
-                console.log(text);
-                if (text) text = commandTextConverter(text, command, moi, args);
+                // console.log(text);
+                if (text) text = commandTextConverter(text, command, moi, args) || "NO VALUE";
 
                 if ("image" in command && command.image) image = (await createImage(command.image, command, moi, args))?.toBuffer();
 
@@ -585,7 +596,7 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
 
                 await wait(Math.max(0, (command.delay || 1000) - (Date.now() - startTime)));
                 moi.reply(res as any)
-                    .then((r) => resolve(r as T))
+                    .then(resolve)
                     .catch(reject);
                 return;
             case "command":
@@ -593,14 +604,16 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                 let newCommand = botData[command.command.bot]["command"][command.command.name];
                 if (!newCommand)
                     return reject(
-                        `${command.command.bot} has no command named ${command.command.name}\n\n${
+                        `\nError:\n\t${command.command.bot} has no command named ${command.command.name}\n\n${
                             command.command.bot
-                        } has these commands:\n${Object.keys(botData[command.command.bot]["command"]).join("\n")}`
+                        } has these commands:\n\t${Object.keys(botData[command.command.bot]["command"]).join("\n\t")}`
                     );
                 runDataCommand(newCommand, moi, args, startTime).then(resolve).catch(reject);
                 return;
             case "function":
                 try {
+                    if (typeof command.function == "string") command.function = eval(command.function);
+                    if (typeof command.function != "function") throw "Function commands must eval to a function";
                     let res = await command.function(...args, moi, command);
                     resolve(res);
                 } catch (err) {
@@ -611,7 +624,7 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                 try {
                     let res = [];
                     for (let _command of command.commands) res.push(await runDataCommand(_command, moi, args, startTime));
-                    resolve(res as T);
+                    resolve(res);
                 } catch (err) {
                     reject(err);
                 }
@@ -626,11 +639,24 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                 };
                 runDataCommand(_command.command, moi, args, startTime).then(resolve).catch(reject);
                 return;
-            case "text":
-                commandTextConverter(command.text, command, moi, args)
-                    .then((s) => resolve(s as T))
-                    .catch(reject);
+            case "string":
+                commandTextConverter(command.value, command, moi, args).then(resolve).catch(reject);
                 return;
+            case "boolean":
+                resolve(command.value);
+                return;
+            case "array": {
+                try {
+                    let res =
+                        "commandArray" in command
+                            ? await Promise.all(command.commandArray.map(async (c) => runDataCommand(c, moi, args, startTime)))
+                            : command.array;
+                    resolve(res);
+                } catch (err) {
+                    reject(err);
+                }
+                return;
+            }
             case "conditional": {
                 let value;
                 const getCondtion = async (condition: CommandCondition) => {
@@ -653,6 +679,10 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                                     return values[0] >= values[1];
                                 case "<=":
                                     return values[0] <= values[1];
+                                case "includes":
+                                    if (typeof values[0] != "string" && !Array.isArray(values[0]))
+                                        throw new Error(`Invalid type for the first value: ${typeof values[0]}\nExpected string or array`);
+                                    return values[0].includes!(values[1]);
                                 default:
                                     throw new Error("Invalid comparison: " + condition.comparison);
                             }
@@ -663,6 +693,7 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                         if (typeof value == "string") value = value == "true" ? true : value == "false" ? false : value;
                         value = !!value;
                     }
+                    if (condition.not) value = !value;
                     return value;
                 };
                 if ("conditions" in command) {
@@ -679,20 +710,26 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                 return;
             }
             case "set-variable":
-                let newValue = runDataCommand(command.newValue, moi, args, startTime);
-                botData[command.bot]["variable"][command.variable].set(newValue);
-                resolve(newValue);
-                return;
             case "get-variable":
                 let variable: DataVariable;
                 if (typeof command.variable == "string") {
                     if (!("bot" in command) || !command.bot) throw new Error("No bot provided");
                     variable = botData[command.bot]["variable"][command.variable];
                 } else variable = new DataVariable(command.variable);
-                variable
-                    .get(moi?.guild, moi instanceof Message ? moi.author : moi?.user)
-                    .then(resolve)
-                    .catch(reject);
+                if (command.type == "get-variable")
+                    variable
+                        .get(moi?.guild, moi instanceof Message ? moi.author : moi?.user)
+                        .then(resolve)
+                        .catch(reject);
+                else
+                    variable
+                        .set(
+                            await runDataCommand(command.newValue, moi, args, startTime),
+                            moi?.guild,
+                            moi instanceof Message ? moi.author : moi?.user
+                        )
+                        .then(resolve)
+                        .catch(reject);
                 return;
             default:
                 throw new Error("Invalid command type: " + (command as any).type);

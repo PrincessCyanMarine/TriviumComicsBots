@@ -1,11 +1,9 @@
 import { ActivityType, Client, Guild, GuildMember, Intents, ThreadChannel, User, WebhookClient } from "discord.js";
 import { config } from "dotenv";
 import { changeActivities, random_from_array, readAllBotData, testExclamationCommand, testMessageCommand, wait } from "./common/functions";
-import { killWords, triviumGuildId } from "./common/variables";
+import { killWords, protectedFromKills, triviumGuildId } from "./common/variables";
 import { Message } from "discord.js";
 import { database } from ".";
-import assets from "./assetsIndexes";
-import { kill } from "./attachments";
 config();
 
 const intents = [
@@ -89,7 +87,10 @@ export type ImageType = {
       }
 );
 
-export type CommandCondition = { value: CommandType } | { values: [CommandType, CommandType]; comparison: "==" | ">" | "<" | ">=" | "<=" | "!=" };
+export type CommandCondition = { not?: boolean } & (
+    | { value: CommandType }
+    | { values: [CommandType, CommandType]; comparison: "includes" | "==" | ">" | "<" | ">=" | "<=" | "!=" }
+);
 
 export type CommandType<T = any, V extends any[] = any[]> = {
     dataType?: "command";
@@ -98,6 +99,7 @@ export type CommandType<T = any, V extends any[] = any[]> = {
     version?: string;
     bot?: BotNames;
     args?: CommandType[];
+    clearArgs?: boolean;
 } & (
     | {
           type: "message";
@@ -108,9 +110,21 @@ export type CommandType<T = any, V extends any[] = any[]> = {
           delay?: number;
       }
     | {
-          type: "text";
-          text: string;
+          type: "string";
+          value: string;
       }
+    | {
+          type: "boolean";
+          value: boolean;
+      }
+    | ({
+          type: "array";
+      } & (
+          | {
+                commandArray: CommandType[];
+            }
+          | { array: any[] }
+      ))
     | {
           type: "sequence";
           commands: CommandType<T>[];
@@ -138,15 +152,14 @@ export type CommandType<T = any, V extends any[] = any[]> = {
     | ({
           type: "get-variable";
       } & ({ variable: string; bot: BotNames } | { variable: VariableType<T> }))
-    | {
+    | ({
           type: "set-variable";
-          variable: string;
           newValue: CommandType<T>;
-          bot: BotNames;
-      }
+          bot?: BotNames;
+      } & ({ variable: string; bot: BotNames } | { variable: VariableType<T> }))
     | {
           type: "function";
-          function: (...args: V) => T;
+          function: string | ((...args: V) => T);
       }
 );
 
@@ -203,7 +216,10 @@ export type VariableType<T = any> = {
 };
 
 export class DataVariable<T = any> {
+    public dataType = "variable";
+    public description?: string;
     constructor(private variable: VariableType<T>) {
+        this.description = variable.description;
         this.variable.value = this.variable.value || this.variable.defaultValue;
         if (this.variable.databaseKey && !this.variable.perGuild && !this.variable.perUser) {
             database.child(this.getPath()).on("value", (snap) => {
@@ -226,18 +242,17 @@ export class DataVariable<T = any> {
             if (!user) throw new Error(`No user for variable ${this.variable.name} in bot ${this.variable.bot}`);
             _path += `${typeof user == "string" ? user : user.id}/`;
         }
-        console.log(this.variable, _path);
+        // console.log(this.variable, _path);
         return _path;
     }
 
     public async get(guild?: Guild | string | null, user?: User | GuildMember | string | null): Promise<T> {
         if (!this.variable.perGuild && !this.variable.perUser) return (this.variable.value || this.variable.defaultValue)! as T;
         let val = (await database.child(this.getPath(guild, user)).once("value")).val() || this.variable.value || this.variable.defaultValue;
-        console.log(val);
         return val;
     }
 
-    public async set(value: T, guild?: Guild | string, user?: User | GuildMember | string): Promise<T> {
+    public async set(value: T, guild?: Guild | string | null, user?: User | GuildMember | string | null): Promise<T> {
         if (this.variable.databaseKey) await database.child(this.getPath(guild, user)).set(value);
         return (this.variable.value = value);
     }
@@ -285,6 +300,48 @@ export var botData: Record<
                     },
                 },
             },
+            help: {
+                dataType: "activator",
+                name: "help",
+                method: "slash",
+                activator: "help",
+                description: "See a list of bot commands and their descriptions (only for commands using the new system)",
+                bot: "d20",
+                version: "1.0.0",
+                type: "command",
+                command: {
+                    type: "message",
+                    command: {
+                        type: "function",
+                        function: () => {
+                            let text = "";
+                            for (let botName in botData) {
+                                let bot = botData[botName as BotNames];
+                                text += `**${botName}**\n\n\`\`\`md\n`;
+                                for (let dataType in bot) {
+                                    let data = bot[dataType as BotDataTypes];
+                                    let commands = [] as string[];
+                                    let activators = [] as string[];
+                                    let variables = [] as string[];
+                                    for (let name in data) {
+                                        let command = data[name as string];
+                                        commands.push(`**${name}**\n${command.description || "No description"}`);
+                                    }
+                                    text += `# ${dataType}\n\n`;
+                                    console.log(botName, "commands", commands, commands.length, commands.length > 0);
+                                    console.log(botName, "activators", activators, activators.length, activators.length > 0);
+                                    console.log(botName, "variables", variables, variables.length, variables.length > 0);
+                                    if (commands.length > 0) text += `## Commands\n\n${commands.join("\n\n")}\n\n`;
+                                    if (activators.length > 0) text += `## Activators\n\n${activators.join("\n\n")}\n\n`;
+                                    if (variables.length > 0) text += `## Variables\n\n${variables.join("\n\n")}\n\n`;
+                                }
+                                text += "```";
+                            }
+                            return text;
+                        },
+                    },
+                },
+            },
         },
         command: {},
         variable: {},
@@ -305,100 +362,8 @@ export var botData: Record<
         variable: {},
     },
     krystal: {
-        activator: {
-            kill: {
-                dataType: "activator",
-                name: "kill",
-                botName: true,
-                description: "Krystal Kills a target",
-                version: "1.0.0",
-                method: "message",
-                matches: killWords,
-                type: "command",
-                bot: "krystal",
-                command: {
-                    type: "command",
-                    command: { bot: "krystal", name: "kill" },
-                },
-            },
-        },
-        command: {
-            kill: {
-                dataType: "command",
-                name: "kill",
-                bot: "krystal",
-                type: "conditional",
-                condition: {
-                    value: {
-                        type: "text",
-                        text: "{target:exists}",
-                    },
-                },
-                ifTrue: {
-                    type: "conditional",
-                    conditions: [
-                        {
-                            values: [
-                                {
-                                    type: "text",
-                                    text: "{author:id}",
-                                },
-                                {
-                                    type: "text",
-                                    text: "{target:id}",
-                                },
-                            ],
-                            comparison: "==",
-                        },
-                        {
-                            values: [
-                                {
-                                    type: "text",
-                                    text: "{random:10}",
-                                },
-                                {
-                                    type: "text",
-                                    text: "0",
-                                },
-                            ],
-                            // comparison: "==",
-                            comparison: ">=",
-                        },
-                    ],
-                    ifTrue: {
-                        type: "message",
-                        text: ":GMKrystalDevious: I do not condone suicide",
-                    },
-                    ifFalse: {
-                        type: "command",
-                        command: {
-                            bot: "krystal",
-                            name: "targettedKill",
-                        },
-                        args: [{ type: "text", text: "{target:displayAvatar}" }],
-                    },
-                },
-                ifFalse: {
-                    type: "message",
-                    image: {
-                        url: "./assets/krystal/kill/kill.png",
-                    },
-                },
-            },
-            targettedKill: {
-                type: "message",
-                image: {
-                    url: assets.krystal.kill,
-                    composite: [
-                        {
-                            url: "{arg:0}",
-                            size: { width: 500, height: 500 },
-                            position: { x: 150, y: 200 },
-                        },
-                    ],
-                },
-            },
-        },
+        activator: {},
+        command: {},
         variable: {},
     },
     ray: {
