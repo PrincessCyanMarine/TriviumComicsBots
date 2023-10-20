@@ -988,7 +988,7 @@ export function testExclamationCommand(bot: BotNames, msg: Message) {
     if (!content.startsWith("!")) return;
     let activators = exclamationCommands[bot];
     if (!activators) return;
-    console.log(msg.content);
+    // console.log(msg.content);
     let words = content.split(" ");
     let activator = words[0].slice(1);
     let command = activators.find((a) => a.activators.includes(activator));
