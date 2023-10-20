@@ -452,12 +452,19 @@ async function createImage(image: ImageType, command: CommandType, moi?: Message
         ctx.fillRect(0, 0, width, height);
     }
 
+    if (image.composite) {
+        for (let composite of image.composite) {
+            let composite_img = await createImage(composite, command, moi);
+            ctx.drawImage(composite_img, composite.position?.x || 0, composite.position?.y || 0, composite_img.width, composite_img.height);
+        }
+    }
+
     for (let action of image.actions || []) {
         if (action.type == "rotate") {
             let rotationCanvas = createCanvas(width, height);
             let rotationCtx = rotationCanvas.getContext("2d");
             rotationCtx.translate(width / 2, height / 2);
-            rotationCtx.rotate((action.angle || 0) * (Math.PI / 180));
+            rotationCtx.rotate(action.angle * (Math.PI / 180));
             rotationCtx.translate(-width / 2, -height / 2);
             rotationCtx.drawImage(canvas, 0, 0, width, height);
             ctx.clearRect(0, 0, width, height);
@@ -472,13 +479,6 @@ async function createImage(image: ImageType, command: CommandType, moi?: Message
             } else {
                 ctx.clearRect(action.x, action.y, action.width, action.height);
             }
-        }
-    }
-
-    if (image.composite) {
-        for (let composite of image.composite) {
-            let composite_img = await createImage(composite, command, moi);
-            ctx.drawImage(composite_img, composite.position?.x || 0, composite.position?.y || 0, composite_img.width, composite_img.height);
         }
     }
 

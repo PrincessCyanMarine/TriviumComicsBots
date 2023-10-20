@@ -68,7 +68,6 @@ export type ImageType = {
         x: number;
         y: number;
     };
-    opacity?: number;
     color?: string;
     actions: (
         | {
