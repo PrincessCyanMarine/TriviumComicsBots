@@ -73,8 +73,9 @@ export function testCommands(msg: Message) {
         } else if (testWord(args, "box") && testWord(args, "shut up", "dont (speak|talk)", "silence", "lamp")) silencedbox(msg);
         else if (testWord(args, "shut up", "dont (speak|talk)", "silence", "lamp")) silencing(msg);
         else if (testWord(args, "box")) boxxing(msg);
-        // else if (testWord(args, ...killWords)) killing(msg);
-        else if (testWord(args, "mannequin", "moe")) creeping(msg);
+        else if (testWord(args, ...killWords)) {
+            // killing(msg)
+        } else if (testWord(args, "mannequin", "moe")) creeping(msg);
         else if (testWord(args, "speak", "talk")) talking(msg);
         else if (testWord(args, "drown", "sink")) drowning(msg);
         else if (testWord(args, "despacito")) despacito(msg);
