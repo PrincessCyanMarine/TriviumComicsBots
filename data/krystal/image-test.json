@@ -89,7 +89,7 @@
                         },
                         {
                             "type": "rotate",
-                            "angle": 90
+                            "angle": 45
                         },
                         {
                             "type": "crop",
@@ -114,6 +114,10 @@
                             "y": 250,
                             "width": 600,
                             "height": 50
+                        },
+                        {
+                            "type": "rotate",
+                            "angle": -45
                         }
                     ]
                 },
