@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, formatEmoji, hyperlink } from "@discordjs/builders";
+import { SlashCommandBuilder, formatEmoji, hyperlink, userMention } from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
 import {
     ActivityType,
@@ -38,6 +38,7 @@ import {
     ActivatorType,
     botData,
     BotDataTypes,
+    BotNames,
     botNames,
     BotTypeNameToType,
     cerby,
@@ -47,6 +48,7 @@ import {
     d20,
     DataVariable,
     eli,
+    ImageType,
     isDataTypeKey,
     krystal,
     mod_alert_webhook,
@@ -345,6 +347,9 @@ function clearActivator(activator: ActivatorType) {
                     await runDataCommand(activator.command, interaction)
             );
             break;
+        case "exclamation":
+            addExclamationCommand(activator.bot, activator);
+            break;
     }
     return activator;
 }
@@ -384,7 +389,7 @@ async function commandTextConverter(text: string, command: CommandType, moi?: Me
                 {
                     let bot = keys[1];
                     let variable = keys[2];
-                    if (!(bot in botData)) return text;
+                    if (!(bot in botData)) continue;
                     let value = await (botData as any)[bot]["variable"][variable].get();
                     text = text.replace(match, value || "MISSING_VALUE");
                 }
@@ -403,9 +408,57 @@ async function commandTextConverter(text: string, command: CommandType, moi?: Me
                 // console.log(value);
                 text = text.replace(match, value || "MISSING_VALUE");
             }
+            case "author": {
+                let author = moi?.member;
+                if (!author) continue;
+
+                text = text.replace(
+                    match,
+                    {
+                        displayName: author instanceof GuildMember ? author.displayName : author.nick || author.user.username,
+                        username: author.user.username,
+                        id: author instanceof GuildMember ? author.id : author.user.id,
+                        mention: userMention(author instanceof GuildMember ? author.id : author.user.id),
+                        displayAvatar:
+                            author instanceof GuildMember
+                                ? author.displayAvatarURL({ size: 2048, format: "png" })
+                                : `https://cdn.discordapp.com/avatars/${author instanceof GuildMember ? author.id : author.user.id}/${
+                                      author.user.avatar
+                                  }.webp?size=2048`,
+                    }[keys[1]] || "MISSING_VALUE"
+                );
+            }
         }
     }
     return text;
+}
+
+async function createImage(image: ImageType, command: CommandType, moi?: Message | CommandInteraction) {
+    let url = image.url;
+    if (url) url = await commandTextConverter(url, command, moi);
+    let img;
+    if (url) img = await loadImage(url);
+    let width = image.size?.width || img?.width;
+    let height = image.size?.height || img?.height;
+
+    if (!(width && height)) throw "Width or height not provided for image or image url not found";
+
+    let canvas = createCanvas(width, height);
+    let ctx = canvas.getContext("2d");
+    if (img) ctx.drawImage(img, 0, 0, width, height);
+    else {
+        ctx.fillStyle = image.color || "black";
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    if (image.composite) {
+        for (let composite of image.composite) {
+            let composite_img = await createImage(composite, command, moi);
+            ctx.drawImage(composite_img, composite.position?.x || 0, composite.position?.y || 0, composite_img.width, composite_img.height);
+        }
+    }
+
+    return canvas;
 }
 
 function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInteraction) {
@@ -413,14 +466,19 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
         if (!command) return reject("No command provided");
         // console.log(command);
         switch (command.type) {
-            case "text":
+            case "message":
                 if (!moi) return reject("No message or interaction provided");
                 if (moi instanceof Message) moi.channel.sendTyping();
-                let text: Promise<string> | string;
+                let text: Promise<string> | string | undefined = undefined;
+                let image: Buffer | undefined = undefined;
                 if ("text" in command && command.text) text = command.text;
                 else if ("command" in command && command.command) text = `${await runDataCommand(command.command, moi)}`;
-                else throw new Error("No text or command provided");
-                text = commandTextConverter(text, command, moi);
+                // else throw new Error("No text or command provided");
+
+                if (text) text = commandTextConverter(text, command, moi);
+
+                if ("image" in command && command.image) image = (await createImage(command.image, command, moi)).toBuffer();
+
                 let res = {
                     ...(moi instanceof CommandInteraction
                         ? ({
@@ -431,6 +489,13 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                               failIfNotExists: false,
                           } as ReplyOptions)),
                 };
+                let b: ReplyOptions | InteractionReplyOptions = {};
+                if (image) {
+                    res = {
+                        ...res,
+                        files: [new MessageAttachment(image, command.name + ".png")],
+                    };
+                }
                 moi.reply({ ...res, content: await text } as any)
                     .then((r) => resolve(r as T))
                     .catch(reject);
@@ -895,3 +960,38 @@ export const gitCommitAsync = (message: string | string[], files?: string | stri
     new Promise((resolve, reject) => simpleGit().commit(message, files, options, (err, result) => (err ? reject(err) : resolve(result))));
 export const gitPushAsync = (remote: string, branch: string, options?: { [key: string]: string }) =>
     new Promise((resolve, reject) => simpleGit().push(remote, branch, options, (err, result) => (err ? reject(err) : resolve(result))));
+
+let exclamationCommands: Partial<
+    Record<
+        BotNames,
+        {
+            activators: string[];
+            command: CommandType;
+            name?: string;
+        }[]
+    >
+> = {};
+
+function addExclamationCommand(bot: BotNames, activator: ActivatorType) {
+    if (activator.method != "exclamation") return;
+    let activators = "activator" in activator ? [activator.activator] : activator.activators;
+    if (!exclamationCommands[bot]) exclamationCommands[bot] = [];
+
+    exclamationCommands[bot] = exclamationCommands[bot]?.filter((a) => a.name != activator.name);
+    exclamationCommands[bot]!.push({ activators, command: activator.command, name: activator.name });
+}
+
+export function testExclamationCommand(bot: BotNames, msg: Message) {
+    if (testing && msg.channelId != testChannelId) return;
+    if (!testing && msg.channelId == testChannelId) return;
+    let content = msg.content.toLowerCase();
+    if (!content.startsWith("!")) return;
+    let activators = exclamationCommands[bot];
+    if (!activators) return;
+    console.log(msg.content);
+    let words = content.split(" ");
+    let activator = words[0].slice(1);
+    let command = activators.find((a) => a.activators.includes(activator));
+    if (!command) return;
+    runDataCommand(command.command, msg);
+}

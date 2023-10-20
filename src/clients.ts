@@ -1,6 +1,6 @@
 import { ActivityType, Client, Guild, GuildMember, Intents, ThreadChannel, User, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { changeActivities, random_from_array, readAllBotData, wait } from "./common/functions";
+import { changeActivities, random_from_array, readAllBotData, testExclamationCommand, wait } from "./common/functions";
 import { triviumGuildId } from "./common/variables";
 import { Message } from "discord.js";
 import { database } from ".";
@@ -48,6 +48,39 @@ export function isDataTypeKey(key: string): key is BotDataTypes {
 export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus", "siegfried", "d20"] as const;
 export type BotNames = (typeof botNames)[number];
 
+export type ImageType = {
+    url?: string;
+    size?: {
+        width: number;
+        height: number;
+    };
+    cut?: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
+    rotate?: number;
+    composite?: ImageType[];
+    position?: {
+        x: number;
+        y: number;
+    };
+    opacity?: number;
+    color?: string;
+} & (
+    | {
+          url: string;
+      }
+    | {
+          size: {
+              width: number;
+              height: number;
+          };
+          color: string;
+      }
+);
+
 export type CommandType<T = any, V extends any[] = any[]> = {
     dataType?: "command";
     name?: string;
@@ -56,10 +89,11 @@ export type CommandType<T = any, V extends any[] = any[]> = {
     bot?: BotNames;
 } & (
     | {
-          type: "text";
+          type: "message";
           ephemeral?: boolean;
           text?: string;
           command?: CommandType;
+          image?: ImageType;
       }
     | {
           type: "sequence";
@@ -115,10 +149,21 @@ export type ActivatorType = {
           activator: string;
           args?: any[];
       }
-    | {
+    | ({
           method: "message";
+      } & ({ matches: string[]; matchType: "any" | "all" } | { match: string }))
+    | {
+          method: "reaction";
           match: string;
       }
+    | ({
+          method: "exclamation";
+      } & (
+          | { activators: string[] }
+          | {
+                activator: string;
+            }
+      ))
 ) & {
         type: "command";
         command: CommandType<any>;
@@ -214,7 +259,7 @@ export var botData: Record<
                 type: "command",
                 bot: "d20",
                 command: {
-                    type: "text",
+                    type: "message",
                     text: "{command:this}",
                     command: {
                         type: "function",
@@ -290,6 +335,7 @@ client_list.forEach((client) => {
     });
     try {
         client.on("messageCreate", async (msg) => {
+            testExclamationCommand(id2bot[client.user!.id!], msg);
             if (!msg.channel.isThread()) return;
             try {
                 await warReact(msg);
@@ -358,7 +404,7 @@ export const clients: { [bot: string]: Client } = {
 };
 
 // IDs are already public
-export const id2bot: { [bot: string]: string } = {
+export const id2bot: { [bot: string]: BotNames } = {
     "743606862578057277": "d20",
     "622898538514350085": "sadie",
     "620634675454541844": "krystal",

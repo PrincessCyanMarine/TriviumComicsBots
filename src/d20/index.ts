@@ -21,7 +21,7 @@ d20.on("messageCreate", async (msg) => {
     if (ignore_message(msg, d20)) return;
     countMessages(msg);
     testCommands(msg);
-    emojiReact(msg);
+    emojiReact(msg).catch(() => {});
 });
 
 d20.on("messageDelete", (msg) => {

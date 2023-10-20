@@ -6,7 +6,7 @@
     "name": "my-xp",
     "description": "Shows your XP",
     "command": {
-        "type": "text",
+        "type": "message",
         "text": "Your XP is {command:this}",
         "command": {
             "type": "get-variable",
