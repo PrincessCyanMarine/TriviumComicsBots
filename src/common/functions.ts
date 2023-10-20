@@ -43,6 +43,7 @@ import {
     BotTypeNameToType,
     cerby,
     clients,
+    CommandCondition,
     CommandType,
     CustomActivity,
     d20,
@@ -205,7 +206,7 @@ export function getTarget(msg: Message): User | undefined {
 }
 
 export function getTargetMember(msg: Message): GuildMember | undefined {
-    if (msg.mentions.users.first()) return msg.mentions.members?.first();
+    if (msg.mentions.members?.first()) return msg.mentions.members?.first();
     if (testWord(msg.content, "me", "I", "Im", "my")) return msg.member || undefined;
     return undefined;
 }
@@ -350,6 +351,9 @@ function clearActivator(activator: ActivatorType) {
         case "exclamation":
             addExclamationCommand(activator.bot, activator);
             break;
+        case "message":
+            addMessageCommand(activator.bot, activator);
+            break;
     }
     return activator;
 }
@@ -368,80 +372,131 @@ function clearCommand<T>(command: CommandType<T>) {
             command.commands = command.commands.map((c) => ({ command: clearCommand(c.command), weight: c.weight }));
             break;
         case "conditional":
-            command.condition = clearCommand<boolean>(command.condition);
+            const clearCondition = (condition: CommandCondition) => {
+                if ("values" in condition) condition.values = condition.values.map((v) => clearCommand(v)) as [CommandType, CommandType];
+                else condition.value = clearCommand<boolean>(condition.value);
+                return condition;
+            };
+            if ("conditions" in command) for (let i in command.conditions) command.conditions[i] = clearCondition(command.conditions[i]);
+            else command.condition = clearCondition(command.condition);
             command.ifTrue = clearCommand(command.ifTrue);
-            command.ifFalse = clearCommand(command.ifFalse);
+            if (command.ifFalse) command.ifFalse = clearCommand(command.ifFalse);
             break;
     }
     return command;
 }
 
-async function commandTextConverter(text: string, command: CommandType, moi?: Message | CommandInteraction) {
+async function commandTextConverter(text: string, command: CommandType, moi?: Message | CommandInteraction, args?: any[]) {
     // console.log(text);
     let m = text.match(/\{[^{}]+?\}/gi);
-    if (!m) return text;
-    for (let match of m) {
-        let keys = match.match(/(?<=[{:])([^{:}]+?)(?=[:}])/gi);
-        // console.log(keys);
-        if (!keys) continue;
-        switch (keys[0]) {
-            case "variable":
-                {
+    if (m)
+        for (let match of m) {
+            let keys = match.match(/(?<=[{:])([^{:}]+?)(?=[:}])/gi);
+            let replace = (str = "") => (text = text.replace(match, str));
+
+            // console.log(keys);
+            if (!keys) continue;
+            switch (keys[0]) {
+                case "variable": {
                     let bot = keys[1];
                     let variable = keys[2];
                     if (!(bot in botData)) continue;
                     let value = await (botData as any)[bot]["variable"][variable].get();
-                    text = text.replace(match, value || "MISSING_VALUE");
+                    replace(value);
+                    break;
                 }
-                break;
-            case "command": {
-                let bot = keys[1];
-                let _command = keys[2];
-                // if (!(bot in botData)) return text;
+                case "command": {
+                    let bot = keys[1];
+                    let _command = keys[2];
+                    // if (!(bot in botData)) return text;
 
-                let value = `${await runDataCommand(
-                    (_command == "this" || bot == "this") && "command" in command && command.command
-                        ? command.command
-                        : (botData as any)[bot]["command"][_command],
-                    moi
-                )}`;
-                // console.log(value);
-                text = text.replace(match, value || "MISSING_VALUE");
+                    let value = `${await runDataCommand(
+                        (_command == "this" || bot == "this") && "command" in command && command.command
+                            ? command.command
+                            : (botData as any)[bot]["command"][_command],
+                        moi
+                    )}`;
+                    // console.log(value);
+                    replace(value);
+                    break;
+                }
+                case "target":
+                case "author": {
+                    let player = {
+                        author: () => moi?.member,
+                        target: () => getTargetMember(moi as Message),
+                    }[keys[0]]();
+                    if (!player) {
+                        replace();
+                        return;
+                    }
+                    replace(
+                        {
+                            displayName: player instanceof GuildMember ? player.displayName : player.nick || player.user.username,
+                            username: player.user.username,
+                            id: player instanceof GuildMember ? player.id : player.user.id,
+                            mention: userMention(player instanceof GuildMember ? player.id : player.user.id),
+                            displayAvatar:
+                                player instanceof GuildMember
+                                    ? player.displayAvatarURL({ size: 2048, format: "png" })
+                                    : `https://cdn.discordapp.com/avatars/${player instanceof GuildMember ? player.id : player.user.id}/${
+                                          player.user.avatar
+                                      }.webp?size=2048`,
+                            exists: player ? "true" : "false",
+                        }[keys[1]]
+                    );
+                    break;
+                }
+                case "arg": {
+                    let arg = parseInt(keys[1]);
+                    let value = args?.[arg];
+                    replace(value);
+                    break;
+                }
+                case "random": {
+                    let min = 0;
+                    let max;
+                    if (keys.length > 3) {
+                        min = parseInt(keys[1]);
+                        max = parseInt(keys[2]);
+                    } else max = parseInt(keys[1]);
+                    replace(`${Math.floor(Math.random() * (max - min + 1)) + min}`);
+                    break;
+                }
             }
-            case "author": {
-                let author = moi?.member;
-                if (!author) continue;
+        }
 
-                text = text.replace(
-                    match,
-                    {
-                        displayName: author instanceof GuildMember ? author.displayName : author.nick || author.user.username,
-                        username: author.user.username,
-                        id: author instanceof GuildMember ? author.id : author.user.id,
-                        mention: userMention(author instanceof GuildMember ? author.id : author.user.id),
-                        displayAvatar:
-                            author instanceof GuildMember
-                                ? author.displayAvatarURL({ size: 2048, format: "png" })
-                                : `https://cdn.discordapp.com/avatars/${author instanceof GuildMember ? author.id : author.user.id}/${
-                                      author.user.avatar
-                                  }.webp?size=2048`,
-                    }[keys[1]] || "MISSING_VALUE"
-                );
+    let emojiMatch = text.match(/(?<=:)[^:]+(?=:)/gi);
+
+    if (emojiMatch) {
+        let guild = await moi?.guild?.emojis.fetch();
+        if (guild) {
+            for (let match of emojiMatch) {
+                let emoji = guild.find((e) => e.name == match);
+                if (!emoji) continue;
+                text = text.replace(new RegExp(`:${match}:`, "gi"), formatEmoji(emoji.id));
             }
         }
     }
-    return text;
+
+    return text || undefined;
 }
 
-async function createImage(image: ImageType, command: CommandType, moi?: Message | CommandInteraction) {
-    let url = image.url;
-    if (url) url = await commandTextConverter(url, command, moi);
+async function createImage(image: ImageType, command: CommandType, moi?: Message | CommandInteraction, args?: any[]) {
+    let url = Array.isArray(image.url) ? random_from_array(image.url) : image.url;
+    if (url) url = await commandTextConverter(url, command, moi, args);
     let img;
-    if (url) img = await loadImage(url);
+    if (url && url != "MISSING VALUE")
+        try {
+            img = await loadImage(url);
+        } catch (err) {
+            return undefined;
+        }
     let width = image.size?.width || img?.width;
     let height = image.size?.height || img?.height;
 
-    if (!(width && height)) throw "Width or height not provided for image or image url not found";
+    if (!(width && height)) return undefined;
+    // throw "Width or height not provided for image or image url not found";
 
     let canvas = createCanvas(width, height);
     let ctx = canvas.getContext("2d");
@@ -454,7 +509,8 @@ async function createImage(image: ImageType, command: CommandType, moi?: Message
 
     if (image.composite) {
         for (let composite of image.composite) {
-            let composite_img = await createImage(composite, command, moi);
+            let composite_img = await createImage(composite, command, moi, args);
+            if (!composite_img) continue;
             ctx.drawImage(composite_img, composite.position?.x || 0, composite.position?.y || 0, composite_img.width, composite_img.height);
         }
     }
@@ -485,23 +541,28 @@ async function createImage(image: ImageType, command: CommandType, moi?: Message
     return canvas;
 }
 
-function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInteraction) {
+function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInteraction, args: any[] = [], startTime = Date.now()) {
     return new Promise<T>(async (resolve, reject) => {
-        if (!command) return reject("No command provided");
         // console.log(command);
-        switch (command.type) {
+        if (!command) return reject("No command provided");
+        if (command.args)
+            args = [...args, ...(await Promise.all((await command.args?.map(async (c) => runDataCommand(c, moi, args, startTime))) || []))];
+
+        switch (command?.type) {
             case "message":
                 if (!moi) return reject("No message or interaction provided");
                 if (moi instanceof Message) moi.channel.sendTyping();
-                let text: Promise<string> | string | undefined = undefined;
+                let text: Promise<string | undefined> | string | undefined = undefined;
                 let image: Buffer | undefined = undefined;
                 if ("text" in command && command.text) text = command.text;
-                else if ("command" in command && command.command) text = `${await runDataCommand(command.command, moi)}`;
+                else if ("command" in command && command.command) text = `${await runDataCommand(command.command, moi, args, startTime)}`;
                 // else throw new Error("No text or command provided");
 
-                if (text) text = commandTextConverter(text, command, moi);
+                text = await text;
+                console.log(text);
+                if (text) text = commandTextConverter(text, command, moi, args);
 
-                if ("image" in command && command.image) image = (await createImage(command.image, command, moi)).toBuffer();
+                if ("image" in command && command.image) image = (await createImage(command.image, command, moi, args))?.toBuffer();
 
                 let res = {
                     ...(moi instanceof CommandInteraction
@@ -514,23 +575,32 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
                           } as ReplyOptions)),
                 };
                 let b: ReplyOptions | InteractionReplyOptions = {};
-                if (image) {
+                if (image)
                     res = {
                         ...res,
                         files: [new MessageAttachment(image, command.name + ".png")],
                     };
-                }
-                moi.reply({ ...res, content: await text } as any)
+
+                if (text) res = { ...res, content: await text };
+
+                await wait(Math.max(0, (command.delay || 1000) - (Date.now() - startTime)));
+                moi.reply(res as any)
                     .then((r) => resolve(r as T))
                     .catch(reject);
                 return;
             case "command":
-                runDataCommand(botData[command.command.bot]["command"][command.command.name], moi).then(resolve).catch(reject);
+                if (!botNames.includes(command.command.bot)) return reject("Invalid bot name: " + command.command.bot);
+                let newCommand = botData[command.command.bot]["command"][command.command.name];
+                if (!newCommand)
+                    return reject(
+                        `${command.command.bot} has no command named ${command.command.name}\n\n${
+                            command.command.bot
+                        } has these commands:\n${Object.keys(botData[command.command.bot]["command"]).join("\n")}`
+                    );
+                runDataCommand(newCommand, moi, args, startTime).then(resolve).catch(reject);
                 return;
             case "function":
                 try {
-                    let args = (await command.args?.map((c) => runDataCommand(c, moi))) || [];
-                    args = await Promise.all(args);
                     let res = await command.function(...args, moi, command);
                     resolve(res);
                 } catch (err) {
@@ -540,28 +610,76 @@ function runDataCommand<T>(command: CommandType<T>, moi?: Message | CommandInter
             case "sequence":
                 try {
                     let res = [];
-                    for (let _command of command.commands) res.push(await runDataCommand(_command, moi));
+                    for (let _command of command.commands) res.push(await runDataCommand(_command, moi, args, startTime));
                     resolve(res as T);
                 } catch (err) {
                     reject(err);
                 }
                 return;
             case "random":
-                await runDataCommand(random_from_array(command.commands), moi).then(resolve).catch(reject);
+                await runDataCommand(random_from_array(command.commands), moi, args, startTime).then(resolve).catch(reject);
                 return;
             case "random-weighted":
                 let _command = command.commands[weightedRandom(command.commands)()] as {
                     command: CommandType<T>;
                     weight: number;
                 };
-                runDataCommand(_command.command, moi).then(resolve).catch(reject);
+                runDataCommand(_command.command, moi, args, startTime).then(resolve).catch(reject);
                 return;
-            case "conditional":
-                if (await runDataCommand(command.condition, moi)) runDataCommand(command.ifTrue, moi).then(resolve).catch(reject);
-                else runDataCommand(command.ifFalse, moi).then(resolve).catch(reject);
+            case "text":
+                commandTextConverter(command.text, command, moi, args)
+                    .then((s) => resolve(s as T))
+                    .catch(reject);
                 return;
+            case "conditional": {
+                let value;
+                const getCondtion = async (condition: CommandCondition) => {
+                    let value;
+                    if ("values" in condition) {
+                        let values = condition.values.map((v) => runDataCommand(v, moi, args, startTime));
+                        values = await Promise.all(values);
+                        const compare = () => {
+                            if (!("comparison" in condition)) throw new Error("No comparison provided");
+                            switch (condition.comparison) {
+                                case "==":
+                                    return values[0] == values[1];
+                                case "!=":
+                                    return values[0] != values[1];
+                                case ">":
+                                    return values[0] > values[1];
+                                case "<":
+                                    return values[0] < values[1];
+                                case ">=":
+                                    return values[0] >= values[1];
+                                case "<=":
+                                    return values[0] <= values[1];
+                                default:
+                                    throw new Error("Invalid comparison: " + condition.comparison);
+                            }
+                        };
+                        value = compare();
+                    } else {
+                        value = await runDataCommand(condition.value, moi, args, startTime);
+                        if (typeof value == "string") value = value == "true" ? true : value == "false" ? false : value;
+                        value = !!value;
+                    }
+                    return value;
+                };
+                if ("conditions" in command) {
+                    for (let condition of command.conditions) {
+                        value = await getCondtion(condition);
+                        if (!value) break;
+                    }
+                } else value = await getCondtion(command.condition);
+                // console.log(command, value);
+
+                if (value) runDataCommand(command.ifTrue, moi, args, startTime).then(resolve).catch(reject);
+                else if (command.ifFalse) runDataCommand(command.ifFalse, moi, args, startTime).then(resolve).catch(reject);
+                else resolve(undefined as any);
+                return;
+            }
             case "set-variable":
-                let newValue = runDataCommand(command.newValue, moi);
+                let newValue = runDataCommand(command.newValue, moi, args, startTime);
                 botData[command.bot]["variable"][command.variable].set(newValue);
                 resolve(newValue);
                 return;
@@ -995,6 +1113,28 @@ let exclamationCommands: Partial<
         }[]
     >
 > = {};
+let messageCommands: Partial<
+    Record<
+        BotNames,
+        (ActivatorType & {
+            method: "message";
+            matches: string[];
+            matchType: "any" | "all";
+        })[]
+    >
+> = {};
+
+function addMessageCommand(bot: BotNames, activator: ActivatorType) {
+    if (activator.method != "message") return;
+    let matches = "match" in activator ? [activator.match] : activator.matches;
+    let matchType;
+    if ("matchType" in activator) matchType = activator.matchType;
+    matchType = matchType || "any";
+    if (!messageCommands[bot]) messageCommands[bot] = [];
+
+    messageCommands[bot] = messageCommands[bot]?.filter((a) => a.name != activator.name);
+    messageCommands[bot]!.push({ ...activator, matches, matchType });
+}
 
 function addExclamationCommand(bot: BotNames, activator: ActivatorType) {
     if (activator.method != "exclamation") return;
@@ -1005,12 +1145,33 @@ function addExclamationCommand(bot: BotNames, activator: ActivatorType) {
     exclamationCommands[bot]!.push({ activators, command: activator.command, name: activator.name });
 }
 
-export function testExclamationCommand(bot: BotNames, msg: Message) {
+export async function testMessageCommand(botName: BotNames, msg: Message) {
+    let bot = clients[botName];
+    if (ignore_message(msg, bot)) return;
+
+    let content = msg.content.toLowerCase();
+    if (content.startsWith("!")) return;
+
+    let activators = messageCommands[botName];
+    if (!activators) return;
+
+    let hasBot = testWord(content, botName);
+    if (hasBot) msg.channel.sendTyping();
+
+    for (let activator of activators) {
+        if ((hasBot || !activator.botName) && (activator.matchType == "all" ? testAllWords : testWord)(content, ...activator.matches)) {
+            if (await runDataCommand(activator.command, msg).catch((err) => console.error(err))) break;
+        }
+    }
+}
+
+export function testExclamationCommand(botName: BotNames, msg: Message) {
     if (testing && msg.channelId != testChannelId) return;
     if (!testing && msg.channelId == testChannelId) return;
+    let bot = clients[botName];
     let content = msg.content.toLowerCase();
     if (!content.startsWith("!")) return;
-    let activators = exclamationCommands[bot];
+    let activators = exclamationCommands[botName];
     if (!activators) return;
     // console.log(msg.content);
     let words = content.split(" ");

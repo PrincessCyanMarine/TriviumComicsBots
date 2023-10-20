@@ -1,9 +1,11 @@
 import { ActivityType, Client, Guild, GuildMember, Intents, ThreadChannel, User, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { changeActivities, random_from_array, readAllBotData, testExclamationCommand, wait } from "./common/functions";
-import { triviumGuildId } from "./common/variables";
+import { changeActivities, random_from_array, readAllBotData, testExclamationCommand, testMessageCommand, wait } from "./common/functions";
+import { killWords, triviumGuildId } from "./common/variables";
 import { Message } from "discord.js";
 import { database } from ".";
+import assets from "./assetsIndexes";
+import { kill } from "./attachments";
 config();
 
 const intents = [
@@ -48,17 +50,8 @@ export function isDataTypeKey(key: string): key is BotDataTypes {
 export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus", "siegfried", "d20"] as const;
 export type BotNames = (typeof botNames)[number];
 
-let image: ImageType = {
-    url: "./assets/krystal/glitch.png",
-    size: {
-        width: 500,
-        height: 500,
-    },
-    actions: [{ type: "crop", style: "in", x: 0, y: 0, width: 500, height: 100 }],
-};
-
 export type ImageType = {
-    url?: string;
+    url?: string | string[];
     size?: {
         width: number;
         height: number;
@@ -69,7 +62,7 @@ export type ImageType = {
         y: number;
     };
     color?: string;
-    actions: (
+    actions?: (
         | {
               type: "crop";
               style: "out" | "in";
@@ -85,7 +78,7 @@ export type ImageType = {
     )[];
 } & (
     | {
-          url: string;
+          url: string | string[];
       }
     | {
           size: {
@@ -96,12 +89,15 @@ export type ImageType = {
       }
 );
 
+export type CommandCondition = { value: CommandType } | { values: [CommandType, CommandType]; comparison: "==" | ">" | "<" | ">=" | "<=" | "!=" };
+
 export type CommandType<T = any, V extends any[] = any[]> = {
     dataType?: "command";
     name?: string;
     description?: string;
     version?: string;
     bot?: BotNames;
+    args?: CommandType[];
 } & (
     | {
           type: "message";
@@ -109,6 +105,11 @@ export type CommandType<T = any, V extends any[] = any[]> = {
           text?: string;
           command?: CommandType;
           image?: ImageType;
+          delay?: number;
+      }
+    | {
+          type: "text";
+          text: string;
       }
     | {
           type: "sequence";
@@ -129,12 +130,11 @@ export type CommandType<T = any, V extends any[] = any[]> = {
           type: "random-weighted";
           commands: { command: CommandType<T>; weight: number }[];
       }
-    | {
+    | ({
           type: "conditional";
-          condition: CommandType<boolean>;
           ifTrue: CommandType<any>;
-          ifFalse: CommandType<any>;
-      }
+          ifFalse?: CommandType<any>;
+      } & ({ condition: CommandCondition } | { conditions: CommandCondition[] }))
     | ({
           type: "get-variable";
       } & ({ variable: string; bot: BotNames } | { variable: VariableType<T> }))
@@ -147,7 +147,6 @@ export type CommandType<T = any, V extends any[] = any[]> = {
     | {
           type: "function";
           function: (...args: V) => T;
-          args?: CommandType<V[number]>[];
       }
 );
 
@@ -166,7 +165,8 @@ export type ActivatorType = {
       }
     | ({
           method: "message";
-      } & ({ matches: string[]; matchType: "any" | "all" } | { match: string }))
+          botName?: boolean;
+      } & ({ matches: string[]; matchType?: "any" | "all" } | { match: string }))
     | {
           method: "reaction";
           match: string;
@@ -275,7 +275,6 @@ export var botData: Record<
                 bot: "d20",
                 command: {
                     type: "message",
-                    text: "{command:this}",
                     command: {
                         type: "function",
                         function: async () => {
@@ -306,8 +305,100 @@ export var botData: Record<
         variable: {},
     },
     krystal: {
-        activator: {},
-        command: {},
+        activator: {
+            kill: {
+                dataType: "activator",
+                name: "kill",
+                botName: true,
+                description: "Krystal Kills a target",
+                version: "1.0.0",
+                method: "message",
+                matches: killWords,
+                type: "command",
+                bot: "krystal",
+                command: {
+                    type: "command",
+                    command: { bot: "krystal", name: "kill" },
+                },
+            },
+        },
+        command: {
+            kill: {
+                dataType: "command",
+                name: "kill",
+                bot: "krystal",
+                type: "conditional",
+                condition: {
+                    value: {
+                        type: "text",
+                        text: "{target:exists}",
+                    },
+                },
+                ifTrue: {
+                    type: "conditional",
+                    conditions: [
+                        {
+                            values: [
+                                {
+                                    type: "text",
+                                    text: "{author:id}",
+                                },
+                                {
+                                    type: "text",
+                                    text: "{target:id}",
+                                },
+                            ],
+                            comparison: "==",
+                        },
+                        {
+                            values: [
+                                {
+                                    type: "text",
+                                    text: "{random:10}",
+                                },
+                                {
+                                    type: "text",
+                                    text: "0",
+                                },
+                            ],
+                            // comparison: "==",
+                            comparison: ">=",
+                        },
+                    ],
+                    ifTrue: {
+                        type: "message",
+                        text: ":GMKrystalDevious: I do not condone suicide",
+                    },
+                    ifFalse: {
+                        type: "command",
+                        command: {
+                            bot: "krystal",
+                            name: "targettedKill",
+                        },
+                        args: [{ type: "text", text: "{target:displayAvatar}" }],
+                    },
+                },
+                ifFalse: {
+                    type: "message",
+                    image: {
+                        url: "./assets/krystal/kill/kill.png",
+                    },
+                },
+            },
+            targettedKill: {
+                type: "message",
+                image: {
+                    url: assets.krystal.kill,
+                    composite: [
+                        {
+                            url: "{arg:0}",
+                            size: { width: 500, height: 500 },
+                            position: { x: 150, y: 200 },
+                        },
+                    ],
+                },
+            },
+        },
         variable: {},
     },
     ray: {
@@ -351,6 +442,7 @@ client_list.forEach((client) => {
     try {
         client.on("messageCreate", async (msg) => {
             testExclamationCommand(id2bot[client.user!.id!], msg);
+            testMessageCommand(id2bot[client.user!.id!], msg);
             if (!msg.channel.isThread()) return;
             try {
                 await warReact(msg);

@@ -3,6 +3,7 @@
     "bot": "sadie",
     "type": "function",
     "function": "(items) => items.map((item) => `${item[0]}\n- ${item[1]}`).join(\"\\n\\n\")",
+    "name": "getShopItems",
     "args": [
         {
             "type": "get-variable",
