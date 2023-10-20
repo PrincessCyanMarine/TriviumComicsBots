@@ -11,23 +11,23 @@
         ],
         [
             "Ring of Frost",
-            "Chills beverages while held (possible curse: the drink becomes ice)"
+            "Chills beverages while held"
         ],
         [
             "Slice of Life",
-            "Pizza slice that regenerates every bite you take (possible curse: its sardine and pineapple)"
+            "Pizza slice that regenerates every bite you take"
         ],
         [
             "Cloak of Sight",
-            "A coat improving your vision to a full 360 view (possible curse: the eyes make noises when they blink)"
+            "A coat improving your vision to a full 360 view"
         ],
         [
             "Lightning Dagger",
-            "Shocks opponent when stabbing (possible curse: also shocks user)"
+            "Shocks opponent when stabbing"
         ],
         [
             "Dragon Egg",
-            "Most expensive item, show off to your friends! (Curse: it's fake/doesn't hatch)"
+            "Most expensive item, show off to your friends!"
         ]
     ],
     "name": "shopItems",
