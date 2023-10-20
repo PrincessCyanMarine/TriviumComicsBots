@@ -1,0 +1,149 @@
+{
+    "name": "targetedKill",
+    "bot": "krystal",
+    "version": "1.0.0",
+    "description": "Ask Krystal to unalive an unattractive weeb (unless they are being spared)",
+    "dataType": "command",
+    "type": "conditional",
+    "conditions": [
+        {
+            "value": {
+                "type": "string",
+                "value": "{arg:3}"
+            },
+            "not": true
+        },
+        {
+            "values": [
+                {
+                    "type": "string",
+                    "value": "{arg:2}"
+                },
+                {
+                    "type": "get-variable",
+                    "variable": {
+                        "databaseKey": "dontattack"
+                    }
+                }
+            ],
+            "comparison": "=="
+        }
+    ],
+    "ifTrue": {
+        "type": "message",
+        "text": "Sorry, {author:mention}, I was asked to spare that unattractive weeb"
+    },
+    "ifFalse": {
+        "type": "conditional",
+        "condition": {
+            "values": [
+                {
+                    "type": "array",
+                    "array": [
+                        "622898538514350085",
+                        "620634675454541844",
+                        "666872683530813441",
+                        "711241945149734914",
+                        "743606862578057277"
+                    ]
+                },
+                {
+                    "type": "string",
+                    "value": "{arg:2}"
+                }
+            ],
+            "comparison": "includes"
+        },
+        "ifTrue": {
+            "type": "command",
+            "command": {
+                "bot": "krystal",
+                "name": "targetedKill"
+            },
+            "args": [
+                {
+                    "type": "string",
+                    "value": "{author:displayAvatar}"
+                },
+                {
+                    "type": "string",
+                    "value": "Sorry, {author:mention}, Sadie asked me to spare that player"
+                },
+                {
+                    "type": "string",
+                    "value": "{author:id}"
+                },
+                {
+                    "type": "boolean",
+                    "value": true
+                }
+            ],
+            "clearArgs": true
+        },
+        "ifFalse": {
+            "type": "conditional",
+            "conditions": [
+                {
+                    "value": {
+                        "type": "string",
+                        "value": "{arg:3}"
+                    },
+                    "not": true
+                },
+                {
+                    "values": [
+                        {
+                            "type": "string",
+                            "value": "{author:id}"
+                        },
+                        {
+                            "type": "string",
+                            "value": "{arg:2}"
+                        }
+                    ],
+                    "comparison": "=="
+                },
+                {
+                    "values": [
+                        {
+                            "type": "string",
+                            "value": "{random:10}"
+                        },
+                        {
+                            "type": "string",
+                            "value": "0"
+                        }
+                    ],
+                    "comparison": "=="
+                }
+            ],
+            "ifTrue": {
+                "type": "message",
+                "text": ":GMKrystalDevious: I do not condone suicide"
+            },
+            "ifFalse": {
+                "type": "message",
+                "text": "{arg:1}",
+                "image": {
+                    "url": [
+                        "./assets/krystal/kill/base0.png",
+                        "./assets/krystal/kill/base1.png"
+                    ],
+                    "composite": [
+                        {
+                            "url": "{arg:0}",
+                            "size": {
+                                "width": 500,
+                                "height": 500
+                            },
+                            "position": {
+                                "x": 150,
+                                "y": 200
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

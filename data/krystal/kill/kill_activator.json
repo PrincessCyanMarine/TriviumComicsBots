@@ -1,0 +1,64 @@
+{
+    "dataType": "activator",
+    "name": "kill",
+    "botName": true,
+    "description": "Ask Krystal to commit an unaliving",
+    "version": "1.0.0",
+    "method": "message",
+    "matches": [
+        "kill",
+        "beat",
+        "punch",
+        "heal",
+        "shoot",
+        "attack",
+        "unalive",
+        "protect",
+        "exterminate",
+        "end.+?suffering",
+        "silence"
+    ],
+    "type": "command",
+    "bot": "krystal",
+    "command": {
+        "type": "conditional",
+        "condition": {
+            "value": {
+                "type": "string",
+                "value": "{target:exists}"
+            }
+        },
+        "ifTrue": {
+            "type": "command",
+            "command": {
+                "bot": "krystal",
+                "name": "targetedKill"
+            },
+            "args": [
+                {
+                    "type": "string",
+                    "value": "{target:displayAvatar}"
+                },
+                {
+                    "type": "string",
+                    "value": "***I will unalive {target:mention} now :GMKrystalDevious:!!!***"
+                },
+                {
+                    "type": "string",
+                    "value": "{target:id}"
+                },
+                {
+                    "type": "boolean",
+                    "value": false
+                }
+            ]
+        },
+        "ifFalse": {
+            "type": "message",
+            "text": "***I will unalive now :GMKrystalDevious:***",
+            "image": {
+                "url": "./assets/krystal/kill/kill.png"
+            }
+        }
+    }
+}

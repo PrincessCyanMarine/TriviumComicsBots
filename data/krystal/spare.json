@@ -1,0 +1,46 @@
+{
+    "dataType": "activator",
+    "name": "spare",
+    "botName": true,
+    "description": "Ask Krystal to spare an unattractive weeb",
+    "bot": "krystal",
+    "version": "1.0.0",
+    "method": "message",
+    "matches": [
+        "not (an|the) enemy",
+        "spare"
+    ],
+    "type": "command",
+    "command": {
+        "type": "conditional",
+        "condition": {
+            "value": {
+                "type": "string",
+                "value": "{target:exists}"
+            }
+        },
+        "ifTrue": {
+            "type": "sequence",
+            "commands": [
+                {
+                    "type": "set-variable",
+                    "variable": {
+                        "databaseKey": "dontattack"
+                    },
+                    "newValue": {
+                        "type": "string",
+                        "value": "{target:id}"
+                    }
+                },
+                {
+                    "type": "message",
+                    "text": "Understood, I will spare the unattractive weeb"
+                }
+            ]
+        },
+        "ifFalse": {
+            "type": "message",
+            "text": "Which unattractive weeb should I spare?"
+        }
+    }
+}
