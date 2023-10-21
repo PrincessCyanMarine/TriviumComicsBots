@@ -1,0 +1,2230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/DataType",
+  "definitions": {
+    "DataType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/CommandType"
+        },
+        {
+          "$ref": "#/definitions/ActivatorType"
+        },
+        {
+          "$ref": "#/definitions/VariableType"
+        }
+      ]
+    },
+    "CommandType": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "message"
+            },
+            "ephemeral": {
+              "type": "boolean"
+            },
+            "text": {
+              "type": "string"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType"
+            },
+            "image": {
+              "$ref": "#/definitions/ImageType"
+            },
+            "delay": {
+              "type": "number"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "boolean"
+            },
+            "value": {
+              "type": "boolean"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "commandArray": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "array"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commandArray",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "array": {
+              "type": "array",
+              "items": {}
+            },
+            "type": {
+              "type": "string",
+              "const": "array"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "array",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "sequence"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType%3Cany%3E"
+              }
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commands",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "bot": {
+                  "$ref": "#/definitions/BotNames"
+                }
+              },
+              "required": [
+                "name",
+                "bot"
+              ],
+              "additionalProperties": false
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "command",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "random"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType%3Cany%3E"
+              }
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commands",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "random-weighted"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "$ref": "#/definitions/CommandType%3Cany%3E"
+                  },
+                  "weight": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "command",
+                  "weight"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commands",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "condition": {
+              "$ref": "#/definitions/CommandCondition"
+            },
+            "type": {
+              "type": "string",
+              "const": "conditional"
+            },
+            "ifTrue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "ifFalse": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "condition",
+            "ifTrue",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "conditions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandCondition"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "conditional"
+            },
+            "ifTrue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "ifFalse": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "conditions",
+            "ifTrue",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "type": {
+              "type": "string",
+              "const": "get-variable"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bot",
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "$ref": "#/definitions/VariableType%3Cany%3E"
+            },
+            "type": {
+              "type": "string",
+              "const": "get-variable"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "type": {
+              "type": "string",
+              "const": "set-variable"
+            },
+            "newValue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bot",
+            "newValue",
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "$ref": "#/definitions/VariableType%3Cany%3E"
+            },
+            "type": {
+              "type": "string",
+              "const": "set-variable"
+            },
+            "newValue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "newValue",
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "function"
+            },
+            "function": {
+              "type": "string"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "function",
+            "type"
+          ]
+        }
+      ]
+    },
+    "ImageType": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "size": {
+              "type": "object",
+              "properties": {
+                "width": {
+                  "type": "number"
+                },
+                "height": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "width",
+                "height"
+              ],
+              "additionalProperties": false
+            },
+            "composite": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageType"
+              }
+            },
+            "position": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "color": {
+              "type": "string"
+            },
+            "actions": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "crop"
+                      },
+                      "style": {
+                        "type": "string",
+                        "enum": [
+                          "out",
+                          "in"
+                        ]
+                      },
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      },
+                      "width": {
+                        "type": "number"
+                      },
+                      "height": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "style",
+                      "x",
+                      "y",
+                      "width",
+                      "height"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "rotate"
+                      },
+                      "angle": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "angle"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "url"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "object",
+              "properties": {
+                "width": {
+                  "type": "number"
+                },
+                "height": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "width",
+                "height"
+              ],
+              "additionalProperties": false
+            },
+            "color": {
+              "type": "string"
+            },
+            "url": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "composite": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageType"
+              }
+            },
+            "position": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "actions": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "crop"
+                      },
+                      "style": {
+                        "type": "string",
+                        "enum": [
+                          "out",
+                          "in"
+                        ]
+                      },
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      },
+                      "width": {
+                        "type": "number"
+                      },
+                      "height": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "style",
+                      "x",
+                      "y",
+                      "width",
+                      "height"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "rotate"
+                      },
+                      "angle": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "angle"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "color",
+            "size"
+          ]
+        }
+      ]
+    },
+    "BotNames": {
+      "type": "string",
+      "enum": [
+        "sadie",
+        "common",
+        "krystal",
+        "ray",
+        "eli",
+        "cerberus",
+        "siegfried",
+        "d20"
+      ]
+    },
+    "CommandType<any>": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "message"
+            },
+            "ephemeral": {
+              "type": "boolean"
+            },
+            "text": {
+              "type": "string"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType"
+            },
+            "image": {
+              "$ref": "#/definitions/ImageType"
+            },
+            "delay": {
+              "type": "number"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "boolean"
+            },
+            "value": {
+              "type": "boolean"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "commandArray": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "array"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commandArray",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "array": {
+              "type": "array",
+              "items": {}
+            },
+            "type": {
+              "type": "string",
+              "const": "array"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "array",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "sequence"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType%3Cany%3E"
+              }
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commands",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "bot": {
+                  "$ref": "#/definitions/BotNames"
+                }
+              },
+              "required": [
+                "name",
+                "bot"
+              ],
+              "additionalProperties": false
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "command",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "random"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType%3Cany%3E"
+              }
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commands",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "random-weighted"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "$ref": "#/definitions/CommandType%3Cany%3E"
+                  },
+                  "weight": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "command",
+                  "weight"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "commands",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "condition": {
+              "$ref": "#/definitions/CommandCondition"
+            },
+            "type": {
+              "type": "string",
+              "const": "conditional"
+            },
+            "ifTrue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "ifFalse": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "condition",
+            "ifTrue",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "conditions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandCondition"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "conditional"
+            },
+            "ifTrue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "ifFalse": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "conditions",
+            "ifTrue",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "type": {
+              "type": "string",
+              "const": "get-variable"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bot",
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "$ref": "#/definitions/VariableType%3Cany%3E"
+            },
+            "type": {
+              "type": "string",
+              "const": "get-variable"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "type": {
+              "type": "string",
+              "const": "set-variable"
+            },
+            "newValue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bot",
+            "newValue",
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variable": {
+              "$ref": "#/definitions/VariableType%3Cany%3E"
+            },
+            "type": {
+              "type": "string",
+              "const": "set-variable"
+            },
+            "newValue": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "newValue",
+            "type",
+            "variable"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "function"
+            },
+            "function": {
+              "type": "string"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "command"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              }
+            },
+            "clearArgs": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "function",
+            "type"
+          ]
+        }
+      ]
+    },
+    "CommandCondition": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "$ref": "#/definitions/CommandType"
+            },
+            "not": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "values": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CommandType"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "comparison": {
+              "type": "string",
+              "enum": [
+                "includes",
+                "==",
+                ">",
+                "<",
+                ">=",
+                "<=",
+                "!="
+              ]
+            },
+            "not": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "comparison",
+            "values"
+          ]
+        }
+      ]
+    },
+    "VariableType<any>": {
+      "type": "object",
+      "properties": {
+        "dataType": {
+          "type": "string",
+          "const": "variable"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "perGuild": {
+          "type": "boolean"
+        },
+        "perUser": {
+          "type": "boolean"
+        },
+        "databaseKey": {
+          "type": "string"
+        },
+        "value": {},
+        "defaultValue": {},
+        "bot": {
+          "$ref": "#/definitions/BotNames"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ActivatorType": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "method": {
+              "type": "string",
+              "const": "slash"
+            },
+            "activator": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {}
+            },
+            "dataType": {
+              "type": "string",
+              "const": "activator"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "guilds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            }
+          },
+          "required": [
+            "activator",
+            "bot",
+            "command",
+            "method",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "matches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "matchType": {
+              "type": "string",
+              "enum": [
+                "any",
+                "all"
+              ]
+            },
+            "method": {
+              "type": "string",
+              "const": "message"
+            },
+            "botName": {
+              "type": "boolean"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "activator"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "guilds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            }
+          },
+          "required": [
+            "bot",
+            "command",
+            "matches",
+            "method",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "match": {
+              "type": "string"
+            },
+            "method": {
+              "type": "string",
+              "const": "message"
+            },
+            "botName": {
+              "type": "boolean"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "activator"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "guilds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            }
+          },
+          "required": [
+            "bot",
+            "command",
+            "match",
+            "method",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "method": {
+              "type": "string",
+              "const": "reaction"
+            },
+            "match": {
+              "type": "string"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "activator"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "guilds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            }
+          },
+          "required": [
+            "bot",
+            "command",
+            "match",
+            "method",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "activators": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "method": {
+              "type": "string",
+              "const": "exclamation"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "activator"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "guilds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            }
+          },
+          "required": [
+            "activators",
+            "bot",
+            "command",
+            "method",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "command"
+            },
+            "command": {
+              "$ref": "#/definitions/CommandType%3Cany%3E"
+            },
+            "activator": {
+              "type": "string"
+            },
+            "method": {
+              "type": "string",
+              "const": "exclamation"
+            },
+            "dataType": {
+              "type": "string",
+              "const": "activator"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "guilds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bot": {
+              "$ref": "#/definitions/BotNames"
+            }
+          },
+          "required": [
+            "activator",
+            "bot",
+            "command",
+            "method",
+            "type"
+          ]
+        }
+      ]
+    },
+    "VariableType": {
+      "type": "object",
+      "properties": {
+        "dataType": {
+          "type": "string",
+          "const": "variable"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "perGuild": {
+          "type": "boolean"
+        },
+        "perUser": {
+          "type": "boolean"
+        },
+        "databaseKey": {
+          "type": "string"
+        },
+        "value": {},
+        "defaultValue": {},
+        "bot": {
+          "$ref": "#/definitions/BotNames"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
