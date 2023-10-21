@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/PrincessCyanMarine/TriviumComicsBots/master/schema/botmeta.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$ref": "#/definitions/DataType",
   "definitions": {
     "DataType": {
@@ -19,6 +19,7 @@
       "anyOf": [
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -71,6 +72,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -112,6 +114,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -153,6 +156,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "commandArray": {
               "type": "array",
@@ -197,6 +201,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "array": {
               "type": "array",
@@ -239,6 +244,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -247,7 +253,7 @@
             "commands": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/CommandType%3Cany%3E"
+                "$ref": "#/definitions/CommandType"
               }
             },
             "dataType": {
@@ -283,6 +289,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -301,7 +308,8 @@
               "required": [
                 "name",
                 "bot"
-              ]
+              ],
+              "additionalProperties": false
             },
             "dataType": {
               "type": "string",
@@ -336,6 +344,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -344,7 +353,7 @@
             "commands": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/CommandType%3Cany%3E"
+                "$ref": "#/definitions/CommandType"
               }
             },
             "dataType": {
@@ -380,6 +389,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -391,7 +401,7 @@
                 "type": "object",
                 "properties": {
                   "command": {
-                    "$ref": "#/definitions/CommandType%3Cany%3E"
+                    "$ref": "#/definitions/CommandType"
                   },
                   "weight": {
                     "type": "number"
@@ -400,7 +410,8 @@
                 "required": [
                   "command",
                   "weight"
-                ]
+                ],
+                "additionalProperties": false
               }
             },
             "dataType": {
@@ -436,6 +447,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "condition": {
               "$ref": "#/definitions/CommandCondition"
@@ -445,10 +457,10 @@
               "const": "conditional"
             },
             "ifTrue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "ifFalse": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "dataType": {
               "type": "string",
@@ -484,6 +496,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "conditions": {
               "type": "array",
@@ -496,10 +509,10 @@
               "const": "conditional"
             },
             "ifTrue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "ifFalse": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "dataType": {
               "type": "string",
@@ -535,6 +548,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "variable": {
               "type": "string"
@@ -577,9 +591,10 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "variable": {
-              "$ref": "#/definitions/VariableType%3Cany%3E"
+              "$ref": "#/definitions/VariableType"
             },
             "type": {
               "type": "string",
@@ -618,6 +633,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "variable": {
               "type": "string"
@@ -630,7 +646,7 @@
               "const": "set-variable"
             },
             "newValue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "dataType": {
               "type": "string",
@@ -664,16 +680,17 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "variable": {
-              "$ref": "#/definitions/VariableType%3Cany%3E"
+              "$ref": "#/definitions/VariableType"
             },
             "type": {
               "type": "string",
               "const": "set-variable"
             },
             "newValue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "bot": {
               "$ref": "#/definitions/BotNames"
@@ -709,6 +726,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -754,6 +772,7 @@
       "anyOf": [
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "url": {
               "anyOf": [
@@ -781,7 +800,8 @@
               "required": [
                 "width",
                 "height"
-              ]
+              ],
+              "additionalProperties": false
             },
             "composite": {
               "type": "array",
@@ -802,7 +822,8 @@
               "required": [
                 "x",
                 "y"
-              ]
+              ],
+              "additionalProperties": false
             },
             "color": {
               "type": "string"
@@ -845,7 +866,8 @@
                       "y",
                       "width",
                       "height"
-                    ]
+                    ],
+                    "additionalProperties": false
                   },
                   {
                     "type": "object",
@@ -861,7 +883,8 @@
                     "required": [
                       "type",
                       "angle"
-                    ]
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               }
@@ -873,6 +896,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "size": {
               "type": "object",
@@ -887,7 +911,8 @@
               "required": [
                 "width",
                 "height"
-              ]
+              ],
+              "additionalProperties": false
             },
             "color": {
               "type": "string"
@@ -924,7 +949,8 @@
               "required": [
                 "x",
                 "y"
-              ]
+              ],
+              "additionalProperties": false
             },
             "actions": {
               "type": "array",
@@ -964,7 +990,8 @@
                       "y",
                       "width",
                       "height"
-                    ]
+                    ],
+                    "additionalProperties": false
                   },
                   {
                     "type": "object",
@@ -980,7 +1007,8 @@
                     "required": [
                       "type",
                       "angle"
-                    ]
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               }
@@ -1006,745 +1034,11 @@
         "d20"
       ]
     },
-    "CommandType<any>": {
-      "anyOf": [
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "message"
-            },
-            "ephemeral": {
-              "type": "boolean"
-            },
-            "text": {
-              "type": "string"
-            },
-            "command": {
-              "$ref": "#/definitions/CommandType"
-            },
-            "image": {
-              "$ref": "#/definitions/ImageType"
-            },
-            "delay": {
-              "type": "number"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "string"
-            },
-            "value": {
-              "type": "string"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "value"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "boolean"
-            },
-            "value": {
-              "type": "boolean"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "value"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "commandArray": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "type": {
-              "type": "string",
-              "const": "array"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "commandArray",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "array": {
-              "type": "array",
-              "items": {}
-            },
-            "type": {
-              "type": "string",
-              "const": "array"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "array",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "sequence"
-            },
-            "commands": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType%3Cany%3E"
-              }
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "commands",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "command"
-            },
-            "command": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "bot": {
-                  "$ref": "#/definitions/BotNames"
-                }
-              },
-              "required": [
-                "name",
-                "bot"
-              ]
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "command",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "random"
-            },
-            "commands": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType%3Cany%3E"
-              }
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "commands",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "random-weighted"
-            },
-            "commands": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "command": {
-                    "$ref": "#/definitions/CommandType%3Cany%3E"
-                  },
-                  "weight": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "command",
-                  "weight"
-                ]
-              }
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "commands",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "condition": {
-              "$ref": "#/definitions/CommandCondition"
-            },
-            "type": {
-              "type": "string",
-              "const": "conditional"
-            },
-            "ifTrue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
-            },
-            "ifFalse": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "condition",
-            "ifTrue",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "conditions": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandCondition"
-              }
-            },
-            "type": {
-              "type": "string",
-              "const": "conditional"
-            },
-            "ifTrue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
-            },
-            "ifFalse": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "conditions",
-            "ifTrue",
-            "type"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "variable": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "type": {
-              "type": "string",
-              "const": "get-variable"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "bot",
-            "type",
-            "variable"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "variable": {
-              "$ref": "#/definitions/VariableType%3Cany%3E"
-            },
-            "type": {
-              "type": "string",
-              "const": "get-variable"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "variable"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "variable": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "type": {
-              "type": "string",
-              "const": "set-variable"
-            },
-            "newValue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "bot",
-            "newValue",
-            "type",
-            "variable"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "variable": {
-              "$ref": "#/definitions/VariableType%3Cany%3E"
-            },
-            "type": {
-              "type": "string",
-              "const": "set-variable"
-            },
-            "newValue": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "newValue",
-            "type",
-            "variable"
-          ]
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "function"
-            },
-            "function": {
-              "type": "string"
-            },
-            "dataType": {
-              "type": "string",
-              "const": "command"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "version": {
-              "type": "string"
-            },
-            "bot": {
-              "$ref": "#/definitions/BotNames"
-            },
-            "args": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CommandType"
-              }
-            },
-            "clearArgs": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "function",
-            "type"
-          ]
-        }
-      ]
-    },
     "CommandCondition": {
       "anyOf": [
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "value": {
               "$ref": "#/definitions/CommandType"
@@ -1759,6 +1053,7 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "values": {
               "type": "array",
@@ -1791,7 +1086,7 @@
         }
       ]
     },
-    "VariableType<any>": {
+    "VariableType": {
       "type": "object",
       "properties": {
         "dataType": {
@@ -1821,19 +1116,21 @@
         "bot": {
           "$ref": "#/definitions/BotNames"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "ActivatorType": {
       "anyOf": [
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "const": "command"
             },
             "command": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "method": {
               "type": "string",
@@ -1879,13 +1176,14 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "const": "command"
             },
             "command": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "matches": {
               "type": "array",
@@ -1940,13 +1238,14 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "const": "command"
             },
             "command": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "match": {
               "type": "string"
@@ -1991,13 +1290,14 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "const": "command"
             },
             "command": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "method": {
               "type": "string",
@@ -2039,13 +1339,14 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "const": "command"
             },
             "command": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "activators": {
               "type": "array",
@@ -2090,13 +1391,14 @@
         },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "const": "command"
             },
             "command": {
-              "$ref": "#/definitions/CommandType%3Cany%3E"
+              "$ref": "#/definitions/CommandType"
             },
             "activator": {
               "type": "string"
@@ -2137,38 +1439,6 @@
           ]
         }
       ]
-    },
-    "VariableType": {
-      "type": "object",
-      "properties": {
-        "dataType": {
-          "type": "string",
-          "const": "variable"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "perGuild": {
-          "type": "boolean"
-        },
-        "perUser": {
-          "type": "boolean"
-        },
-        "databaseKey": {
-          "type": "string"
-        },
-        "value": {},
-        "defaultValue": {},
-        "bot": {
-          "$ref": "#/definitions/BotNames"
-        }
-      }
     }
   }
 }
