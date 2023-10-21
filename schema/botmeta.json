@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://raw.githubusercontent.com/PrincessCyanMarine/TriviumComicsBots/master/schema/botmeta.json",
   "$ref": "#/definitions/DataType",
   "definitions": {
     "DataType": {
