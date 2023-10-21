@@ -19,7 +19,6 @@
       "anyOf": [
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -72,7 +71,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -114,7 +112,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -156,7 +153,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "commandArray": {
               "type": "array",
@@ -201,7 +197,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "array": {
               "type": "array",
@@ -244,7 +239,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -289,7 +283,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -308,8 +301,7 @@
               "required": [
                 "name",
                 "bot"
-              ],
-              "additionalProperties": false
+              ]
             },
             "dataType": {
               "type": "string",
@@ -344,7 +336,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -389,7 +380,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -410,8 +400,7 @@
                 "required": [
                   "command",
                   "weight"
-                ],
-                "additionalProperties": false
+                ]
               }
             },
             "dataType": {
@@ -447,7 +436,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "condition": {
               "$ref": "#/definitions/CommandCondition"
@@ -496,7 +484,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "conditions": {
               "type": "array",
@@ -548,7 +535,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "type": "string"
@@ -591,7 +577,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "$ref": "#/definitions/VariableType%3Cany%3E"
@@ -633,7 +618,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "type": "string"
@@ -680,7 +664,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "$ref": "#/definitions/VariableType%3Cany%3E"
@@ -726,7 +709,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -772,7 +754,6 @@
       "anyOf": [
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "url": {
               "anyOf": [
@@ -800,8 +781,7 @@
               "required": [
                 "width",
                 "height"
-              ],
-              "additionalProperties": false
+              ]
             },
             "composite": {
               "type": "array",
@@ -822,8 +802,7 @@
               "required": [
                 "x",
                 "y"
-              ],
-              "additionalProperties": false
+              ]
             },
             "color": {
               "type": "string"
@@ -866,8 +845,7 @@
                       "y",
                       "width",
                       "height"
-                    ],
-                    "additionalProperties": false
+                    ]
                   },
                   {
                     "type": "object",
@@ -883,8 +861,7 @@
                     "required": [
                       "type",
                       "angle"
-                    ],
-                    "additionalProperties": false
+                    ]
                   }
                 ]
               }
@@ -896,7 +873,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "size": {
               "type": "object",
@@ -911,8 +887,7 @@
               "required": [
                 "width",
                 "height"
-              ],
-              "additionalProperties": false
+              ]
             },
             "color": {
               "type": "string"
@@ -949,8 +924,7 @@
               "required": [
                 "x",
                 "y"
-              ],
-              "additionalProperties": false
+              ]
             },
             "actions": {
               "type": "array",
@@ -990,8 +964,7 @@
                       "y",
                       "width",
                       "height"
-                    ],
-                    "additionalProperties": false
+                    ]
                   },
                   {
                     "type": "object",
@@ -1007,8 +980,7 @@
                     "required": [
                       "type",
                       "angle"
-                    ],
-                    "additionalProperties": false
+                    ]
                   }
                 ]
               }
@@ -1038,7 +1010,6 @@
       "anyOf": [
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1091,7 +1062,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1133,7 +1103,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1175,7 +1144,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "commandArray": {
               "type": "array",
@@ -1220,7 +1188,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "array": {
               "type": "array",
@@ -1263,7 +1230,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1308,7 +1274,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1327,8 +1292,7 @@
               "required": [
                 "name",
                 "bot"
-              ],
-              "additionalProperties": false
+              ]
             },
             "dataType": {
               "type": "string",
@@ -1363,7 +1327,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1408,7 +1371,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1429,8 +1391,7 @@
                 "required": [
                   "command",
                   "weight"
-                ],
-                "additionalProperties": false
+                ]
               }
             },
             "dataType": {
@@ -1466,7 +1427,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "condition": {
               "$ref": "#/definitions/CommandCondition"
@@ -1515,7 +1475,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "conditions": {
               "type": "array",
@@ -1567,7 +1526,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "type": "string"
@@ -1610,7 +1568,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "$ref": "#/definitions/VariableType%3Cany%3E"
@@ -1652,7 +1609,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "type": "string"
@@ -1699,7 +1655,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "variable": {
               "$ref": "#/definitions/VariableType%3Cany%3E"
@@ -1745,7 +1700,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1791,7 +1745,6 @@
       "anyOf": [
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "value": {
               "$ref": "#/definitions/CommandType"
@@ -1806,7 +1759,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "values": {
               "type": "array",
@@ -1869,14 +1821,12 @@
         "bot": {
           "$ref": "#/definitions/BotNames"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "ActivatorType": {
       "anyOf": [
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1929,7 +1879,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -1991,7 +1940,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -2043,7 +1991,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -2092,7 +2039,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -2144,7 +2090,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
@@ -2223,8 +2168,7 @@
         "bot": {
           "$ref": "#/definitions/BotNames"
         }
-      },
-      "additionalProperties": false
+      }
     }
   }
 }
