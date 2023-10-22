@@ -466,6 +466,7 @@ export async function commandTextConverter(
     startTime: number,
     rootCommand?: { name: string; bot: BotNames | "NONE" }
 ) {
+    if (command.dontParse) return text;
     try {
         while (true) {
             text = text

@@ -181,6 +181,7 @@ d20.on("interactionCreate", async (interaction) => {
         }
         default:
             for (let { name, callback } of slash_commands["d20"]) {
+                console.log(interaction.commandName, name);
                 if (name == interaction.commandName) {
                     callback(interaction, startTime);
                     return;

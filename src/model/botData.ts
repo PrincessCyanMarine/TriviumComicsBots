@@ -58,6 +58,7 @@ export type CommandType<T = any, V extends any[] = any[]> = {
     bot?: BotNames;
     args?: CommandType[];
     clearArgs?: boolean;
+    dontParse?: boolean;
     rootCommand?: {
         bot: BotNames | "NONE";
         name: string;

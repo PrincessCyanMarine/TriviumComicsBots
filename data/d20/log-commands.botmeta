@@ -1,0 +1,14 @@
+{
+    "dataType": "activator",
+    "type": "command",
+    "command": {
+        "type": "message",
+        "command": {
+            "type": "function",
+            "function": "(moi)=> moi.user.id == require(\"./variables\").marineId ? JSON.stringify(require(\"../clients\").botData, null, 4) : \"You don't have permission to use this command\""
+        },
+        "dontParse": true
+    },
+    "method": "slash",
+    "activator": "log-commands"
+}
