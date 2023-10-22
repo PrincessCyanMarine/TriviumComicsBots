@@ -1,23 +1,3 @@
-# reload-data (d20)
-
-Reloads bot data (you probably can't use this one lol)
-
-Activator type: slash
-
-Command: /reload-data
-
-
-
-# help (d20)
-
-See a list of bot commands and their descriptions (only for commands using the new system) (functionality is limited for now)
-
-Activator type: slash
-
-Command: /help
-
-
-
 # my-xp (d20)
 
 Shows your XP
