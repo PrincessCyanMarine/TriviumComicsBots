@@ -381,18 +381,17 @@ function clearActivator(activator: ActivatorType) {
     if (!activator.dataType) activator.dataType = "activator";
     switch (activator.method) {
         case "slash":
-            addSlashCommand(
-                activator.bot,
-                new SlashCommandBuilder().setName(activator.activator).setDescription(activator.description || "NO DESCRIPTION"),
-                async (interaction) =>
-                    // console.log("Running command " + activator.activator);
-                    runDataCommand(activator.command, interaction, [], Date.now()).catch((err) => {
-                        console.error(err);
-                        interaction.reply({
-                            content: `${userMention(marineId)}\nAn error occured while running this command`,
-                            embeds: [new MessageEmbed().addFields([{ name: "Error", value: `${err || "No error message"}` }]).setColor("RED")],
-                        });
-                    })
+            let description = activator.description || "NO DESCRIPTION";
+            if (description.length > 100) description = description.slice(0, 97) + "...";
+            addSlashCommand(activator.bot, new SlashCommandBuilder().setName(activator.activator).setDescription(description), async (interaction) =>
+                // console.log("Running command " + activator.activator);
+                runDataCommand(activator.command, interaction, [], Date.now()).catch((err) => {
+                    console.error(err);
+                    interaction.reply({
+                        content: `${userMention(marineId)}\nAn error occured while running this command`,
+                        embeds: [new MessageEmbed().addFields([{ name: "Error", value: `${err || "No error message"}` }]).setColor("RED")],
+                    });
+                })
             );
             break;
         case "exclamation":
