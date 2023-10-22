@@ -1,6 +1,6 @@
 # my-xp (d20)
 
-Shows your XP
+A test command that shows your XP
 
 Activator type: slash
 
