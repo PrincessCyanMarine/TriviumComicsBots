@@ -9,6 +9,10 @@ This is the repository for the code of the bots from [Trivium comics' official d
 
 
 # Commands
+The command system is currently being rewritten, for commands implemented under the new system, check [this list](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
+
+
+# (OLD LIST)
 ## Krystal commands (in order of priority)
 - Yeet
 - Pfft (won't rebel to it)

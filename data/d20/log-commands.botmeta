@@ -1,5 +1,7 @@
 {
     "dataType": "activator",
+    "bot": "d20",
+    "hideFromHelp": true,
     "type": "command",
     "command": {
         "type": "message",
