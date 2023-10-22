@@ -13,6 +13,7 @@ import { killWords, marineId, protectedFromKills, triviumGuildId } from "./commo
 import { Message } from "discord.js";
 import { database } from ".";
 import { ActivatorType, BotDataTypes, BotNames, CommandType, VariableType, botNames } from "./model/botData";
+import { writeFileSync } from "fs";
 config();
 
 const intents = [
@@ -123,6 +124,7 @@ export var botData: Record<
                 type: "command",
                 bot: "d20",
                 description: "Reloads bot data (you probably can't use this one lol)",
+                hideFromHelp: true,
                 command: {
                     type: "message",
                     command: {
@@ -146,6 +148,7 @@ export var botData: Record<
                 bot: "d20",
                 version: "1.0.0",
                 type: "command",
+                hideFromHelp: true,
                 command: {
                     type: "message",
                     delay: 0,
@@ -154,7 +157,14 @@ export var botData: Record<
                         function: async (moi, thiscommand, startTime) => {
                             if (moi.user.id != marineId)
                                 return `Sorry, in its current state, this command is only available for {mention:${marineId}}`;
-                            let text = "";
+                            let text = `
+# "Message commands" use regex
+
+- /.*/ Matches anything
+- /end.+?suffering/ "end (anything) suffering"
+- /pf{2,}t/ "p", followed by 2 or more "f"s followed by "t" (for example "pfffffft", "pfft", "pffffffffffffffffffffffffffffffffffffffffft", etc)
+- /(I|Im|I am)\s(will|going to|gonna|shall)\s(bed|sleep)/ "I am going to bed", "I'm gonna sleep", "I will bed", etc
+- /(\S+?)s tip of the day/ A word followed by "tip of the day"\n\n\n\n\n\n\n`;
                             for (let botName in botData) {
                                 let bot = botData[botName as BotNames];
                                 let commands = [] as string[];
@@ -165,33 +175,34 @@ export var botData: Record<
                                         let command = data[name as string];
                                         if (command.dataType == "activator") {
                                             let activator = command as ActivatorType;
-                                            let _activator_text = `**${name} (${activator.bot})**\n${
+                                            if (activator.hideFromHelp) continue;
+                                            let _activator_text = `# ${name} (${activator.bot})\n${
                                                 activator.description
                                                     ? await commandTextConverter(activator.description, thiscommand, moi, [], startTime, {
                                                           bot: activator.bot,
                                                           name: activator.name || name,
                                                       })
                                                     : "No description"
-                                            }\n`;
+                                            }\n\n`;
                                             // _activator_text += `Version: ${activator.version}\n`;
-                                            _activator_text += `Activator type: ${activator.method}\n`;
+                                            _activator_text += `Activator type: ${activator.method}\n\n`;
                                             switch (activator.method) {
                                                 case "slash":
-                                                    _activator_text += `Command: /${activator.activator}\n`;
+                                                    _activator_text += `Command: /${activator.activator}\n\n`;
                                                     break;
                                                 case "message":
                                                     if ("match" in activator) {
-                                                        _activator_text += `Command: "${activator.match}"\n`;
+                                                        _activator_text += `Command: /${activator.match}/\n\n`;
                                                     } else {
-                                                        _activator_text += `Command: ${activator.matchType || "any"} of ${activator.matches
-                                                            .map((s) => `"${s}"`)
-                                                            .join(", ")}\n`;
-                                                        _activator_text += activator.botName ? `Must include bot name (${activator.bot})\n` : "";
+                                                        _activator_text += `Command: ${activator.matchType || "any"} of\n- ${activator.matches
+                                                            .map((s) => `/${s}/`)
+                                                            .join("\n- ")}\n\n`;
+                                                        _activator_text += activator.botName ? `Must include bot name (${activator.bot})\n\n` : "";
                                                     }
                                                     break;
                                                 case "exclamation":
-                                                    if ("activator" in activator) _activator_text += `Command: !${activator.activator}\n`;
-                                                    else _activator_text += `Command: ${activator.activators.map((s) => `!${s}`).join(", ")}\n`;
+                                                    if ("activator" in activator) _activator_text += `Command: !${activator.activator}\n\n`;
+                                                    else _activator_text += `Command: ${activator.activators.map((s) => `!${s}`).join(", ")}\n\n`;
                                                     break;
                                             }
 
@@ -199,9 +210,10 @@ export var botData: Record<
                                         }
                                     }
                                 }
-                                if (commands.length > 0) text += `${commands.join("\n")}\n`;
+                                if (commands.length > 0) text += `${commands.join("\n\n")}\n\n`;
                             }
-                            return text;
+                            writeFileSync("commands.md", text);
+                            return "Commands written to file";
                         },
                     },
                 },

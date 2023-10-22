@@ -139,6 +139,7 @@ export type ActivatorType = {
     guilds?: string[];
     bot: BotNames;
     priority?: number;
+    hideFromHelp?: boolean;
 } & (
     | {
           method: "slash";

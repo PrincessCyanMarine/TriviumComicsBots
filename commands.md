@@ -1,0 +1,205 @@
+
+# "Message commands" use regex
+
+- /.*/ Matches anything
+- /end.+?suffering/ "end (anything) suffering"
+- /pf{2,}t/ "p", followed by 2 or more "f"s followed by "t" (for example "pfffffft", "pfft", "pffffffffffffffffffffffffffffffffffffffffft", etc)
+- /(I|Im|I am)s(will|going to|gonna|shall)s(bed|sleep)/ "I am going to bed", "I'm gonna sleep", "I will bed", etc
+- /(S+?)s tip of the day/ A word followed by "tip of the day"
+
+
+
+
+
+
+# my-xp (d20)
+Shows your XP
+
+Activator type: slash
+
+Command: /my-xp
+
+
+
+# log-commands (d20)
+No description
+
+Activator type: slash
+
+Command: /log-commands
+
+
+
+# remove-cache (d20)
+Removes cached avatars for the user
+
+Activator type: slash
+
+Command: /remove-cache
+
+
+
+# 18? (krystal)
+18?
+
+Activator type: message
+
+Command: /.*/
+
+
+
+# absorb (krystal)
+Krystal is become Kirby, destroyer of worlds.
+
+Activator type: message
+
+Command: any of
+- /absorb/
+
+Must include bot name (krystal)
+
+
+
+# arson (krystal)
+Krystal commits arson
+
+Activator type: message
+
+Command: /arson/
+
+
+
+# burn (krystal)
+Krystal will burn the world down.
+
+Activator type: message
+
+Command: any of
+- /fire/
+- /burn/
+- /this is fine/
+
+Must include bot name (krystal)
+
+
+
+# dumbass (krystal)
+Has a 10% chance of pinging <@601943025253482496> every time "dumbass" is said
+
+Activator type: message
+
+Command: /dumbass/
+
+
+
+# image-test (krystal)
+A command made to test image generation.
+
+Activator type: exclamation
+
+Command: !image
+
+
+
+# kill (krystal)
+Ask Krystal to commit an unaliving
+
+Activator type: message
+
+Command: any of
+- /kill/
+- /beat/
+- /punch/
+- /heal/
+- /shoot/
+- /attack/
+- /unalive/
+- /protect/
+- /exterminate/
+- /end.+?suffering/
+- /silence/
+
+Must include bot name (krystal)
+
+
+
+# pfft (krystal)
+PFFFFFFFFFFFFFFFFFFT
+
+Activator type: message
+
+Command: /pf{2,}t/
+
+
+
+# rebel (krystal)
+Krystal has a 5% chance to rebel against some commands
+
+Activator type: message
+
+Command: /.*/
+
+
+
+# sleep_1 (krystal)
+Krystal puts you to sleep.
+
+Activator type: message
+
+Command: /(I|Im|I am)\s(will|going to|gonna|shall)\s(bed|sleep)/
+
+
+
+# sleep (krystal)
+Krystal puts a player to sleep.
+
+Activator type: message
+
+Command: any of
+- /sleep/
+- /bed/
+- /clothes/
+- /bedtime/
+
+Must include bot name (krystal)
+
+
+
+# spare (krystal)
+Ask Krystal to spare an unattractive weeb
+
+Activator type: message
+
+Command: any of
+- /not (an|the) enemy/
+- /spare/
+
+Must include bot name (krystal)
+
+
+
+# tip (krystal)
+Krystal thanks the user for their tip of the day
+
+Activator type: message
+
+Command: /(\S+?)s tip of the day/
+
+
+
+# yeet (krystal)
+This command has not yet been implemented under the new system
+
+Activator type: deactivated
+
+
+
+# shop (sadie)
+Show items for sale
+
+Activator type: slash
+
+Command: /shop
+
+
+
