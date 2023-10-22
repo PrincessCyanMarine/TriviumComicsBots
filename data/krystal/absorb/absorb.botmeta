@@ -1,0 +1,38 @@
+{
+    "dataType": "command",
+    "type": "conditional",
+    "name": "absorb",
+    "condition": {
+        "value": {
+            "type": "string",
+            "value": "{string:{args:0}:or:{target:exists}}"
+        }
+    },
+    "ifTrue": {
+        "type": "message",
+        "image": {
+            "url": "./assets/krystal/absorb/absorb.png",
+            "composite": [
+                {
+                    "url": "{string:{args:0}:or:{target:avatar}}",
+                    "size": {
+                        "width": 512,
+                        "height": 512
+                    },
+                    "position": {
+                        "x": 82,
+                        "y": 98
+                    }
+                }
+            ],
+            "name": "absorb.png"
+        }
+    },
+    "ifFalse": {
+        "type": "message",
+        "image": {
+            "url": "./assets/krystal/absorb/absorb.png",
+            "name": "absorb.png"
+        }
+    }
+}

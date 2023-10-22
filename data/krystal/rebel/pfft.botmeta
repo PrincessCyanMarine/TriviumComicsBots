@@ -1,0 +1,18 @@
+{
+    "dataType": "activator",
+    "method": "message",
+    "match": "pf{2,}t",
+    "name": "pfft",
+    "bot": "krystal",
+    "type": "command",
+    "botName": false,
+    "priority": 10,
+    "description": "PFFFFFFFFFFFFFFFFFFT",
+    "command": {
+        "type": "command",
+        "command": {
+            "name": "rebel",
+            "bot": "krystal"
+        }
+    }
+}

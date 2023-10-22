@@ -1,0 +1,16 @@
+{
+    "dataType": "activator",
+    "name": "sleep_1",
+    "method": "message",
+    "type": "command",
+    "bot": "krystal",
+    "match": "(I|Im|I am)\\s(will|going to|gonna|shall)\\s(bed|sleep)",
+    "description": "Krystal puts you to sleep.",
+    "command": {
+        "type": "command",
+        "command": {
+            "name": "sleep",
+            "bot": "krystal"
+        }
+    }
+}

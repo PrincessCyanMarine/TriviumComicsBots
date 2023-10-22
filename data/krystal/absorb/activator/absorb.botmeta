@@ -1,0 +1,19 @@
+{
+    "dataType": "activator",
+    "name": "absorb",
+    "method": "message",
+    "type": "command",
+    "bot": "krystal",
+    "matches": [
+        "absorb"
+    ],
+    "description": "Krystal is become Kirby, destroyer of worlds.",
+    "botName": true,
+    "command": {
+        "type": "command",
+        "command": {
+            "name": "absorb",
+            "bot": "krystal"
+        }
+    }
+}

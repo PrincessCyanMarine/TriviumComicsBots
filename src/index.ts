@@ -1,3 +1,6 @@
+// import { existsSync, rmdirSync } from "fs";
+// if (existsSync(".cache")) rmdirSync(".cache", { recursive: true });
+
 let oldConsoleLog = console.log;
 let oldConsoleError = console.error;
 let oldConsoleWarn = console.warn;

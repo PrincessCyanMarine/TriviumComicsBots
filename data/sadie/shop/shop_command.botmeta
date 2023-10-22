@@ -1,0 +1,44 @@
+{
+    "dataType": "command",
+    "name": "shop",
+    "version": "1.0.0",
+    "description": "Shows a selection of potentially cursed items",
+    "type": "message",
+    "bot": "sadie",
+    "text": "Non-cursed items for sale! Totally curse free! I triple checked I swear!\n```{array:{array:{arg:0}:map:[0]\n- [1]}:join:\n\n}```",
+    "args": [
+        {
+            "type": "array",
+            "array": [
+                [
+                    "D20 of perfect rolls",
+                    "A magical D20 that guarantees only the best of rolls"
+                ],
+                [
+                    "The Elder Scroll",
+                    "The holder of this item will always roll perfectly"
+                ],
+                [
+                    "Ring of Frost",
+                    "Chills beverages while held"
+                ],
+                [
+                    "Slice of Life",
+                    "Pizza slice that regenerates every bite you take"
+                ],
+                [
+                    "Cloak of Sight",
+                    "A coat improving your vision to a full 360 view"
+                ],
+                [
+                    "Lightning Dagger",
+                    "Shocks opponent when stabbing"
+                ],
+                [
+                    "Dragon Egg",
+                    "Most expensive item, show off to your friends!"
+                ]
+            ]
+        }
+    ]
+}

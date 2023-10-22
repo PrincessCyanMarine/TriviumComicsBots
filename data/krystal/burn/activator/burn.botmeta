@@ -1,0 +1,20 @@
+{
+    "dataType": "activator",
+    "type": "command",
+    "method": "message",
+    "matches": [
+        "fire",
+        "burn",
+        "this is fine"
+    ],
+    "description": "Krystal will burn the world down.",
+    "bot": "krystal",
+    "botName": true,
+    "command": {
+        "type": "command",
+        "command": {
+            "bot": "krystal",
+            "name": "burn"
+        }
+    }
+}

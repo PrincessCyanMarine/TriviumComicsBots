@@ -1,0 +1,27 @@
+{
+    "dataType": "activator",
+    "method": "message",
+    "match": ".*",
+    "name": "rebel",
+    "bot": "krystal",
+    "type": "command",
+    "botName": true,
+    "priority": 10,
+    "description": "Krystal has a 5% chance to rebel against some commands",
+    "command": {
+        "type": "conditional",
+        "condition": {
+            "value": {
+                "type": "percentage",
+                "percentage": 5
+            }
+        },
+        "ifTrue": {
+            "type": "command",
+            "command": {
+                "name": "rebel",
+                "bot": "krystal"
+            }
+        }
+    }
+}

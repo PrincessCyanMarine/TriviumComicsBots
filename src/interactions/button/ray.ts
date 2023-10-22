@@ -1,7 +1,7 @@
 import { GuildMember, Message } from "discord.js";
 import { testing } from "../..";
 import { ray } from "../../clients";
-import { Help } from "../../common/help";
+// import { Help } from "../../common/help";
 import { testChannelId, triviumGuildId } from "../../common/variables";
 import { get_rank_message } from "../../d20/functions";
 

@@ -1,0 +1,30 @@
+{
+    "dataType": "activator",
+    "method": "message",
+    "match": ".*",
+    "bot": "krystal",
+    "type": "command",
+    "description": "18?",
+    "name": "18?",
+    "priority": 5,
+    "command": {
+        "type": "conditional",
+        "condition": {
+            "values": [
+                {
+                    "type": "string",
+                    "value": "{message:content}"
+                },
+                {
+                    "type": "string",
+                    "value": "18?"
+                }
+            ],
+            "comparison": "=="
+        },
+        "ifTrue": {
+            "type": "message",
+            "text": "18!"
+        }
+    }
+}

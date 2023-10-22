@@ -1,0 +1,22 @@
+{
+    "bot": "krystal",
+    "name": "dumbass",
+    "dataType": "activator",
+    "method": "message",
+    "type": "command",
+    "match": "dumbass",
+    "description": "Has a 10% chance of pinging <@601943025253482496> every time \"dumbass\" is said",
+    "command": {
+        "type": "conditional",
+        "condition": {
+            "value": {
+                "type": "percentage",
+                "percentage": 10
+            }
+        },
+        "ifTrue": {
+            "type": "message",
+            "text": "{mention:user:601943025253482496}"
+        }
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "dataType": "command",
+    "bot": "sadie",
+    "type": "function",
+    "function": "(items) => items",
+    "name": "getShopItems",
+    "args": []
+}

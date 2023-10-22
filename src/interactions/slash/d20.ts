@@ -15,6 +15,7 @@ d20.on("ready", async () => {
     console.log("D20 is processing slash commands");
 });
 d20.on("interactionCreate", async (interaction) => {
+    let startTime = Date.now();
     if (!interaction.isCommand()) return;
     if (ignore_channels.includes(interaction.channelId)) {
         reply(interaction, "Try another channel", true);
@@ -181,7 +182,7 @@ d20.on("interactionCreate", async (interaction) => {
         default:
             for (let { name, callback } of slash_commands["d20"]) {
                 if (name == interaction.commandName) {
-                    callback(interaction);
+                    callback(interaction, startTime);
                     return;
                 }
             }

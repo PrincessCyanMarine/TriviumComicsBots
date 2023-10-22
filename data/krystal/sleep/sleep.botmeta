@@ -1,0 +1,44 @@
+{
+    "dataType": "command",
+    "type": "conditional",
+    "name": "sleep",
+    "condition": {
+        "value": {
+            "type": "string",
+            "value": "{string:{args:0}:or:{target:exists}}"
+        }
+    },
+    "ifTrue": {
+        "type": "message",
+        "image": {
+            "size": {
+                "width": 361,
+                "height": 303
+            },
+            "composite": [
+                {
+                    "url": "{string:{args:0}:or:{target:avatar}}",
+                    "size": {
+                        "width": 121,
+                        "height": 121
+                    },
+                    "position": {
+                        "x": 95,
+                        "y": 38
+                    }
+                },
+                {
+                    "url": "./assets/krystal/sleep/top.png"
+                }
+            ],
+            "name": "Sleep.png"
+        }
+    },
+    "ifFalse": {
+        "type": "message",
+        "image": {
+            "url": "./assets/krystal/sleep/sleep.png",
+            "name": "Sleep.png"
+        }
+    }
+}

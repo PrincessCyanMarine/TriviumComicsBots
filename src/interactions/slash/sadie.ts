@@ -10,6 +10,7 @@ sadie.on("ready", async () => {
 });
 
 sadie.on("interactionCreate", async (interaction) => {
+    let startTime = Date.now();
     if (!interaction.isCommand()) return;
     if (ignore_channels.includes(interaction.channelId)) {
         reply(interaction, "Try another channel", true);
@@ -37,7 +38,7 @@ sadie.on("interactionCreate", async (interaction) => {
         default:
             for (let { name, callback } of slash_commands["sadie"]) {
                 if (name == interaction.commandName) {
-                    callback(interaction);
+                    callback(interaction, startTime);
                     return;
                 }
             }

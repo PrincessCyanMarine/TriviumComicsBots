@@ -1,0 +1,22 @@
+{
+    "dataType": "activator",
+    "name": "sleep",
+    "method": "message",
+    "type": "command",
+    "bot": "krystal",
+    "description": "Krystal puts a player to sleep.",
+    "matches": [
+        "sleep",
+        "bed",
+        "clothes",
+        "bedtime"
+    ],
+    "botName": true,
+    "command": {
+        "type": "command",
+        "command": {
+            "name": "sleep",
+            "bot": "krystal"
+        }
+    }
+}

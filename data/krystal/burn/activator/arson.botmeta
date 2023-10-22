@@ -1,0 +1,16 @@
+{
+    "dataType": "activator",
+    "type": "command",
+    "method": "message",
+    "match": "arson",
+    "bot": "krystal",
+    "botName": false,
+    "description": "Krystal commits arson",
+    "command": {
+        "type": "command",
+        "command": {
+            "bot": "krystal",
+            "name": "burn"
+        }
+    }
+}

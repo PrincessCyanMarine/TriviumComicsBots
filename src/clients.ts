@@ -1,9 +1,18 @@
 import { ActivityType, Client, Guild, GuildMember, Intents, ThreadChannel, User, WebhookClient } from "discord.js";
 import { config } from "dotenv";
-import { changeActivities, random_from_array, readAllBotData, testExclamationCommand, testMessageCommand, wait } from "./common/functions";
-import { killWords, protectedFromKills, triviumGuildId } from "./common/variables";
+import {
+    changeActivities,
+    commandTextConverter,
+    random_from_array,
+    readAllBotData,
+    testExclamationCommand,
+    testMessageCommand,
+    wait,
+} from "./common/functions";
+import { killWords, marineId, protectedFromKills, triviumGuildId } from "./common/variables";
 import { Message } from "discord.js";
 import { database } from ".";
+import { ActivatorType, BotDataTypes, BotNames, CommandType, VariableType, botNames } from "./model/botData";
 config();
 
 const intents = [
@@ -40,180 +49,17 @@ const all_clients_ready = () => {
     return true;
 };
 
-export const botDataTypes = ["activator", "command", "variable"] as const;
-export type BotDataTypes = (typeof botDataTypes)[number];
-export function isDataTypeKey(key: string): key is BotDataTypes {
-    return botDataTypes.includes(key as any);
+export function isBotNameKey(key: string): key is BotNames {
+    return botNames.includes(key as any);
 }
-export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus", "siegfried", "d20"] as const;
-export type BotNames = (typeof botNames)[number];
 
-export type ImageType = {
-    url?: string | string[];
-    size?: {
-        width: number;
-        height: number;
-    };
-    composite?: ImageType[];
-    position?: {
-        x: number;
-        y: number;
-    };
-    color?: string;
-    actions?: (
-        | {
-              type: "crop";
-              style: "out" | "in";
-              x: number;
-              y: number;
-              width: number;
-              height: number;
-          }
-        | {
-              type: "rotate";
-              angle: number;
-          }
-    )[];
-} & (
-    | {
-          url: string | string[];
-      }
-    | {
-          size: {
-              width: number;
-              height: number;
-          };
-          color: string;
-      }
-);
-
-export type CommandCondition = { not?: boolean } & (
-    | { value: CommandType }
-    | { values: [CommandType, CommandType]; comparison: "includes" | "==" | ">" | "<" | ">=" | "<=" | "!=" }
-);
-
-export type CommandType<T = any, V extends any[] = any[]> = {
-    dataType?: "command";
-    name?: string;
-    description?: string;
-    version?: string;
-    bot?: BotNames;
-    args?: CommandType[];
-    clearArgs?: boolean;
-} & (
-    | {
-          type: "message";
-          ephemeral?: boolean;
-          text?: string;
-          command?: CommandType;
-          image?: ImageType;
-          delay?: number;
-      }
-    | {
-          type: "string";
-          value: string;
-      }
-    | {
-          type: "boolean";
-          value: boolean;
-      }
-    | ({
-          type: "array";
-      } & (
-          | {
-                commandArray: CommandType[];
-            }
-          | { array: any[] }
-      ))
-    | {
-          type: "sequence";
-          commands: CommandType<T>[];
-      }
-    | {
-          type: "command";
-          command: {
-              name: string;
-              bot: BotNames;
-          };
-      }
-    | {
-          type: "random";
-          commands: CommandType<T>[];
-      }
-    | {
-          type: "random-weighted";
-          commands: { command: CommandType<T>; weight: number }[];
-      }
-    | ({
-          type: "conditional";
-          ifTrue: CommandType<any>;
-          ifFalse?: CommandType<any>;
-      } & ({ condition: CommandCondition } | { conditions: CommandCondition[] }))
-    | ({
-          type: "get-variable";
-      } & ({ variable: string; bot: BotNames } | { variable: VariableType<T> }))
-    | ({
-          type: "set-variable";
-          newValue: CommandType<T>;
-          bot?: BotNames;
-      } & ({ variable: string; bot: BotNames } | { variable: VariableType<T> }))
-    | {
-          type: "function";
-          function: string | ((...args: V) => T);
-      }
-);
-
-export type ActivatorType = {
-    dataType?: "activator";
-    name?: string;
-    description?: string;
-    version?: string;
-    guilds?: string[];
-    bot: BotNames;
-} & (
-    | {
-          method: "slash";
-          activator: string;
-          args?: any[];
-      }
-    | ({
-          method: "message";
-          botName?: boolean;
-      } & ({ matches: string[]; matchType?: "any" | "all" } | { match: string }))
-    | {
-          method: "reaction";
-          match: string;
-      }
-    | ({
-          method: "exclamation";
-      } & (
-          | { activators: string[] }
-          | {
-                activator: string;
-            }
-      ))
-) & {
-        type: "command";
-        command: CommandType<any>;
-    };
-
-export type VariableType<T = any> = {
-    dataType?: "variable";
-    name?: string;
-    description?: string;
-    version?: string;
-    perGuild?: boolean;
-    perUser?: boolean;
-    // perChannel?: boolean;
-    // perRole?: boolean;
-    // perMessage?: boolean;
-    // perActivator?: boolean;
-    // perCommand?: boolean;
-    databaseKey?: string;
-    value?: T;
-    defaultValue?: T;
-    bot?: BotNames;
-};
+export type BotTypeNameToType<T extends BotDataTypes> = T extends "activator"
+    ? ActivatorType
+    : T extends "command"
+    ? CommandType<any>
+    : T extends "variable"
+    ? DataVariable<any>
+    : any;
 
 export class DataVariable<T = any> {
     public dataType = "variable";
@@ -258,18 +104,6 @@ export class DataVariable<T = any> {
     }
 }
 
-export function isBotNameKey(key: string): key is BotNames {
-    return botNames.includes(key as any);
-}
-
-export type BotTypeNameToType<T extends BotDataTypes> = T extends "activator"
-    ? ActivatorType
-    : T extends "command"
-    ? CommandType<any>
-    : T extends "variable"
-    ? DataVariable<any>
-    : any;
-
 export function setBotData(newBotData: typeof botData) {
     botData = newBotData;
 }
@@ -288,11 +122,13 @@ export var botData: Record<
                 method: "slash",
                 type: "command",
                 bot: "d20",
+                description: "Reloads bot data (you probably can't use this one lol)",
                 command: {
                     type: "message",
                     command: {
                         type: "function",
-                        function: async () => {
+                        function: async (moi) => {
+                            if (!moi.user?.id || moi.user?.id != marineId) return "You can't do that";
                             require("./commands");
                             await readAllBotData();
                             return "Data reloaded";
@@ -305,37 +141,65 @@ export var botData: Record<
                 name: "help",
                 method: "slash",
                 activator: "help",
-                description: "See a list of bot commands and their descriptions (only for commands using the new system)",
+                description:
+                    "See a list of bot commands and their descriptions (only for commands using the new system) (functionality is limited for now)",
                 bot: "d20",
                 version: "1.0.0",
                 type: "command",
                 command: {
                     type: "message",
+                    delay: 0,
                     command: {
                         type: "function",
-                        function: () => {
+                        function: async (moi, thiscommand, startTime) => {
+                            if (moi.user.id != marineId)
+                                return `Sorry, in its current state, this command is only available for {mention:${marineId}}`;
                             let text = "";
                             for (let botName in botData) {
                                 let bot = botData[botName as BotNames];
-                                text += `**${botName}**\n\n\`\`\`md\n`;
+                                let commands = [] as string[];
+
                                 for (let dataType in bot) {
                                     let data = bot[dataType as BotDataTypes];
-                                    let commands = [] as string[];
-                                    let activators = [] as string[];
-                                    let variables = [] as string[];
                                     for (let name in data) {
                                         let command = data[name as string];
-                                        commands.push(`**${name}**\n${command.description || "No description"}`);
+                                        if (command.dataType == "activator") {
+                                            let activator = command as ActivatorType;
+                                            let _activator_text = `**${name} (${activator.bot})**\n${
+                                                activator.description
+                                                    ? await commandTextConverter(activator.description, thiscommand, moi, [], startTime, {
+                                                          bot: activator.bot,
+                                                          name: activator.name || name,
+                                                      })
+                                                    : "No description"
+                                            }\n`;
+                                            // _activator_text += `Version: ${activator.version}\n`;
+                                            _activator_text += `Activator type: ${activator.method}\n`;
+                                            switch (activator.method) {
+                                                case "slash":
+                                                    _activator_text += `Command: /${activator.activator}\n`;
+                                                    break;
+                                                case "message":
+                                                    if ("match" in activator) {
+                                                        _activator_text += `Command: "${activator.match}"\n`;
+                                                    } else {
+                                                        _activator_text += `Command: ${activator.matchType || "any"} of ${activator.matches
+                                                            .map((s) => `"${s}"`)
+                                                            .join(", ")}\n`;
+                                                        _activator_text += activator.botName ? `Must include bot name (${activator.bot})\n` : "";
+                                                    }
+                                                    break;
+                                                case "exclamation":
+                                                    if ("activator" in activator) _activator_text += `Command: !${activator.activator}\n`;
+                                                    else _activator_text += `Command: ${activator.activators.map((s) => `!${s}`).join(", ")}\n`;
+                                                    break;
+                                            }
+
+                                            commands.push(_activator_text);
+                                        }
                                     }
-                                    text += `# ${dataType}\n\n`;
-                                    console.log(botName, "commands", commands, commands.length, commands.length > 0);
-                                    console.log(botName, "activators", activators, activators.length, activators.length > 0);
-                                    console.log(botName, "variables", variables, variables.length, variables.length > 0);
-                                    if (commands.length > 0) text += `## Commands\n\n${commands.join("\n\n")}\n\n`;
-                                    if (activators.length > 0) text += `## Activators\n\n${activators.join("\n\n")}\n\n`;
-                                    if (variables.length > 0) text += `## Variables\n\n${variables.join("\n\n")}\n\n`;
                                 }
-                                text += "```";
+                                if (commands.length > 0) text += `${commands.join("\n")}\n`;
                             }
                             return text;
                         },
@@ -406,8 +270,9 @@ client_list.forEach((client) => {
     });
     try {
         client.on("messageCreate", async (msg) => {
-            testExclamationCommand(id2bot[client.user!.id!], msg);
-            testMessageCommand(id2bot[client.user!.id!], msg);
+            let startTime = Date.now();
+            testExclamationCommand(id2bot[client.user!.id!], msg, startTime);
+            testMessageCommand(id2bot[client.user!.id!], msg, startTime);
             if (!msg.channel.isThread()) return;
             try {
                 await warReact(msg);

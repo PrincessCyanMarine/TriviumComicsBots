@@ -1,0 +1,21 @@
+{
+    "dataType": "activator",
+    "method": "slash",
+    "activator": "remove-cache",
+    "bot": "d20",
+    "type": "command",
+    "description": "Removes cached avatars for the user",
+    "command": {
+        "type": "sequence",
+        "commands": [
+            {
+                "type": "function",
+                "function": "(moi)=>{console.log(moi.user.id); removeUserProfileCache(moi.user.id)}"
+            },
+            {
+                "type": "message",
+                "text": "Removed cached avatars for {author:mention}"
+            }
+        ]
+    }
+}

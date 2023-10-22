@@ -1,5 +1,5 @@
 /.env
-/.vscode
+# /.vscode
 /node_modules
 *lock.json
 *lock.yaml
@@ -9,3 +9,5 @@ dist/
 vscode-profile**
 **.code-workspace
 TODO.md
+.cache
+output.json

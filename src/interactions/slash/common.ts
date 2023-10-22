@@ -10,9 +10,10 @@ import {
     MessagePayload,
     TextChannel,
 } from "discord.js";
-import { BotNames, clients } from "../../clients";
+import { clients } from "../../clients";
 import { testing } from "../..";
 import { testGuildId } from "../../common/variables";
+import { BotNames } from "../../model/botData";
 function testvalid(interaction: Interaction): boolean {
     if (!interaction.channel?.isText()) return false;
     if (interaction.member && !(interaction.member instanceof GuildMember)) return false;
@@ -53,7 +54,10 @@ export const addCommandToGuild = async (guild: Guild, command: SlashCommandBuild
     guild.commands.create(command.toJSON());
 };
 
-export const slash_commands: Record<BotNames, { name: string; callback: (interaction: CommandInteraction<CacheType>) => Promise<void> }[]> = {
+export const slash_commands: Record<
+    BotNames,
+    { name: string; callback: (interaction: CommandInteraction<CacheType>, startTime: number) => Promise<void> }[]
+> = {
     sadie: [],
     d20: [],
     cerberus: [],
@@ -67,7 +71,7 @@ export const slash_commands: Record<BotNames, { name: string; callback: (interac
 export const addSlashCommand = async (
     botName: keyof typeof slash_commands,
     command: SlashCommandBuilder,
-    callback: (interaction: CommandInteraction<CacheType>) => Promise<void>,
+    callback: (interaction: CommandInteraction<CacheType>, startTime: number) => Promise<void>,
     addToGuilds?: string[]
 ) => {
     let bot = clients[botName];

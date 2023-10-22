@@ -1,0 +1,20 @@
+{
+    "dataType": "activator",
+    "type": "command",
+    "method": "message",
+    "match": "(\\S+?)s tip of the day",
+    "bot": "krystal",
+    "botName": false,
+    "priority": 20,
+    "description": "Krystal thanks the user for their tip of the day",
+    "command": {
+        "type": "message",
+        "text": "Thanks, {regex:(\\S+?)s tip of the day:i:1}",
+        "messageSender": [
+            "krystal",
+            "ray",
+            "sadie",
+            "eli"
+        ]
+    }
+}

@@ -85,6 +85,12 @@
             "conditions": [
                 {
                     "value": {
+                        "type": "percentage",
+                        "percentage": 10
+                    }
+                },
+                {
+                    "value": {
                         "type": "string",
                         "value": "{arg:3}"
                     },
@@ -99,19 +105,6 @@
                         {
                             "type": "string",
                             "value": "{arg:2}"
-                        }
-                    ],
-                    "comparison": "=="
-                },
-                {
-                    "values": [
-                        {
-                            "type": "string",
-                            "value": "{random:10}"
-                        },
-                        {
-                            "type": "string",
-                            "value": "0"
                         }
                     ],
                     "comparison": "=="

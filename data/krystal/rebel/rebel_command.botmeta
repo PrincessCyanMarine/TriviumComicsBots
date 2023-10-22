@@ -1,0 +1,63 @@
+{
+    "bot": "krystal",
+    "dataType": "command",
+    "type": "conditional",
+    "name": "rebel",
+    "condition": {
+        "value": {
+            "type": "percentage",
+            "percentage": 30
+        }
+    },
+    "ifTrue": {
+        "type": "random",
+        "commands": [
+            {
+                "type": "command",
+                "command": {
+                    "name": "targetedKill",
+                    "bot": "krystal"
+                },
+                "args": [
+                    {
+                        "type": "string",
+                        "value": "{author:displayAvatar}"
+                    },
+                    {
+                        "type": "string",
+                        "value": "Pfft"
+                    },
+                    {
+                        "type": "string",
+                        "value": "{author:id}"
+                    },
+                    {
+                        "type": "boolean",
+                        "value": true
+                    }
+                ]
+            },
+            {
+                "type": "command",
+                "command": {
+                    "name": "sleep",
+                    "bot": "krystal"
+                },
+                "args": [
+                    {
+                        "type": "string",
+                        "value": "{author:displayAvatar}"
+                    }
+                ]
+            }
+        ]
+    },
+    "ifFalse": {
+        "type": "message",
+        "text": "Pfft",
+        "image": {
+            "url": "./assets/krystal/pfft.png",
+            "name": "PFFT.png"
+        }
+    }
+}

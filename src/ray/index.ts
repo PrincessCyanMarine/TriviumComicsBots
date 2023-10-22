@@ -1,7 +1,7 @@
 import { database, testing } from "..";
 import { clients, id2bot, ray } from "../clients";
 import { ignore_message, say } from "../common/functions";
-import { Help } from "../common/help";
+// import { Help } from "../common/help";
 import { ignore_channels, roleplay_channels, testChannelId } from "../common/variables";
 import { testCommands } from "./commandHandler";
 import { roleplay } from "./functions";
@@ -26,8 +26,8 @@ ray.on("messageCreate", (msg) => {
 //     }
 // });
 
-ray.on("interactionCreate", (interaction) => {
-    if ((interaction.isSelectMenu() || interaction.isButton()) && interaction.customId.startsWith("help")) {
-        Help.processInteraction(interaction);
-    }
-});
+// ray.on("interactionCreate", (interaction) => {
+//     if ((interaction.isSelectMenu() || interaction.isButton()) && interaction.customId.startsWith("help")) {
+//         Help.processInteraction(interaction);
+//     }
+// });
