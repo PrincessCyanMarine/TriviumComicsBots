@@ -10,7 +10,7 @@
         "commands": [
             {
                 "type": "function",
-                "function": "(moi)=>{console.log(moi.user.id); removeUserProfileCache(moi.user.id)}"
+                "function": "(moi)=>removeUserProfileCache(moi.user.id)"
             },
             {
                 "type": "message",
