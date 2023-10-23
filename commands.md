@@ -114,6 +114,19 @@ Command: /remove-cache
 
 
 
+# help (d20)
+See a list of bot commands and their descriptions (only for commands using the new system) (functionality is limited for now)
+
+Version: 1.0.0
+
+Priority: 0
+
+Activator type: slash
+
+Command: /help
+
+
+
 # absorb (krystal)
 Krystal is become Kirby, destroyer of worlds.
 

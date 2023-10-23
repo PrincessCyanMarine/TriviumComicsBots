@@ -1,4 +1,20 @@
-import { SlashCommandBuilder, channelMention, formatEmoji, hyperlink, roleMention, userMention } from "@discordjs/builders";
+import {
+    SlashCommandAttachmentOption,
+    SlashCommandBooleanOption,
+    SlashCommandBuilder,
+    SlashCommandChannelOption,
+    SlashCommandIntegerOption,
+    SlashCommandMentionableOption,
+    SlashCommandNumberOption,
+    SlashCommandRoleOption,
+    SlashCommandStringOption,
+    SlashCommandUserOption,
+    channelMention,
+    formatEmoji,
+    hyperlink,
+    roleMention,
+    userMention,
+} from "@discordjs/builders";
 import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
 import {
     ActivityType,
@@ -57,6 +73,7 @@ import {
     d20,
     DataVariable,
     eli,
+    getActivatorHelp,
     krystal,
     makeCommandsMD,
     mod_alert_webhook,
@@ -330,6 +347,66 @@ export function readAllBotData() {
             }
         }
         clearAllData();
+        let choices: { name: string; value: string }[] = [];
+        for (let bot of botNames) {
+            choices.push(
+                ...Object.keys(botData[bot].activator)
+                    .filter((s) => !botData[bot].activator[s].hideFromHelp)
+                    .map((s) => ({ value: `[${s}](${bot})`, name: `${s} (${bot})` }))
+            );
+            if (bot == "d20") choices.push({ value: `[help](d20)`, name: `help (d20)` });
+        }
+
+        // console.log(choices);
+
+        botData["d20"]["activator"]["help"] = clearActivator({
+            dataType: "activator",
+            name: "help",
+            method: "slash",
+            activator: "help",
+            args: [
+                {
+                    name: "command",
+                    description: "What command do you want more info about?",
+                    type: "string",
+                    required: false,
+                    choices,
+                },
+            ],
+            description: "See a list of bot commands and their descriptions (only for commands using the new system)",
+            bot: "d20",
+            version: "1.0.0",
+            type: "command",
+            command: {
+                type: "message",
+                delay: 0,
+                command: {
+                    type: "function",
+                    function: async (moi: CommandInteraction, thiscommand, startTime) => {
+                        if (moi.user.id != marineId) return `Sorry, in its current state, this command is only available for {mention:${marineId}}`;
+                        // console.log(moi.options.getString("command", false));
+                        let command = moi.options.getString("command", false);
+                        if (!command) {
+                            let commands = [];
+                            for (let bot of botNames)
+                                commands.push(
+                                    ...Object.keys(botData[bot].activator)
+                                        .filter((s) => !botData[bot].activator[s].hideFromHelp)
+                                        .map((s) => `- (${bot}) ${s}`)
+                                );
+                            return `### Commands:\n\n${commands.join("\n")}`;
+                        }
+                        let [_, command_name, command_bot] = command.match(/\[(.+?)\]\((.+?)\)/)!;
+                        console.log(command, command_name, command_bot);
+                        let activator = botData[command_bot as BotNames].activator[command_name];
+                        if (!activator) return `Command ${command_name} not found`;
+                        return getActivatorHelp(activator, "\n");
+
+                        // return makeCommandsMD();
+                    },
+                },
+            },
+        });
         // writeFileSync("output.json", JSON.stringify(botData, null, 4));
         console.log(makeCommandsMD());
         resolve("Loaded all data");
@@ -385,7 +462,86 @@ function clearActivator(activator: ActivatorType) {
         case "slash":
             let description = activator.description || "NO DESCRIPTION";
             if (description.length > 100) description = description.slice(0, 97) + "...";
-            addSlashCommand(activator.bot, new SlashCommandBuilder().setName(activator.activator).setDescription(description), async (interaction) =>
+            let slashCommand = new SlashCommandBuilder().setName(activator.activator).setDescription(description);
+            if (activator.args)
+                for (let arg of activator.args) {
+                    // console.log(arg);
+                    let option;
+                    switch (arg.type) {
+                        case "string":
+                        case "integer":
+                        case "number":
+                            switch (arg.type) {
+                                case "integer":
+                                    option = new SlashCommandIntegerOption();
+                                case "number":
+                                    option = new SlashCommandNumberOption();
+                                case "string":
+                                    option = new SlashCommandStringOption();
+                            }
+                            for (let [key, fun] of [
+                                ["max", "setMaxValue"],
+                                ["min", "setMinValue"],
+                                ["autocomplete", "setAutocomplete"],
+                            ] as const)
+                                if (key in arg && fun in option && typeof option[fun] == "function")
+                                    option = (option as any)[fun](arg[key as keyof typeof arg]);
+                            if (arg.choices) option.addChoices(...arg.choices);
+
+                            break;
+                        case "attachment":
+                            option = new SlashCommandAttachmentOption();
+                            break;
+                        case "boolean":
+                            option = new SlashCommandBooleanOption();
+                            break;
+                        case "channel":
+                            option = new SlashCommandChannelOption();
+                            break;
+                        case "mentionable":
+                            option = new SlashCommandMentionableOption();
+                            break;
+                        case "role":
+                            option = new SlashCommandRoleOption();
+                            break;
+                        case "user":
+                            option = new SlashCommandUserOption();
+                            break;
+                        default:
+                            throw new Error(`Unknown slash command option type ${(arg as any)?.type}`);
+                    }
+                    option?.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
+                    switch (arg.type) {
+                        case "string":
+                            slashCommand.addStringOption(option);
+                            break;
+                        case "integer":
+                            slashCommand.addIntegerOption(option);
+                            break;
+                        case "number":
+                            slashCommand.addNumberOption(option);
+                            break;
+                        case "boolean":
+                            slashCommand.addBooleanOption(option);
+                            break;
+                        case "channel":
+                            slashCommand.addChannelOption(option);
+                            break;
+                        case "mentionable":
+                            slashCommand.addMentionableOption(option);
+                            break;
+                        case "role":
+                            slashCommand.addRoleOption(option);
+                            break;
+                        case "user":
+                            slashCommand.addUserOption(option);
+                            break;
+                        case "attachment":
+                            slashCommand.addAttachmentOption(option);
+                            break;
+                    }
+                }
+            addSlashCommand(activator.bot, slashCommand, async (interaction) =>
                 // console.log("Running command " + activator.activator);
                 runDataCommand(activator.command, interaction, [], Date.now()).catch((err) => {
                     console.error(err);

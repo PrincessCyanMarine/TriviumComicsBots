@@ -109,6 +109,34 @@ export function setBotData(newBotData: typeof botData) {
     botData = newBotData;
 }
 
+export function getActivatorHelp(activator: ActivatorType, line_skip = "\n\n") {
+    let _activator_text = `# ${activator.name} (${activator.bot})\n${activator.description ? activator.description : "No description"}${line_skip}`;
+    _activator_text += `Version: ${activator.version || "1.0.0"}${line_skip}`;
+    _activator_text += `Priority: ${activator.priority || 0}${line_skip}`;
+    // _activator_text += `Version: ${activator.version}\n`;
+    _activator_text += `Activator type: ${activator.method}${line_skip}`;
+    switch (activator.method) {
+        case "slash":
+            _activator_text += `Command: /${activator.activator}${line_skip}`;
+            break;
+        case "message":
+            if ("match" in activator) {
+                _activator_text += `Command: /${activator.match}/${line_skip}`;
+            } else {
+                _activator_text += `Command: ${activator.matchType || "any"} of\n- ${activator.matches
+                    .map((s) => `/${s}/`)
+                    .join("\n- ")}${line_skip}`;
+                _activator_text += activator.botName ? `Must include bot name (${activator.bot})${line_skip}` : "";
+            }
+            break;
+        case "exclamation":
+            if ("activator" in activator) _activator_text += `Command: !${activator.activator}${line_skip}`;
+            else _activator_text += `Command: ${activator.activators.map((s) => `!${s}`).join(", ")}${line_skip}`;
+            break;
+    }
+    return _activator_text;
+}
+
 export function makeCommandsMD() {
     let text = `
 # "Message commands" use regex
@@ -131,32 +159,8 @@ export function makeCommandsMD() {
         if (command.dataType == "activator") {
             let activator = command as ActivatorType;
             if (activator.hideFromHelp) continue;
-            let _activator_text = `# ${activator.name} (${activator.bot})\n${activator.description ? activator.description : "No description"}\n\n`;
-            _activator_text += `Version: ${activator.version || "1.0.0"}\n\n`;
-            _activator_text += `Priority: ${activator.priority || 0}\n\n`;
-            // _activator_text += `Version: ${activator.version}\n`;
-            _activator_text += `Activator type: ${activator.method}\n\n`;
-            switch (activator.method) {
-                case "slash":
-                    _activator_text += `Command: /${activator.activator}\n\n`;
-                    break;
-                case "message":
-                    if ("match" in activator) {
-                        _activator_text += `Command: /${activator.match}/\n\n`;
-                    } else {
-                        _activator_text += `Command: ${activator.matchType || "any"} of\n- ${activator.matches
-                            .map((s) => `/${s}/`)
-                            .join("\n- ")}\n\n`;
-                        _activator_text += activator.botName ? `Must include bot name (${activator.bot})\n\n` : "";
-                    }
-                    break;
-                case "exclamation":
-                    if ("activator" in activator) _activator_text += `Command: !${activator.activator}\n\n`;
-                    else _activator_text += `Command: ${activator.activators.map((s) => `!${s}`).join(", ")}\n\n`;
-                    break;
-            }
 
-            commands.push(_activator_text);
+            commands.push(getActivatorHelp(activator));
         }
     }
     if (commands.length > 0) text += `${commands.join("\n\n")}\n\n`;
@@ -190,30 +194,6 @@ export var botData: Record<
                             require("./commands");
                             await readAllBotData();
                             return "Data reloaded";
-                        },
-                    },
-                },
-            },
-            help: {
-                dataType: "activator",
-                name: "help",
-                method: "slash",
-                activator: "help",
-                description:
-                    "See a list of bot commands and their descriptions (only for commands using the new system) (functionality is limited for now)",
-                bot: "d20",
-                version: "1.0.0",
-                type: "command",
-                hideFromHelp: true,
-                command: {
-                    type: "message",
-                    delay: 0,
-                    command: {
-                        type: "function",
-                        function: async (moi, thiscommand, startTime) => {
-                            if (moi.user.id != marineId)
-                                return `Sorry, in its current state, this command is only available for {mention:${marineId}}`;
-                            return makeCommandsMD();
                         },
                     },
                 },

@@ -149,7 +149,7 @@ export type ActivatorType = {
     | {
           method: "slash";
           activator: string;
-          args?: any[];
+          args?: SlashOptionType[];
       }
     | ({
           method: "message";
@@ -186,3 +186,27 @@ export type VariableType<T = any> = {
 };
 
 export type DataType = CommandType | ActivatorType | VariableType;
+
+export type SlashOptionType = {
+    name: string;
+    description: string;
+    required: boolean;
+} & (
+    | {
+          type: "string";
+          choices?: { name: string; value: string }[];
+          autocomplete?: boolean;
+      }
+    | (({ type: "number" } | { type: "integer" }) & {
+          choices?: { name: string; value: number }[];
+          autocomplete?: boolean;
+          min?: number;
+          max?: number;
+      })
+    | { type: "boolean" }
+    | { type: "user" }
+    | { type: "channel" }
+    | { type: "role" }
+    | { type: "mentionable" }
+    | { type: "attachment" }
+);
