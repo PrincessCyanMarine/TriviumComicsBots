@@ -598,19 +598,15 @@ export function get_rank_message(
         let end = start + 10;
         let members: Collection<string, GuildMember>;
 
-        let _ranking: [string, number][];
-        do {
-            members = await guild.members.fetch({ user: ranking.slice(start, end).map((u) => u[0]) });
-            _ranking = ranking.filter((r) => members.has(r[0]));
-            end += _ranking.length - 10;
-        } while (_ranking.length < 10 && end < ranking.length);
+        members = await guild.members.fetch({ user: ranking.map((u) => u[0]) });
+        ranking = ranking.filter((r) => members.has(r[0]));
 
-        let zeros = _ranking.length.toString().length;
+        let zeros = ranking.length.toString().length;
 
-        for (let i = start; i < end && i < _ranking.length; i++) {
-            let ranking_member_name = members.get(_ranking[i][0])?.displayName;
+        for (let i = start; i < end && i < ranking.length; i++) {
+            let ranking_member_name = members.get(ranking[i][0])?.displayName;
             if (!ranking_member_name) ranking_member_name = "Unknown";
-            text += `${(i + 1).toString().padStart(zeros, "0")}: ${ranking_member_name} (${_ranking[i][1]} messages)\n`;
+            text += `${(i + 1).toString().padStart(zeros, "0")}: ${ranking_member_name} (${ranking[i][1]} messages)\n`;
         }
 
         let buttons = {
