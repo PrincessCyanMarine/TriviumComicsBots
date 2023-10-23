@@ -65,6 +65,11 @@ export type CommandType<T = any, V extends any[] = any[]> = {
     };
 } & (
     | {
+          type: "targeted";
+          hasTarget: CommandType<T>;
+          noTarget?: CommandType<T>;
+      }
+    | {
           type: "message";
           ephemeral?: boolean;
           text?: string;

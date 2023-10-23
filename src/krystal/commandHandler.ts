@@ -59,19 +59,26 @@ export function testCommands(msg: Message) {
         // eighteen(msg);
     } else if (testWord(args, "(I|Im|I am)\\s(will|going to|gonna|shall)\\s(bed|sleep)")) {
         // sleeping(msg, msg.author);
-    } else if (testWord(args, "(I|Im|I am|(I (will|((am|m)\\s(going\\sto|gonna))|shall)))\\s(hungry|eat)")) eating(msg, msg.author);
-    else if (testWord(args, "cow poop(y?)", "ox excrement", "bullshit")) bullshit(msg);
-    else if (testWord(args, "krystal")) {
+    } else if (testWord(args, "(I|Im|I am|(I (will|((am|m)\\s(going\\sto|gonna))|shall)))\\s(hungry|eat)")) {
+        // eating(msg, msg.author);
+    } else if (testWord(args, "cow poop(y?)", "ox excrement", "bullshit")) {
+        // bullshit(msg);
+    } else if (testWord(args, "krystal")) {
         msg.channel.sendTyping();
         if (willRebel()) rebel(msg, false);
-        else if (testWord(args, "run", "gun", "book it", "escape")) gunning(msg);
-        else if (testWord(args, "sleep", "bed", "clothes", "bedtime")) {
+        else if (testWord(args, "run", "gun", "book it", "escape")) {
+            // gunning(msg);
+        } else if (testWord(args, "sleep", "bed", "clothes", "bedtime")) {
             // sleeping(msg);
-        } else if (testWord(args, "absorb")) absorbing(msg);
-        else if (testWord(args, "girlfriend", "marry", "date", "love", "gf", "boyfriend", "waifu", "wife")) loving(msg);
-        else if (testWord(args, "popcorn", "feed", "hungry", "eat")) eating(msg);
-        else if (testWord(args, "swim")) swimming(msg);
-        else if (testWord(args, "fire", "burn", "this is fine")) {
+        } else if (testWord(args, "absorb")) {
+            // absorbing(msg);
+        } else if (testWord(args, "girlfriend", "marry", "date", "love", "gf", "boyfriend", "waifu", "wife")) {
+            // loving(msg);
+        } else if (testWord(args, "popcorn", "feed", "hungry", "eat")) {
+            // eating(msg);
+        } else if (testWord(args, "swim")) {
+            // swimming(msg);
+        } else if (testWord(args, "fire", "burn", "this is fine")) {
             // burning(msg);
         } else if (testWord(args, "(divide by |\\S*/\\s?)(0|zero)", "crash", "meaning of life")) crashing(msg);
         else if (testWord(args, "spin", "beyblade")) spinning(msg);

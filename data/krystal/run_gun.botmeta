@@ -1,0 +1,22 @@
+{
+    "bot": "krystal",
+    "name": "run",
+    "dataType": "activator",
+    "type": "command",
+    "method": "message",
+    "description": "Was that \"run\" or \"gun\"?",
+    "matches": [
+        "run",
+        "gun",
+        "book it",
+        "escape"
+    ],
+    "botName": true,
+    "command": {
+        "type": "message",
+        "image": {
+            "url": "./assets/krystal/runngun.png",
+            "name": "Run and gun.png"
+        }
+    }
+}

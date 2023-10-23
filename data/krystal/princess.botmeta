@@ -1,0 +1,23 @@
+{
+    "bot": "krystal",
+    "name": "princess",
+    "dataType": "activator",
+    "type": "command",
+    "method": "message",
+    "description": "Krystal is not your girlfriend.",
+    "matches": [
+        "girlfriend",
+        "marry",
+        "date",
+        "love",
+        "gf",
+        "boyfriend",
+        "waifu",
+        "wife"
+    ],
+    "botName": true,
+    "command": {
+        "type": "message",
+        "text": "I'm sorry, {author:displayName} Your Princess is in another castle."
+    }
+}

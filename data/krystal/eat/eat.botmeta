@@ -1,0 +1,34 @@
+{
+    "dataType": "command",
+    "name": "eat",
+    "bot": "krystal",
+    "type": "targeted",
+    "hasTarget": {
+        "type": "message",
+        "image": {
+            "url": "./assets/krystal/popcorn/base.png",
+            "composite": [
+                {
+                    "url": "{target:displayAvatar}",
+                    "position": {
+                        "x": 125,
+                        "y": 200
+                    },
+                    "size": {
+                        "width": 500,
+                        "height": 500
+                    }
+                },
+                {
+                    "url": "./assets/krystal/popcorn/top.png"
+                }
+            ]
+        }
+    },
+    "noTarget": {
+        "type": "message",
+        "image": {
+            "url": "./assets/krystal/popcorn/popcorn.png"
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "name": "eat",
+    "bot": "krystal",
+    "dataType": "activator",
+    "method": "message",
+    "matches": [
+        "popcorn",
+        "feed",
+        "hungry",
+        "eat"
+    ],
+    "botName": true,
+    "type": "command",
+    "command": {
+        "type": "command",
+        "command": {
+            "name": "eat",
+            "bot": "krystal"
+        }
+    }
+}

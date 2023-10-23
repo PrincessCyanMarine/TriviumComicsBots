@@ -12,35 +12,12 @@
 
 
 
-# my-xp (d20)
-Shows your XP
-
-Activator type: slash
-
-Command: /my-xp
-
-
-
-# log-commands (d20)
-No description
-
-Activator type: slash
-
-Command: /log-commands
-
-
-
-# remove-cache (d20)
-Removes cached avatars for the user
-
-Activator type: slash
-
-Command: /remove-cache
-
-
-
 # 18? (krystal)
 18?
+
+Version: 1.0.0
+
+Priority: 30
 
 Activator type: message
 
@@ -48,8 +25,101 @@ Command: /.*/
 
 
 
+# tip (krystal)
+Krystal thanks the user for their tip of the day
+
+Version: 1.0.0
+
+Priority: 20
+
+Activator type: message
+
+Command: /(\S+?)s tip of the day/
+
+
+
+# pfft (krystal)
+PFFFFFFFFFFFFFFFFFFT
+
+Version: 1.0.0
+
+Priority: 10
+
+Activator type: message
+
+Command: /pf{2,}t/
+
+
+
+# rebel (krystal)
+Krystal has a 5% chance to rebel against some commands
+
+Version: 1.0.0
+
+Priority: 10
+
+Activator type: message
+
+Command: /.*/
+
+
+
+# yeet (krystal)
+This command has not yet been implemented under the new system
+
+Version: 1.0.0
+
+Priority: 10
+
+Activator type: deactivated
+
+
+
+# dumbass (krystal)
+Has a 10% chance of pinging <@601943025253482496> every time "dumbass" is said
+
+Version: 1.0.0
+
+Priority: 5
+
+Activator type: message
+
+Command: /dumbass/
+
+
+
+# my-xp (d20)
+Shows your XP
+
+Version: 1.0.0
+
+Priority: 0
+
+Activator type: slash
+
+Command: /my-xp
+
+
+
+# remove-cache (d20)
+Removes cached avatars for the user
+
+Version: 1.0.0
+
+Priority: 0
+
+Activator type: slash
+
+Command: /remove-cache
+
+
+
 # absorb (krystal)
 Krystal is become Kirby, destroyer of worlds.
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
@@ -63,6 +133,10 @@ Must include bot name (krystal)
 # arson (krystal)
 Krystal commits arson
 
+Version: 1.0.0
+
+Priority: 0
+
 Activator type: message
 
 Command: /arson/
@@ -71,6 +145,10 @@ Command: /arson/
 
 # burn (krystal)
 Krystal will burn the world down.
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
@@ -83,17 +161,60 @@ Must include bot name (krystal)
 
 
 
-# dumbass (krystal)
-Has a 10% chance of pinging <@601943025253482496> every time "dumbass" is said
+# cow-poopy (krystal)
+Cow poopy
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
-Command: /dumbass/
+Command: any of
+- /cow poop(y?)/
+- /ox excrement/
+- /bullshit/
+
+
+
+# eat (krystal)
+No description
+
+Version: 1.0.0
+
+Priority: 0
+
+Activator type: message
+
+Command: any of
+- /popcorn/
+- /feed/
+- /hungry/
+- /eat/
+
+Must include bot name (krystal)
+
+
+
+# eat_1 (krystal)
+No description
+
+Version: 1.0.0
+
+Priority: 0
+
+Activator type: message
+
+Command: /(I|Im|I am|(I (will|((am|m)\s(going\sto|gonna))|shall)))\s(hungry|eat)/
 
 
 
 # image-test (krystal)
 A command made to test image generation.
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: exclamation
 
@@ -103,6 +224,10 @@ Command: !image
 
 # kill (krystal)
 Ask Krystal to commit an unaliving
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
@@ -123,26 +248,54 @@ Must include bot name (krystal)
 
 
 
-# pfft (krystal)
-PFFFFFFFFFFFFFFFFFFT
+# princess (krystal)
+Krystal is not your girlfriend.
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
-Command: /pf{2,}t/
+Command: any of
+- /girlfriend/
+- /marry/
+- /date/
+- /love/
+- /gf/
+- /boyfriend/
+- /waifu/
+- /wife/
+
+Must include bot name (krystal)
 
 
 
-# rebel (krystal)
-Krystal has a 5% chance to rebel against some commands
+# run (krystal)
+Was that "run" or "gun"?
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
-Command: /.*/
+Command: any of
+- /run/
+- /gun/
+- /book it/
+- /escape/
+
+Must include bot name (krystal)
 
 
 
 # sleep_1 (krystal)
 Krystal puts you to sleep.
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
@@ -152,6 +305,10 @@ Command: /(I|Im|I am)\s(will|going to|gonna|shall)\s(bed|sleep)/
 
 # sleep (krystal)
 Krystal puts a player to sleep.
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
@@ -168,6 +325,10 @@ Must include bot name (krystal)
 # spare (krystal)
 Ask Krystal to spare an unattractive weeb
 
+Version: 1.0.0
+
+Priority: 0
+
 Activator type: message
 
 Command: any of
@@ -178,24 +339,25 @@ Must include bot name (krystal)
 
 
 
-# tip (krystal)
-Krystal thanks the user for their tip of the day
+# swim (krystal)
+No description
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: message
 
-Command: /(\S+?)s tip of the day/
-
-
-
-# yeet (krystal)
-This command has not yet been implemented under the new system
-
-Activator type: deactivated
+Command: /swim/
 
 
 
 # shop (sadie)
 Show items for sale
+
+Version: 1.0.0
+
+Priority: 0
 
 Activator type: slash
 

@@ -58,6 +58,7 @@ import {
     DataVariable,
     eli,
     krystal,
+    makeCommandsMD,
     mod_alert_webhook,
     ray,
     sadie,
@@ -330,6 +331,7 @@ export function readAllBotData() {
         }
         clearAllData();
         // writeFileSync("output.json", JSON.stringify(botData, null, 4));
+        console.log(makeCommandsMD());
         resolve("Loaded all data");
     });
 }
@@ -431,6 +433,10 @@ function clearCommand<T>(
     // console.log("rootCommand for " + command.name, JSON.stringify(command.rootCommand, null, 2), JSON.stringify(command, null, 2));
     const _clearCommand = <V = T>(_command: CommandType) => clearCommand<V>(_command, rootCommand);
     switch (command.type) {
+        case "targeted":
+            command.hasTarget = _clearCommand(command.hasTarget);
+            if (command.noTarget) command.noTarget = _clearCommand(command.noTarget);
+            break;
         case "function":
             if (typeof command.function == "string") command.function = eval(command.function as unknown as string);
             command.args = command.args?.map(_clearCommand) || [];
@@ -716,6 +722,7 @@ function clearExpiredCache() {
         if (timestamp + MAX_CACHE_TIME < Date.now()) {
             unlinkSync(path);
             delete imageCache[key];
+            console.log(`Deleted expired cache ${key}`);
         }
     }
 }
@@ -723,6 +730,7 @@ clearExpiredCache();
 setInterval(clearExpiredCache, TIME.HOURS);
 
 function removeUserProfileCache(id: number | string) {
+    console.log(`Removing user profile cache for ${id}`);
     for (let [key, { path, timestamp }] of Object.entries(imageCache))
         if (key.startsWith(`https://cdn.discordapp.com/avatars/${id}`)) delete imageCache[key];
 
@@ -756,6 +764,7 @@ async function createImage(
         try {
             img = await loadImage(url);
             if (!imageCache[url] && url.startsWith("http")) {
+                console.log(`Caching image ${url}`);
                 let canvas = createCanvas(img.width, img.height);
                 let ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, img.width, img.height);
@@ -861,6 +870,12 @@ function runDataCommand<T>(
                 ];
 
             switch (command?.type) {
+                case "targeted":
+                    if (moi instanceof Message && getTargetMember(moi))
+                        runDataCommand(command.hasTarget, moi, args, startTime, rootCommand).then(resolve).catch(reject);
+                    else if (command.noTarget) runDataCommand(command.noTarget, moi, args, startTime, rootCommand).then(resolve).catch(reject);
+
+                    break;
                 case "message":
                     try {
                         if (!moi) return reject("No message or interaction provided");
@@ -1545,7 +1560,7 @@ let messageCommands: Partial<
 
 function addMessageCommand(bot: BotNames, activator: ActivatorType) {
     if (activator.method != "message") return;
-    let matches = "match" in activator ? [activator.match] : activator.matches;
+    let matches = ("match" in activator ? [activator.match] : activator.matches) || [];
     let matchType;
     if ("matchType" in activator) matchType = activator.matchType;
     matchType = matchType || "any";

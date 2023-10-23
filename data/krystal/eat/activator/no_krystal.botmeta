@@ -1,0 +1,16 @@
+{
+    "name": "eat_1",
+    "bot": "krystal",
+    "dataType": "activator",
+    "method": "message",
+    "match": "(I|Im|I am|(I (will|((am|m)\\s(going\\sto|gonna))|shall)))\\s(hungry|eat)",
+    "botName": false,
+    "type": "command",
+    "command": {
+        "type": "command",
+        "command": {
+            "name": "eat",
+            "bot": "krystal"
+        }
+    }
+}

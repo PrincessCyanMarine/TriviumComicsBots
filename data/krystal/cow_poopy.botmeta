@@ -1,0 +1,17 @@
+{
+    "bot": "krystal",
+    "name": "cow-poopy",
+    "dataType": "activator",
+    "description": "Cow poopy",
+    "type": "command",
+    "method": "message",
+    "matches": [
+        "cow poop(y?)",
+        "ox excrement",
+        "bullshit"
+    ],
+    "command": {
+        "type": "message",
+        "text": "Cow poopy"
+    }
+}

@@ -1,30 +1,37 @@
 {
+    "name": "swim",
+    "type": "command",
     "dataType": "activator",
     "method": "message",
-    "match": ".*",
     "bot": "krystal",
-    "type": "command",
-    "description": "18?",
-    "name": "18?",
-    "priority": 30,
+    "match": "swim",
+    "botName": true,
     "command": {
         "type": "conditional",
         "condition": {
             "values": [
                 {
                     "type": "string",
-                    "value": "{message:content}"
+                    "value": "{author:displayName}"
                 },
                 {
                     "type": "string",
-                    "value": "18?"
+                    "value": "sadie"
                 }
             ],
             "comparison": "=="
         },
         "ifTrue": {
             "type": "message",
-            "text": "18!"
+            "image": {
+                "url": "./assets/krystal/swim/swimsadie.png"
+            }
+        },
+        "ifFalse": {
+            "type": "message",
+            "image": {
+                "url": "./assets/krystal/swim/swim.png"
+            }
         }
     }
 }
