@@ -598,6 +598,8 @@ export function get_rank_message(
         let members = await guild.members.fetch({ user: ranking.slice(start, end).map((u) => u[0]) });
         let zeros = ranking.length.toString().length;
 
+        ranking = ranking.filter((r) => members.has(r[0]));
+
         for (let i = start; i < end && i < ranking.length; i++) {
             let ranking_member_name = members.get(ranking[i][0])?.displayName;
             if (!ranking_member_name) ranking_member_name = "Unknown";
