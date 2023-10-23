@@ -261,10 +261,16 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
     });
 }
 
-export function getposition(guildid: string, memberid: string, all_messages?: { [id: string]: number }): Promise<number> {
+export function getposition(
+    guildid: string,
+    memberid: string,
+    all_messages?: { [id: string]: number },
+    members?: Collection<string, GuildMember>
+): Promise<number> {
     return new Promise(async (resolve, reject) => {
         if (!all_messages) all_messages = await (await database.child("lvl/" + guildid).once("value")).val();
         if (!all_messages) return resolve(1);
+        if (members) all_messages = Object.fromEntries(Object.entries(all_messages).filter((r) => members.has(r[0])));
         let messages = all_messages[memberid];
         let ranking: number[] = Object.values(all_messages);
         if (!messages) return resolve(ranking.length);
@@ -435,7 +441,8 @@ export function generatecard(
         let level = getLevel(messages, prestige);
         let level_cost = getLevelCost(level);
         let level_cost_next = getLevelCost(level + 1);
-        let position = await getposition(msg.guildId, target.id, all_messages);
+        let members = await msg.guild.members.fetch();
+        let position = await getposition(msg.guildId, target.id, all_messages, members);
 
         if (!style) style = defaultstyle;
         else {
