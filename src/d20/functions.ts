@@ -586,7 +586,8 @@ export function get_rank_message(
     guild: Guild,
     authorId: string,
     all_messages?: Object,
-    page: number = 0
+    page: number = 0,
+    player_filter?: string
 ): Promise<{ content: string; components?: MessageActionRow[] } | string> {
     return new Promise(async (resolve, reject) => {
         let ranking: [string, number][];
@@ -609,7 +610,12 @@ export function get_rank_message(
         ranking = ranking.filter((r) => members.has(r[0]));
 
         let zeros = ranking.length.toString().length;
-
+        if (player_filter) {
+            let players = ranking.map((r, i) => [r, i + 1] as const).filter((r) => members.get(r[0][0])?.id == player_filter);
+            for (let [[player, count], position] of players) {
+                resolve(`${position}: ${members.get(player)?.displayName} (${count} messages)`);
+            }
+        }
         for (let i = start; i < end && i < ranking.length; i++) {
             let ranking_member_name = members.get(ranking[i][0])?.displayName;
             if (!ranking_member_name) ranking_member_name = "Unknown";

@@ -244,10 +244,17 @@ d20.on("messageCreate", async (msg) => {
                 let ray_channel = await ray.channels.fetch(msg.channel.id);
                 if (!ray_channel?.isText()) return;
                 ray_channel.sendTyping();
+                let player_filter = msg.mentions.members?.first()?.id;
                 say(
                     ray,
                     ray_channel,
-                    await get_rank_message(msg.guild, msg.author.id, await (await database.child("lvl/" + msg.guild.id).once("value")).val(), 0)
+                    await get_rank_message(
+                        msg.guild,
+                        msg.author.id,
+                        await (await database.child("lvl/" + msg.guild.id).once("value")).val(),
+                        0,
+                        player_filter
+                    )
                 );
                 break;
             case "summon":
