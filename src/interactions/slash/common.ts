@@ -82,7 +82,10 @@ export const addSlashCommand = async (
     } else {
         let guilds = await bot.guilds.fetch();
         if (addToGuilds) guilds = guilds.filter((guild) => addToGuilds.includes(guild.id));
-        for (let guild of guilds.values()) await addCommandToGuild(await guild.fetch(), command);
+        for (let guild of guilds.values()) {
+            console.log(`Adding to guild ${guild.name} (${guild.id})}`);
+            await addCommandToGuild(await guild.fetch(), command);
+        }
     }
 
     slash_commands[botName] = slash_commands[botName].filter((c) => c.name != command.name);
