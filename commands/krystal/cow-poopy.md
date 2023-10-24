@@ -1,4 +1,5 @@
-# cow-poopy (krystal)
+# [cow-poopy (krystal)](/commands/krystal/cow-poopy.md)
+
 Cow poopy
 
 Version: 1.0.0
@@ -12,3 +13,6 @@ Command: any of
 - /ox excrement/
 - /bullshit/
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)

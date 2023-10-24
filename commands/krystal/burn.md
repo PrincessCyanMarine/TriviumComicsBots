@@ -1,4 +1,5 @@
-# burn (krystal)
+# [burn (krystal)](/commands/krystal/burn.md)
+
 Krystal will burn the world down.
 
 Version: 1.0.0
@@ -14,3 +15,6 @@ Command: any of
 
 Must include bot name (krystal)
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)

@@ -1,4 +1,5 @@
-# pfft (krystal)
+# [pfft (krystal)](/commands/krystal/pfft.md)
+
 PFFFFFFFFFFFFFFFFFFT
 
 Version: 1.0.0
@@ -9,3 +10,6 @@ Activator type: message
 
 Command: /pf{2,}t/
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)

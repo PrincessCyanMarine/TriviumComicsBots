@@ -1,4 +1,5 @@
-# swim (krystal)
+# [swim (krystal)](/commands/krystal/swim.md)
+
 No description
 
 Version: 1.0.0
@@ -9,3 +10,6 @@ Activator type: message
 
 Command: /swim/
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)

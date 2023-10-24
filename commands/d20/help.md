@@ -1,4 +1,5 @@
-# help (d20)
+# [help (d20)](/commands/d20/help.md)
+
 See a list of bot commands and their descriptions (only for commands using the new system)
 
 Version: 1.0.0
@@ -51,3 +52,6 @@ What command do you want more info about?
 
 </details>
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)

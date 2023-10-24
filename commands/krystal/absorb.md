@@ -1,4 +1,5 @@
-# absorb (krystal)
+# [absorb (krystal)](/commands/krystal/absorb.md)
+
 Krystal is become Kirby, destroyer of worlds.
 
 Version: 1.0.0
@@ -12,3 +13,6 @@ Command: any of
 
 Must include bot name (krystal)
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)

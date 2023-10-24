@@ -1,4 +1,5 @@
-# dumbass (krystal)
+# [dumbass (krystal)](/commands/krystal/dumbass.md)
+
 Has a 10% chance of pinging <@601943025253482496> every time "dumbass" is said
 
 Version: 1.0.0
@@ -9,3 +10,6 @@ Activator type: message
 
 Command: /dumbass/
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)

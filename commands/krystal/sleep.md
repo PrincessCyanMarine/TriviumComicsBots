@@ -1,4 +1,5 @@
-# sleep (krystal)
+# [sleep (krystal)](/commands/krystal/sleep.md)
+
 Krystal puts a player to sleep.
 
 Version: 1.0.0
@@ -15,3 +16,6 @@ Command: any of
 
 Must include bot name (krystal)
 
+
+
+[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
