@@ -8,5 +8,9 @@ module.exports = {
             name: "nodemon",
             script: "./nodemon.js",
         },
+        {
+            name: "tsc",
+            script: "./tsc_watch.js",
+        },
     ],
 };
