@@ -1,13 +1,13 @@
 {
     "dataType": "activator",
     "type": "command",
-    "method": "deactivated",
+    "method": "message",
     "match": "ye{2,}t",
     "bot": "krystal",
     "priority": 10,
     "description": "This command has not yet been implemented under the new system",
     "command": {
-        "type": "message",
-        "text": "This command has not yet been implemented under the new system"
+        "type": "boolean",
+        "value": true
     }
 }

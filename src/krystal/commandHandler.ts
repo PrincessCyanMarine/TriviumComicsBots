@@ -70,7 +70,7 @@ export function testCommands(msg: Message) {
             // gunning(msg);
         } else if (testWord(args, "sleep", "bed", "clothes", "bedtime")) {
             // sleeping(msg);
-        } else if (testWord(args, "absorb")) {
+        } else if (testWord(args, "absorbs?", "suck")) {
             // absorbing(msg);
         } else if (testWord(args, "girlfriend", "marry", "date", "love", "gf", "boyfriend", "waifu", "wife")) {
             // loving(msg);
