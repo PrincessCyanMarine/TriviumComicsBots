@@ -9,7 +9,8 @@ Priority: 0
 Activator type: message
 
 Command: any of
-- /absorb/
+- /absorbs?/
+- /suck/
 
 Must include bot name (krystal)
 

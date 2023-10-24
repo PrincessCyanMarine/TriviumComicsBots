@@ -84,7 +84,9 @@ Version: 1.0.0
 
 Priority: 10
 
-Activator type: deactivated
+Activator type: message
+
+Command: /ye{2,}t/
 
 link: [/commands/krystal/yeet.md](/commands/krystal/yeet.md)
 
@@ -207,7 +209,8 @@ Priority: 0
 Activator type: message
 
 Command: any of
-- /absorb/
+- /absorbs?/
+- /suck/
 
 Must include bot name (krystal)
 

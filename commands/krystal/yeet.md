@@ -6,7 +6,9 @@ Version: 1.0.0
 
 Priority: 10
 
-Activator type: deactivated
+Activator type: message
+
+Command: /ye{2,}t/
 
 link: [/commands/krystal/yeet.md](/commands/krystal/yeet.md)
 
