@@ -397,10 +397,13 @@ export function readAllBotData() {
                             return `### Commands:\n\n${commands.join("\n")}`;
                         }
                         let [_, command_name, command_bot] = command.match(/\[(.+?)\]\((.+?)\)/)!;
-                        console.log(command, command_name, command_bot);
+                        // console.log(command, command_name, command_bot);
                         let activator = botData[command_bot as BotNames].activator[command_name];
                         if (!activator) return `Command ${command_name} not found`;
-                        return getActivatorHelp(activator, "\n", false);
+                        return getActivatorHelp(activator, "\n", false).replace(
+                            /\/commands\/(.+?)\.md/g,
+                            (a, $1) => `https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands/${$1}.md`
+                        );
 
                         // return makeCommandsMD();
                     },

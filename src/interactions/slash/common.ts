@@ -76,7 +76,7 @@ export const addSlashCommand = async (
     addToGuilds?: string[]
 ) => {
     let bot = clients[botName];
-    console.log("Adding " + command.name + " command to " + botName);
+    // console.log("Adding " + command.name + " command to " + botName);
     if (testing) {
         let guild = await bot.guilds.fetch(testGuildId);
         addCommandToGuild(guild, command);
