@@ -12,4 +12,4 @@ Command: /(I|Im|I am)\s(will|going to|gonna|shall)\s(bed|sleep)/
 
 
 
-[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
+[All commands](/commands.md)

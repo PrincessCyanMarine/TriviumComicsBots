@@ -12,4 +12,4 @@ Command: /my-xp
 
 
 
-[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
+[All commands](/commands.md)

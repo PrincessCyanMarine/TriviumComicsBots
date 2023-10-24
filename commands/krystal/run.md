@@ -18,4 +18,4 @@ Must include bot name (krystal)
 
 
 
-[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
+[All commands](/commands.md)

@@ -12,4 +12,4 @@ Command: /(\S+?)s tip of the day/
 
 
 
-[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
+[All commands](/commands.md)

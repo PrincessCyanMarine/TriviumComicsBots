@@ -54,4 +54,4 @@ What command do you want more info about?
 
 
 
-[All commands](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
+[All commands](/commands.md)
