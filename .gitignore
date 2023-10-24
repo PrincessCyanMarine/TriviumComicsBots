@@ -3,7 +3,7 @@
 **/node_modules
 *lock.json
 *lock.yaml
-**.js
+dist/**.js
 **/dist/
 **.sql
 vscode-profile**
