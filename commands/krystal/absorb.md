@@ -13,6 +13,8 @@ Command: any of
 
 Must include bot name (krystal)
 
+link: [/commands/krystal/absorb.md](/commands/krystal/absorb.md)
+
 
 
 [All commands](/commands.md)

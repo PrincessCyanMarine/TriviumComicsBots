@@ -10,6 +10,8 @@ Activator type: message
 
 Command: /arson/
 
+link: [/commands/krystal/arson.md](/commands/krystal/arson.md)
+
 
 
 [All commands](/commands.md)

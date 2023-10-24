@@ -8,6 +8,8 @@ Priority: 10
 
 Activator type: deactivated
 
+link: [/commands/krystal/yeet.md](/commands/krystal/yeet.md)
+
 
 
 [All commands](/commands.md)

@@ -400,7 +400,7 @@ export function readAllBotData() {
                         console.log(command, command_name, command_bot);
                         let activator = botData[command_bot as BotNames].activator[command_name];
                         if (!activator) return `Command ${command_name} not found`;
-                        return getActivatorHelp(activator, "\n");
+                        return getActivatorHelp(activator, "\n", false);
 
                         // return makeCommandsMD();
                     },
@@ -408,7 +408,7 @@ export function readAllBotData() {
             },
         });
         // writeFileSync("output.json", JSON.stringify(botData, null, 4));
-        console.log(makeCommandsMD());
+        if (testing) console.log(makeCommandsMD());
         resolve("Loaded all data");
     });
 }
@@ -900,6 +900,18 @@ function removeUserProfileCache(id: number | string) {
     }
 }
 
+export function clearFilePath(path: string) {
+    return path
+        .replace(/\?/g, "%3F")
+        .replace(/\\/g, "%5C")
+        .replace(/\</g, "%3C")
+        .replace(/\>/g, "%3E")
+        .replace(/\:/g, "%3A")
+        .replace(/\"/g, "%22")
+        .replace(/\*/g, "%2A")
+        .replace(/\|/g, "%7C");
+}
+
 async function createImage(
     image: ImageType,
     command: CommandType,
@@ -924,18 +936,7 @@ async function createImage(
                 let canvas = createCanvas(img.width, img.height);
                 let ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, img.width, img.height);
-                let { dir, name, ext } = path.parse(
-                    `.cache/${url}.png`
-                        .replace(/https?\:\/\//, "")
-                        .replace(/\?/g, "%3F")
-                        .replace(/\\/g, "%5C")
-                        .replace(/\</g, "%3C")
-                        .replace(/\>/g, "%3E")
-                        .replace(/\:/g, "%3A")
-                        .replace(/\"/g, "%22")
-                        .replace(/\*/g, "%2A")
-                        .replace(/\|/g, "%7C")
-                );
+                let { dir, name, ext } = path.parse(clearFilePath(`.cache/${url}.png`.replace(/https?\:\/\//, "")));
                 let p = `${dir}/${name}${ext}`;
                 if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
                 writeFileSync(p, canvas.toBuffer("image/png"));

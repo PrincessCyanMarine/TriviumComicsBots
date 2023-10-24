@@ -10,6 +10,8 @@ Activator type: message
 
 Command: /(\S+?)s tip of the day/
 
+link: [/commands/krystal/tip.md](/commands/krystal/tip.md)
+
 
 
 [All commands](/commands.md)

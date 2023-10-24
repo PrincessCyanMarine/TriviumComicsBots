@@ -23,6 +23,8 @@ Command: any of
 
 Must include bot name (krystal)
 
+link: [/commands/krystal/kill.md](/commands/krystal/kill.md)
+
 
 
 [All commands](/commands.md)

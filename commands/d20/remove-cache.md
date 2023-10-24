@@ -10,6 +10,8 @@ Activator type: slash
 
 Command: /remove-cache
 
+link: [/commands/d20/remove-cache.md](/commands/d20/remove-cache.md)
+
 
 
 [All commands](/commands.md)

@@ -16,6 +16,8 @@ Command: any of
 
 Must include bot name (krystal)
 
+link: [/commands/krystal/eat.md](/commands/krystal/eat.md)
+
 
 
 [All commands](/commands.md)

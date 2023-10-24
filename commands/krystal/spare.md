@@ -14,6 +14,8 @@ Command: any of
 
 Must include bot name (krystal)
 
+link: [/commands/krystal/spare.md](/commands/krystal/spare.md)
+
 
 
 [All commands](/commands.md)

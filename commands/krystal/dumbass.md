@@ -10,6 +10,8 @@ Activator type: message
 
 Command: /dumbass/
 
+link: [/commands/krystal/dumbass.md](/commands/krystal/dumbass.md)
+
 
 
 [All commands](/commands.md)

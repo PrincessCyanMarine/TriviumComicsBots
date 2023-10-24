@@ -10,6 +10,8 @@ Activator type: slash
 
 Command: /my-xp
 
+link: [/commands/d20/my-xp.md](/commands/d20/my-xp.md)
+
 
 
 [All commands](/commands.md)

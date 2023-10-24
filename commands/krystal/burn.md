@@ -15,6 +15,8 @@ Command: any of
 
 Must include bot name (krystal)
 
+link: [/commands/krystal/burn.md](/commands/krystal/burn.md)
+
 
 
 [All commands](/commands.md)

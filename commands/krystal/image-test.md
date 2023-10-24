@@ -10,6 +10,8 @@ Activator type: exclamation
 
 Command: !image
 
+link: [/commands/krystal/image-test.md](/commands/krystal/image-test.md)
+
 
 
 [All commands](/commands.md)

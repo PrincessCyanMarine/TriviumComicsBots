@@ -21,14 +21,8 @@
     "type": "command",
     "bot": "krystal",
     "command": {
-        "type": "conditional",
-        "condition": {
-            "value": {
-                "type": "string",
-                "value": "{target:exists}"
-            }
-        },
-        "ifTrue": {
+        "type": "targeted",
+        "hasTarget": {
             "type": "command",
             "command": {
                 "bot": "krystal",
@@ -53,7 +47,7 @@
                 }
             ]
         },
-        "ifFalse": {
+        "noTarget": {
             "type": "message",
             "text": "***I will unalive now :GMKrystalDevious:***",
             "image": {

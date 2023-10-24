@@ -16,6 +16,8 @@ Command: any of
 
 Must include bot name (krystal)
 
+link: [/commands/krystal/sleep.md](/commands/krystal/sleep.md)
+
 
 
 [All commands](/commands.md)

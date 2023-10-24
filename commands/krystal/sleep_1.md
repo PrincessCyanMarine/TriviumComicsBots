@@ -10,6 +10,8 @@ Activator type: message
 
 Command: /(I|Im|I am)\s(will|going to|gonna|shall)\s(bed|sleep)/
 
+link: [/commands/krystal/sleep_1.md](/commands/krystal/sleep_1.md)
+
 
 
 [All commands](/commands.md)

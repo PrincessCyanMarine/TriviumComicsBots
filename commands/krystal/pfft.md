@@ -10,6 +10,8 @@ Activator type: message
 
 Command: /pf{2,}t/
 
+link: [/commands/krystal/pfft.md](/commands/krystal/pfft.md)
+
 
 
 [All commands](/commands.md)

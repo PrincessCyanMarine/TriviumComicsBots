@@ -1,13 +1,14 @@
-/.env
+**/.env
 # /.vscode
-/node_modules
+**/node_modules
 *lock.json
 *lock.yaml
 **.js
-dist/
+**/dist/
 **.sql
 vscode-profile**
 **.code-workspace
 TODO.md
 .cache
 output.json
+**/command_builder

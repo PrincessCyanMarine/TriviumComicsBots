@@ -10,6 +10,8 @@ Activator type: message
 
 Command: /.*/
 
+link: [/commands/krystal/rebel.md](/commands/krystal/rebel.md)
+
 
 
 [All commands](/commands.md)

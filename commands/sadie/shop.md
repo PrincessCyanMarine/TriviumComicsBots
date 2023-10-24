@@ -10,6 +10,8 @@ Activator type: slash
 
 Command: /shop
 
+link: [/commands/sadie/shop.md](/commands/sadie/shop.md)
+
 
 
 [All commands](/commands.md)

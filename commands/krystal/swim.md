@@ -10,6 +10,8 @@ Activator type: message
 
 Command: /swim/
 
+link: [/commands/krystal/swim.md](/commands/krystal/swim.md)
+
 
 
 [All commands](/commands.md)

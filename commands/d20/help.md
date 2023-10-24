@@ -52,6 +52,8 @@ What command do you want more info about?
 
 </details>
 
+link: [/commands/d20/help.md](/commands/d20/help.md)
+
 
 
 [All commands](/commands.md)

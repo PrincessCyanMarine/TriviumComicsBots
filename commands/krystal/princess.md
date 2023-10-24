@@ -20,6 +20,8 @@ Command: any of
 
 Must include bot name (krystal)
 
+link: [/commands/krystal/princess.md](/commands/krystal/princess.md)
+
 
 
 [All commands](/commands.md)

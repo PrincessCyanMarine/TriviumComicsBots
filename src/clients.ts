@@ -2,6 +2,7 @@ import { ActivityType, Client, CommandInteraction, Guild, GuildMember, Intents, 
 import { config } from "dotenv";
 import {
     changeActivities,
+    clearFilePath,
     commandTextConverter,
     random_from_array,
     readAllBotData,
@@ -13,7 +14,7 @@ import { killWords, marineId, protectedFromKills, triviumGuildId } from "./commo
 import { Message } from "discord.js";
 import { database } from ".";
 import { ActivatorType, BotDataTypes, BotNames, CommandType, VariableType, botNames } from "./model/botData";
-import { writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 config();
 
 const intents = [
@@ -109,8 +110,10 @@ export function setBotData(newBotData: typeof botData) {
     botData = newBotData;
 }
 
-export function getActivatorHelp(activator: ActivatorType, line_skip = "\n\n") {
-    let _activator_text = `# ${activator.name} (${activator.bot})\n${activator.description ? activator.description : "No description"}${line_skip}`;
+export function getActivatorHelp(activator: ActivatorType, line_skip: string, detailed: boolean) {
+    let url = `/commands/${clearFilePath(`${activator.bot}/${activator.name}.md`).replace(/%/g, "%25")}`;
+    let _activator_text = `# [${activator.name} (${activator.bot})](${url})${line_skip}`;
+    _activator_text += `${activator.description ? activator.description : "No description"}${line_skip}`;
     _activator_text += `Version: ${activator.version || "1.0.0"}${line_skip}`;
     _activator_text += `Priority: ${activator.priority || 0}${line_skip}`;
     // _activator_text += `Version: ${activator.version}\n`;
@@ -118,6 +121,26 @@ export function getActivatorHelp(activator: ActivatorType, line_skip = "\n\n") {
     switch (activator.method) {
         case "slash":
             _activator_text += `Command: /${activator.activator}${line_skip}`;
+            if (activator.args) {
+                _activator_text += `${line_skip}## Options:${line_skip}`;
+                for (let arg of activator.args) {
+                    _activator_text += detailed
+                        ? `### ${arg.name}${arg.required ? "*" : ""}${line_skip}`
+                        : `- ${arg.name}${arg.required ? "*" : ""} (${arg.type})${line_skip}`;
+
+                    if (detailed) {
+                        _activator_text += `Type: ${arg.type}${line_skip}`;
+                        if (arg.description) _activator_text += `${arg.description}${line_skip}`;
+                        if ("min" in arg && (arg.min || arg.min == 0)) _activator_text += `Minimum: ${arg.min}${line_skip}`;
+                        if ("max" in arg && (arg.max || arg.max == 0)) _activator_text += `Maximum: ${arg.max}${line_skip}`;
+                        if ("choices" in arg && arg.choices && arg.choices.length > 0) {
+                            _activator_text += `<details>${line_skip}<summary>Accepted values</summary> ${line_skip}`;
+                            for (let choice of arg.choices) _activator_text += `- ${choice.name}\n`;
+                            _activator_text += `${line_skip}</details>${line_skip}`;
+                        }
+                    }
+                }
+            }
             break;
         case "message":
             if ("match" in activator) {
@@ -134,20 +157,14 @@ export function getActivatorHelp(activator: ActivatorType, line_skip = "\n\n") {
             else _activator_text += `Command: ${activator.activators.map((s) => `!${s}`).join(", ")}${line_skip}`;
             break;
     }
+    if (detailed) _activator_text += `link: [${url}](${url})${line_skip}`;
+    else _activator_text += `${line_skip}For more information, see the [documentation](${url})`;
     return _activator_text;
 }
 
 export function makeCommandsMD() {
-    let text = `
-# "Message commands" use regex
-
-- /.*/ Matches anything
-- /end.+?suffering/ "end (anything) suffering"
-- /pf{2,}t/ "p", followed by 2 or more "f"s followed by "t" (for example "pfffffft", "pfft", "pffffffffffffffffffffffffffffffffffffffffft", etc)
-- /(I|Im|I am)\s(will|going to|gonna|shall)\s(bed|sleep)/ "I am going to bed", "I'm gonna sleep", "I will bed", etc
-- /(\S+?)s tip of the day/ A word followed by "tip of the day"\n\n\n\n\n\n\n`;
     let data: ActivatorType[] = [];
-    let commands = [] as string[];
+    let commands = [] as [ActivatorType, string][];
     for (let botName in botData) {
         let bot = botData[botName as BotNames];
 
@@ -160,11 +177,27 @@ export function makeCommandsMD() {
             let activator = command as ActivatorType;
             if (activator.hideFromHelp) continue;
 
-            commands.push(getActivatorHelp(activator));
+            commands.push([activator, getActivatorHelp(activator, "\n\n", true)]);
         }
     }
-    if (commands.length > 0) text += `${commands.join("\n\n")}\n\n`;
+
+    let text = `
+# "Message commands" use regex
+
+- /.*/ Matches anything
+- /end.+?suffering/ "end (anything) suffering"
+- /pf{2,}t/ "p", followed by 2 or more "f"s followed by "t" (for example "pfffffft", "pfft", "pffffffffffffffffffffffffffffffffffffffffft", etc)
+- /(I|Im|I am)\s(will|going to|gonna|shall)\s(bed|sleep)/ "I am going to bed", "I'm gonna sleep", "I will bed", etc
+- /(\S+?)s tip of the day/ A word followed by "tip of the day"\n\n\n\n\n\n\n`;
+    if (commands.length > 0) text += `${commands.map((a) => a[1]).join("\n\n")}\n\n`;
     writeFileSync("commands.md", text);
+
+    for (let [activator, text] of commands) {
+        let dir = clearFilePath(`commands/${activator.bot}`);
+        if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+        writeFileSync(clearFilePath(`${dir}/${activator.name}.md`), text + `\n\n[All commands](/commands.md)`);
+    }
+
     return "Commands written to commands.md";
 }
 

@@ -13,6 +13,8 @@ Command: any of
 - /ox excrement/
 - /bullshit/
 
+link: [/commands/krystal/cow-poopy.md](/commands/krystal/cow-poopy.md)
+
 
 
 [All commands](/commands.md)
