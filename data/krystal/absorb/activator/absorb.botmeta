@@ -4,7 +4,10 @@
     "method": "message",
     "type": "command",
     "bot": "krystal",
-    "match": "absorbs?",
+    "matches": [
+        "absorbs?",
+        "suck"
+    ],
     "description": "Krystal is become Kirby, destroyer of worlds.",
     "botName": true,
     "command": {
