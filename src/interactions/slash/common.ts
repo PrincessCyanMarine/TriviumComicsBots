@@ -51,7 +51,7 @@ export const removeCommandFromAllGuilds = async (bot: Client, command: SlashComm
 export const addCommandToGuild = async (guild: Guild, command: SlashCommandBuilder) => {
     let commands = await guild.commands.fetch();
     commands.delete(command.name);
-    console.log(`Adding command ${command.name} to guild ${guild.name} (${guild.id})}`);
+    // console.log(`Adding command ${command.name} to guild ${guild.name} (${guild.id})}`);
     guild.commands.create(command.toJSON());
 };
 
