@@ -4,7 +4,7 @@
     "description": "Code of the bots from Trivium comics' official discord server",
     "main": "dist/index.js",
     "scripts": {
-        "start": "node dist/index.js"
+        "start": "nodemon --exec \"pm2 start ecosystem.config.js\""
     },
     "engines": {
         "node": "16.6.2"
