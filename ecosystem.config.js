@@ -3,8 +3,8 @@ module.exports = {
         {
             name: "bots",
             script: "dist/index.js",
-            watch: true,
-            ignore_watch: ["node_modules"],
+            watch: ["dist"],
+            // ignore_watch: ["node_modules"],
         },
     ],
 };
