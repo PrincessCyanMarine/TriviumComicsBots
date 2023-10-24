@@ -4,7 +4,7 @@
     "description": "Code of the bots from Trivium comics' official discord server",
     "main": "dist/index.js",
     "scripts": {
-        "start": "nodemon --exec \"pm2 start ecosystem.config.js\""
+        "start": "pm2 start ecosystem.config.js"
     },
     "engines": {
         "node": "16.6.2"
@@ -18,6 +18,7 @@
         "@types/express": "^4.17.13",
         "@types/gifencoder": "^2.0.1",
         "@types/node": "^17.0.35",
+        "@types/nodemon": "^1.19.4",
         "@types/seedrandom": "^3.0.2",
         "@types/sharp": "^0.30.2",
         "axios": "^0.27.2",
@@ -30,6 +31,7 @@
         "firebase-admin": "^10.2.0",
         "gifencoder": "^2.0.1",
         "node_extra_ca_certs_mozilla_bundle": "^1.0.4",
+        "nodemon": "^3.0.1",
         "seedrandom": "^3.0.5",
         "simple-git": "^3.19.1",
         "ts-json-schema-generator": "^1.4.0",
