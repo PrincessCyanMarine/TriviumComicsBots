@@ -41,10 +41,10 @@ d20.on("interactionCreate", async (interaction) => {
     else if (!testing && interaction.channelId == testChannelId) return;
 
     switch (interaction.commandName) {
-        case "mute":
-        case "unmute":
-            mute_unmute(interaction);
-            break;
+        // case "mute":
+        // case "unmute":
+        //     mute_unmute(interaction);
+        //     break;
         case "card":
             try {
                 let card = await generatecard(interaction);
@@ -81,86 +81,86 @@ d20.on("interactionCreate", async (interaction) => {
             say(bot, channel, { content: content, files: attachments });
             followup(interaction, "Announced!", true);
             break;
-        case "warn": {
-            let reason = interaction.options.get("reason")?.value;
-            let player = interaction.options.get("player")?.member;
+        // case "warn": {
+        //     let reason = interaction.options.get("reason")?.value;
+        //     let player = interaction.options.get("player")?.member;
 
-            if (!(interaction.member instanceof GuildMember) || !(player instanceof GuildMember)) return;
+        //     if (!(interaction.member instanceof GuildMember) || !(player instanceof GuildMember)) return;
 
-            if (!interaction.member.permissions.has("KICK_MEMBERS") && !player.permissions.has("KICK_MEMBERS")) {
-                reply(interaction, "You can' do that", true);
-                return;
-            }
+        //     if (!interaction.member.permissions.has("KICK_MEMBERS") && !player.permissions.has("KICK_MEMBERS")) {
+        //         reply(interaction, "You can' do that", true);
+        //         return;
+        //     }
 
-            if (!reason || !(typeof reason == "string") || !interaction.guildId || !interaction.channel) {
-                reply(interaction, "Something went wrong", true);
-                return;
-            }
-            warn(player, interaction.guildId, reason, interaction);
-            break;
-        }
-        case "unwarn": {
-            if (!(interaction.member instanceof GuildMember)) return;
-            if (!interaction.member.permissions.has("KICK_MEMBERS")) {
-                reply(interaction, "You can' do that", true);
-                return;
-            }
+        //     if (!reason || !(typeof reason == "string") || !interaction.guildId || !interaction.channel) {
+        //         reply(interaction, "Something went wrong", true);
+        //         return;
+        //     }
+        //     warn(player, interaction.guildId, reason, interaction);
+        //     break;
+        // }
+        // case "unwarn": {
+        //     if (!(interaction.member instanceof GuildMember)) return;
+        //     if (!interaction.member.permissions.has("KICK_MEMBERS")) {
+        //         reply(interaction, "You can' do that", true);
+        //         return;
+        //     }
 
-            let player = interaction.options.get("player")?.member;
+        //     let player = interaction.options.get("player")?.member;
 
-            if (!player || !(player instanceof GuildMember) || !interaction.guildId || !interaction.channel) {
-                reply(interaction, "Something went wrong", true);
-                return;
-            }
+        //     if (!player || !(player instanceof GuildMember) || !interaction.guildId || !interaction.channel) {
+        //         reply(interaction, "Something went wrong", true);
+        //         return;
+        //     }
 
-            let warnings = (await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val()) ?? {};
-            if (Array.isArray(warnings)) warnings = Object.fromEntries(warnings.map((v, i) => [i, v]));
-            let keys = Object.keys(warnings);
-            if (keys.length == 0) {
-                reply(interaction, "This player has no warnings!", true);
-                return;
-            }
+        //     let warnings = (await (await database.child(`warnings/${interaction.guildId}/${player.id}`).once("value")).val()) ?? {};
+        //     if (Array.isArray(warnings)) warnings = Object.fromEntries(warnings.map((v, i) => [i, v]));
+        //     let keys = Object.keys(warnings);
+        //     if (keys.length == 0) {
+        //         reply(interaction, "This player has no warnings!", true);
+        //         return;
+        //     }
 
-            // console.log(warnings);
-            let components = [
-                new MessageActionRow().addComponents(
-                    new MessageSelectMenu()
-                        .setCustomId(`unwarn?guild=${interaction.guildId}&user=${player.id}`)
-                        .setOptions(keys.slice(0, 25).map((v) => ({ label: warnings[v], value: v })))
-                ),
-            ];
-            if (keys.length > 25)
-                components.push(
-                    new MessageActionRow().addComponents(new MessageButton().setCustomId("next_unwarn?page=2").setLabel("More").setStyle("PRIMARY"))
-                );
+        //     // console.log(warnings);
+        //     let components = [
+        //         new MessageActionRow().addComponents(
+        //             new MessageSelectMenu()
+        //                 .setCustomId(`unwarn?guild=${interaction.guildId}&user=${player.id}`)
+        //                 .setOptions(keys.slice(0, 25).map((v) => ({ label: warnings[v], value: v })))
+        //         ),
+        //     ];
+        //     if (keys.length > 25)
+        //         components.push(
+        //             new MessageActionRow().addComponents(new MessageButton().setCustomId("next_unwarn?page=2").setLabel("More").setStyle("PRIMARY"))
+        //         );
 
-            interaction.reply({
-                components,
-                content: "Select the warnings to remove",
-                // ephemeral: true,
-            });
+        //     interaction.reply({
+        //         components,
+        //         content: "Select the warnings to remove",
+        //         // ephemeral: true,
+        //     });
 
-            // if (!warnings || typeof warnings != "object") {
-            //     warnings = [];
-            //     database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
-            //     reply(interaction, "This player has no warnings!", true);
-            //     return;
-            // }
+        //     // if (!warnings || typeof warnings != "object") {
+        //     //     warnings = [];
+        //     //     database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+        //     //     reply(interaction, "This player has no warnings!", true);
+        //     //     return;
+        //     // }
 
-            // let i;
-            // let reason = "";
-            // for (i = 0; i <= end - start; i++) {
-            //     // console.log(warnings, start, warnings[start]);
-            //     reason += warnings.splice(start, 1) + "\n";
-            // }
+        //     // let i;
+        //     // let reason = "";
+        //     // for (i = 0; i <= end - start; i++) {
+        //     //     // console.log(warnings, start, warnings[start]);
+        //     //     reason += warnings.splice(start, 1) + "\n";
+        //     // }
 
-            // database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
-            // interaction.reply(
-            //     `Removed ${i} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`
-            // );
+        //     // database.child(`warnings/${interaction.guildId}/${player.id}`).set(warnings);
+        //     // interaction.reply(
+        //     //     `Removed ${i} warnings from ${player.user.username}\nRemoved\n\`\`\`${reason}\`\`\`\nThey have ${warnings.length} warnings left`
+        //     // );
 
-            break;
-        }
+        //     break;
+        // }
         case "warnings": {
             let player = interaction.options.get("player")?.member;
             if (!player || !(player instanceof GuildMember)) {
