@@ -879,7 +879,7 @@ function clearExpiredCache() {
     for (let [key, { path, timestamp }] of Object.entries(imageCache)) {
         // console.log(timestamp, timestamp + MAX_CACHE_TIME, Date.now(), timestamp + MAX_CACHE_TIME < Date.now());
         if (timestamp + MAX_CACHE_TIME < Date.now()) {
-            unlinkSync(path);
+            if (existsSync(path)) unlinkSync(path);
             delete imageCache[key];
             console.log(`Deleted expired cache ${key}`);
         }

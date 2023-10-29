@@ -9,7 +9,7 @@ export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;
     let args = msg.content.toLowerCase().replace(/\s/g, "");
     // console.log(args);
-    if (args.match(/nitro/gi) && (args.match(/free/gi) || args.match(/(.+?\..+?)|(http)/gi))) nitro(msg);
+    if (args.match(/(nitro)|(nudes?)/gi) && (args.match(/free/gi) || args.match(/(.+?\..+?)|(http)/gi))) nitro(msg);
     else for (let { title, description } of msg.embeds) if (title?.includes("nitro") || description?.includes("nitro")) nitro(msg);
 
     /* let slur_detection = args.match(/n(e|ig)g[re]?[orae]|fag|nip/gi);
@@ -73,14 +73,13 @@ export async function emojiReact(msg: Message) {
 
 async function nitro(msg: Message) {
     let key;
-    if (msg.member && msg.member instanceof GuildMember && msg.guild)
-        key = await warn(msg.member, msg.guild.id, "Possible free nitro scam", msg.channel);
+    if (msg.member && msg.member instanceof GuildMember && msg.guild) key = await warn(msg.member, msg.guild.id, "Possible scam", msg.channel);
     console.log(key);
     let embeds = msg2embed(msg);
     embeds[embeds.length - 1].setColor("RED");
     mod_alert_webhook(testing).send({
-        content: `<@&${alert_role_id}> please confirm the message below isn\'t a free nitro scam`,
-        username: "Mod alert - Free nitro!",
+        content: `<@&${alert_role_id}> please confirm the message below isn\'t a scam`,
+        username: "Mod alert - Possible scam!!",
         avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",
         embeds,
         components: [
