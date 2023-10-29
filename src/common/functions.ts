@@ -884,6 +884,7 @@ function clearExpiredCache() {
             console.log(`Deleted expired cache ${key}`);
         }
     }
+    writeFileSync(".cache/data.json", JSON.stringify(imageCache), { encoding: "utf-8" });
 }
 clearExpiredCache();
 setInterval(clearExpiredCache, TIME.HOURS);
