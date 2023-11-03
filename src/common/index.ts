@@ -183,7 +183,7 @@ d20.on("messageCreate", async (msg) => {
                 }
 
                 if (guilds_compare.includes(options[1].toLowerCase())) {
-                    database.child(`guild / ${msg.author.id}`).set(options[1].toLowerCase());
+                    database.child(`guild/${msg.author.id}`).set(options[1].toLowerCase());
                     say(eli, msg.channel, `<@${msg.author.id}> joined ${options[1]} \'s guild!'`);
                     return;
                 }
