@@ -517,14 +517,19 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
 
             text += "\n" + userMention(player.id) + " received 2 or more warnings and got muted";
         }
-        if (warnings.length >= 3) {
-            player.kick().catch(() => {
-                text += "\nFailed to kick " + player.user.username;
+        if (warnings.length >= 3)
+            player
+                .kick()
+                .catch(() => {
+                    text += "\nFailed to kick " + player.user.username;
 
-                console.error();
-            });
-            text += "You received 3 or more warnings and got kicked from the server\nIf you think it was undeserved, please contact a moderator";
-        }
+                    console.error();
+                })
+                .then(() => {
+                    player.send(
+                        "You received 3 or more warnings and got kicked from the server\nIf you think it was undeserved, please contact a moderator"
+                    );
+                });
     }
 
     if (replyMethod instanceof CommandInteraction) {
