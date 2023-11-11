@@ -140,6 +140,7 @@ export type CardOptions = {
     stats: StatsObject;
     target: GuildMember;
     harem: Harem;
+    id: string;
 };
 export interface CardStyle {
     type: string;
@@ -246,6 +247,10 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
         if (cardoptions.title) ctx.fillText(cardoptions.title.replace(/\n/g, " ").substring(0, 70), 15, 235 + 24);
         if (cardoptions.guild) ctx.fillText(cardoptions.guild, 800, 73 + 24);
 
+        if (cardoptions.id) {
+            if (cardoptions.id == "480831467908235285") cardoptions.time_on_server += 45;
+            else if (cardoptions.id == "601943025253482496") cardoptions.time_on_server += 34;
+        }
         ctx.fillText(`${cardoptions.time_on_server.toString()} months`, 521, 340 + 24);
         ctx.fillText(`${cardoptions.warnings.toString()} warning(s)`, 40, 177);
         if (cardoptions.harem?.ownsOne) ctx.fillText(`Harem: ${cardoptions.harem.getSize().toString()} members`, 40, 214);
@@ -488,6 +493,7 @@ export function generatecard(
                 title: style["title"],
                 stats,
                 harem,
+                id: target.id,
             })
         ).toBuffer();
         return resolve(card);
