@@ -141,6 +141,7 @@ export type CardOptions = {
     target: GuildMember;
     harem: Harem;
     id: string;
+    guildId: string;
 };
 export interface CardStyle {
     type: string;
@@ -247,7 +248,7 @@ export function createCard(cardoptions: CardOptions): Promise<Canvas> {
         if (cardoptions.title) ctx.fillText(cardoptions.title.replace(/\n/g, " ").substring(0, 70), 15, 235 + 24);
         if (cardoptions.guild) ctx.fillText(cardoptions.guild, 800, 73 + 24);
 
-        if (cardoptions.id) {
+        if (cardoptions.id && cardoptions.guildId == triviumGuildId) {
             if (cardoptions.id == "480831467908235285") cardoptions.time_on_server += 45;
             else if (cardoptions.id == "601943025253482496") cardoptions.time_on_server += 34;
         }
@@ -494,6 +495,7 @@ export function generatecard(
                 stats,
                 harem,
                 id: target.id,
+                guildId: msg.guildId,
             })
         ).toBuffer();
         return resolve(card);

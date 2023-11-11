@@ -223,6 +223,7 @@ express_app.get("/profile/:tokentype/:token", async (req, res) => {
             title: profile.style["title"],
             harem: await Harem.get(guildId, user.id),
             id: user.id,
+            guildId: guildId,
         })
     ).toDataURL();
 
