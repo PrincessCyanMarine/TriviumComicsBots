@@ -511,25 +511,26 @@ export async function warn(player: GuildMember, guildId: string, reason: string,
             : "They are a Queensblade and therefore this is useless"
     }${works ? "\nIf you think this warning was undeserved, talk to a Queensblade" : ""}`;
     let key = (await database.child(`warnings/${guildId}/${player.id}`).push(reason)).key;
-    if (works)
+    if (works) {
         if (warnings.length >= 2 && [triviumGuildId, testGuildId].includes(guildId)) {
             player.timeout(TIME.DAYS, reason);
 
             text += "\n" + userMention(player.id) + " received 2 or more warnings and got muted";
         }
-    if (warnings.length >= 3)
-        player
-            .kick()
-            .catch(() => {
-                text += "\nFailed to kick " + player.user.username;
+        if (warnings.length >= 3)
+            player
+                .kick()
+                .catch(() => {
+                    text += "\nFailed to kick " + player.user.username;
 
-                console.error();
-            })
-            .then(() => {
-                player.send(
-                    "You received 3 or more warnings and got kicked from the server\nIf you think it was undeserved, please contact a moderator"
-                );
-            });
+                    console.error();
+                })
+                .then(() => {
+                    player.send(
+                        "You received 3 or more warnings and got kicked from the server\nIf you think it was undeserved, please contact a moderator"
+                    );
+                });
+    }
 
     if (replyMethod instanceof CommandInteraction) {
         replyMethod.editReply(text);
