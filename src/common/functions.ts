@@ -15,7 +15,7 @@ import {
     roleMention,
     userMention,
 } from "@discordjs/builders";
-import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
+import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage, registerFont } from "canvas";
 import {
     ActivityType,
     AllowedImageSize,
@@ -1783,4 +1783,147 @@ export function testExclamationCommand(botName: BotNames, msg: Message, startTim
     let command = activators.find((a) => a.activators.includes(activator));
     if (!command) return;
     runDataCommand(command.command, msg, [], startTime);
+}
+
+export const writeUnderlined = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+    let { width, actualBoundingBoxLeft, actualBoundingBoxDescent, actualBoundingBoxAscent } = ctx.measureText(text);
+    // ctx.fillStyle = "#000";
+    let actualX = x + maxWidth / 2 - width / 2;
+    let actualY = y + lineHeight / 2 + actualBoundingBoxDescent;
+    // console.log(actualX, actualY, width, y, lineHeight, actualBoundingBoxDescent, actualBoundingBoxAscent);
+    // ctx.fillRect(actualX - 2, actualY + 2, width + 4, 8);
+    // ctx.fillStyle = "#fff";
+    ctx.fillRect(actualX, actualY, width, 2);
+    writeOutline(ctx, text, x, y, maxWidth, lineHeight);
+};
+
+export const writeNormal = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+    // console.log(x, x + (maxWidth - ctx.measureText(text).width) / 2, (maxWidth - ctx.measureText(text).width) / 2);
+    x = x + maxWidth / 2;
+    y = y + lineHeight / 2;
+    // ctx.strokeText(text, x, y, maxWidth);
+    ctx.fillText(text, x, y, maxWidth);
+};
+export const writeOutline = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+    // console.log(x, x + (maxWidth - ctx.measureText(text).width) / 2, (maxWidth - ctx.measureText(text).width) / 2);
+    x = x + maxWidth / 2;
+    y = y + lineHeight / 2;
+    ctx.strokeText(text, x, y, maxWidth);
+    ctx.fillText(text, x, y, maxWidth);
+};
+// registerFont("./assets/card/fonts/CelticGaramondPro.ttf", { family: "Celtic Garamond Pro" });
+// registerFont("./assets/card/fonts/AlmendraSC-Regular.otf", { family: "Almendra" });
+// registerFont("./assets/card/fonts/AlmendraSC-Italic.otf", { family: "Almendra" });
+// registerFont("./assets/card/fonts/AlmendraSC-Bold.otf", { family: "Almendra" });
+// registerFont("./assets/card/fonts/AlmendraSC-BoldItalic.otf", { family: "Almendra" });
+// registerFont("./assets/card/fonts/Almendra-Bold.otf", { family: "Almendra" });
+// registerFont("./assets/card/fonts/Almendra-Regular.otf", { family: "Almendra" });
+// registerFont("./assets/card/fonts/Almendra-Italic.otf", { family: "Almendra" });
+// registerFont("./assets/card/fonts/Almendra-BoldItalic.otf", { family: "Almendra" });
+
+export const createCharacterCard = async (
+    msg: Message,
+    cardType: "character",
+    portrait: string,
+    abilities: string[],
+    power: number,
+    level: number
+) => {
+    if (level > 99) level = 99;
+    if (power > 9999) power = 9999;
+    if (level < 0) level = 0;
+    if (power < 0) power = 0;
+    let canvas = createCanvas(817, 1111);
+    if (!msg.member) return;
+
+    let portraitImage = await loadImage(portrait);
+    let bg = await loadImage(`./assets/card/card/${cardType}.png`);
+
+    let abilityChips = await Promise.all(abilities.map((a) => loadImage(`./assets/card/ability/${a}.png`)));
+
+    // canvas.width = 817;
+    // canvas.height = 1111;
+    let ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    if (portraitImage) ctx.drawImage(portraitImage, 71, 173, 677, 575);
+    if (bg) ctx.drawImage(bg, 0, 0, 817, 1111);
+
+    let y = 968;
+    let x = 402;
+    if (abilityChips && cardType == "character")
+        for (let ability of abilityChips) {
+            ctx.drawImage(ability, x, y, 70, 70);
+            x -= 80;
+        }
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 8;
+
+    // ctx.shadowColor = "#000000";
+    // ctx.shadowBlur = 4;
+
+    ctx.font = '48px "Celtic Garamond Pro"';
+
+    // top: 68 * cardReductionRate,
+    // left: 81 * cardReductionRate,
+    // width: 75 * cardReductionRate,
+    // height: 102 * cardReductionRate,
+    writeOutline(ctx, level.toString(), 81, 68, 75, 102);
+
+    // ctx.strokeText(level.toString(), 118, 119);
+    // ctx.fillText(level.toString(), 118, 119);
+
+    // left: 506 * cardReductionRate,
+    // top: 958 * cardReductionRate,
+    // width: 151 * cardReductionRate,
+    // height: 83 * cardReductionRate,
+
+    ctx.font = '40px "Celtic Garamond Pro"';
+    writeOutline(ctx, power.toString().padStart(4, "0"), 506, 958, 151, 83);
+
+    ctx.font = '20px "Almendra SC"';
+
+    writeUnderlined(ctx, cardType.toUpperCase(), 588, 89, 153, 56);
+    // ctx.strokeText(cardType.toUpperCase(), 664, 117);
+    // ctx.fillText(cardType.toUpperCase(), 664, 117);
+
+    return canvas.toBuffer();
+};
+
+export async function getMana(msg: Message, target = msg.author) {
+    let time = Date.now();
+    let level = (await database.child(`level/${msg.guild?.id}/${target.id}`).once("value")).val() || 1;
+    let prestige = (await database.child(`prestige/${msg.guild?.id}/${target.id}`).once("value")).val() || 0;
+    let mana: {
+        value: number;
+        timestamp: number;
+    } | null = (await database.child(`mana/${msg.guild?.id}/${target.id}`).once("value")).val();
+    let regen = (prestige + 1) / 60;
+    let maxMana = 100 + level * 10 + prestige * 50;
+    if (mana == null || mana == undefined) mana = { value: maxMana, timestamp: time };
+    else mana.value += ((time - mana.timestamp) / 1000) * regen;
+
+    mana.value = Math.min(mana.value, maxMana);
+    mana.timestamp = time;
+    return {
+        ...mana,
+        regen,
+        maxMana,
+        level,
+        prestige,
+    };
+}
+
+export async function useMana(msg: Message, amount: number) {
+    let mana = await getMana(msg);
+    if (mana.value < amount) return [false, mana] as const;
+    mana.value -= amount;
+    await database.child(`mana/${msg.guild?.id}/${msg.author.id}`).set({
+        value: mana.value,
+        timestamp: mana.timestamp,
+    });
+    return [true, mana] as const;
 }

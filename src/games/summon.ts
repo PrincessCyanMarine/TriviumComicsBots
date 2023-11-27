@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { database } from "..";
 import { glitch } from "../attachments";
 import { d20, krystal, sadie } from "../clients";
-import { random_from_array, say } from "../common/functions";
+import { random_from_array, say, useMana } from "../common/functions";
 import { marineId, notificationChannel, triviumGuildId } from "../common/variables";
 import { burning, killing } from "../krystal/functions";
 
@@ -42,6 +42,11 @@ export enum SUMMON_NAMES {
 
 export async function summon(msg: Message, options: string[]) {
     try {
+        let [canUse, mana] = await useMana(msg, 30);
+        if (!canUse) {
+            say(sadie, msg.channel, `Not enough mana to summon!\nSummoning cost: 30\nCurrent mana: ${mana.value}`);
+            return;
+        }
         // console.log(SUMMON_NAMES);
         let summoned_creature = Math.floor(Math.random() * 21);
         let summoned_name: number | string | undefined = undefined;

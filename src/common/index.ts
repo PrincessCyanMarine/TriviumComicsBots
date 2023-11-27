@@ -31,6 +31,8 @@ import {
     restart,
     sendCardCustomizationMessage,
     gitpull,
+    createCharacterCard,
+    getMana,
 } from "./functions";
 import {
     colors,
@@ -81,6 +83,7 @@ d20.on("messageCreate", async (msg) => {
         let command = args.split(" ")[0];
         switch (command) {
             case "card":
+            case "profile":
                 msg.channel.sendTyping();
                 msg.channel.send({ files: [await generatecard(msg)] });
                 break;
@@ -91,27 +94,27 @@ d20.on("messageCreate", async (msg) => {
                 msg.channel.sendTyping();
                 sendCardCustomizationMessage(msg, false, undefined, undefined, ["slow", "card"].includes(options[1]));
                 break;
-            case "profile":
-                let target = msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member;
-                const profile = [
-                    () => {
-                        say(d20, msg.channel, "You can customize your card at https://www.cyanmarine.net/tc/card/customize");
-                    },
-                    () => {
-                        msg.channel.sendTyping();
-                        generatecard(msg).then((card) => {
-                            msg.channel.send({ files: [card] });
-                        });
-                    },
-                    () => {
-                        say(krystal, msg.channel, `!profile <@${target?.id}>`);
-                    },
-                    () => {
-                        killing(msg, target?.user, "normal", "Cyan asked me to kill whoever did that :GMKrystalDevious: :GMKrystalDevious:");
-                    },
-                ];
-                profile[Math.floor(Math.random() * profile.length)]();
-                break;
+            // case "profile":
+            //     let target = msg.mentions.members?.first() ? msg.mentions.members?.first() : msg.member;
+            //     const profile = [
+            //         () => {
+            //             say(d20, msg.channel, "You can customize your card at https://www.cyanmarine.net/tc/card/customize");
+            //         },
+            //         () => {
+            //             msg.channel.sendTyping();
+            //             generatecard(msg).then((card) => {
+            //                 msg.channel.send({ files: [card] });
+            //             });
+            //         },
+            //         () => {
+            //             say(krystal, msg.channel, `!profile <@${target?.id}>`);
+            //         },
+            //         () => {
+            //             killing(msg, target?.user, "normal", "Cyan asked me to kill whoever did that :GMKrystalDevious: :GMKrystalDevious:");
+            //         },
+            //     ];
+            //     profile[Math.floor(Math.random() * profile.length)]();
+            //     break;
             case "roll":
                 if (!options[1]) {
                     say(ray, msg.channel, "Missing arguments!");
@@ -257,6 +260,11 @@ d20.on("messageCreate", async (msg) => {
                     )
                 );
                 break;
+            case "mana": {
+                let { level, maxMana, prestige, regen, timestamp, value } = await getMana(msg, msg.mentions.users.first());
+                msg.reply(`Level: ${level}\nPrestige: ${prestige}\nMana: ${value}/${maxMana}\nRegen: ${regen * 60}/m`);
+                break;
+            }
             case "summon":
                 summon(msg, options);
                 break;
@@ -636,33 +644,46 @@ d20.on("messageCreate", async (msg) => {
             //     break;
             // }
 
-            case "test": {
-                if (msg.author.id != marineId) return;
-                let embed = new MessageEmbed()
-                    .setAuthor({
-                        name: "Test",
-                        iconURL: "https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024",
-                        url: "https://www.cyanmarine.net/",
-                    })
-                    .setDescription("This is a test")
-                    .setColor("#00ff00")
-                    .setFooter({
-                        iconURL: "https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024",
-                        text: "Cyanmarine",
-                    })
-                    .setThumbnail("https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024")
-                    .setTimestamp(new Date())
-                    .setURL("https://cyanmarine.net/")
-                    .setTitle("Test")
-                    .setImage("https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024")
-                    .addField("FIELD", "THIS IS AN INLINE FIELD", true)
-                    .addField("FIELD", "THIS IS AN INLINE FIELD", true)
-                    .addField("FIELD", "THIS IS NOT AN INLINE FIELD", false)
-                    .addField("FIELD", "THIS IS NOT AN INLINE FIELD", false)
-                    .addField("Test", "This is a test")
-                    .addField("Something", "Something");
+            // case "test": {
+            //     if (msg.author.id != marineId) return;
+            //     let embed = new MessageEmbed()
+            //         .setAuthor({
+            //             name: "Test",
+            //             iconURL: "https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024",
+            //             url: "https://www.cyanmarine.net/",
+            //         })
+            //         .setDescription("This is a test")
+            //         .setColor("#00ff00")
+            //         .setFooter({
+            //             iconURL: "https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024",
+            //             text: "Cyanmarine",
+            //         })
+            //         .setThumbnail("https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024")
+            //         .setTimestamp(new Date())
+            //         .setURL("https://cyanmarine.net/")
+            //         .setTitle("Test")
+            //         .setImage("https://cdn.discordapp.com/avatars/305883924310261760/af928f5799ff344d1b42cdc74cd14d68.webp?size=1024")
+            //         .addField("FIELD", "THIS IS AN INLINE FIELD", true)
+            //         .addField("FIELD", "THIS IS AN INLINE FIELD", true)
+            //         .addField("FIELD", "THIS IS NOT AN INLINE FIELD", false)
+            //         .addField("FIELD", "THIS IS NOT AN INLINE FIELD", false)
+            //         .addField("Test", "This is a test")
+            //         .addField("Something", "Something");
 
-                msg.reply({ embeds: [embed] });
+            //     msg.reply({ embeds: [embed] });
+            //     break;
+            // }
+
+            case "test": {
+                let img = await createCharacterCard(
+                    msg,
+                    "character",
+                    msg.member.displayAvatarURL({ format: "png", size: 1024 }),
+                    ["Archery", "Earth", "Dark"],
+                    9999,
+                    99
+                );
+                if (img) msg.reply({ files: [img] });
                 break;
             }
 
