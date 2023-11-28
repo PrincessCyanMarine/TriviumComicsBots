@@ -23,6 +23,7 @@
     "command": {
         "type": "targeted",
         "hasTarget": {
+            "manaCost": 50,
             "type": "command",
             "command": {
                 "bot": "krystal",

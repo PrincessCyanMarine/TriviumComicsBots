@@ -8,7 +8,6 @@
     "name": "18?",
     "priority": 30,
     "command": {
-        "manaCost": 18,
         "type": "conditional",
         "condition": {
             "values": [
@@ -24,6 +23,7 @@
             "comparison": "=="
         },
         "ifTrue": {
+            "manaCost": 18,
             "type": "message",
             "text": "18!"
         }

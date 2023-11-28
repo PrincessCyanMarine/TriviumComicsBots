@@ -1022,6 +1022,7 @@ function runDataCommand<T>(
     return new Promise<any>(async (resolve, reject) => {
         try {
             if (command.manaCost && !command.manaSpent) {
+                console.log(command?.name);
                 let [canUse, mana] = await useMana(moi, command.manaCost);
                 command.manaSpent = true;
                 if (!canUse) {
@@ -1953,6 +1954,7 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
 }
 
 export async function useMana(moi: Message | CommandInteraction, amount: number) {
+    console.log("Using " + amount + " mana");
     let mana = await getMana(moi);
     let target = moi instanceof Message ? moi.author : moi.user;
     if (mana.value < amount) return [false, mana] as const;

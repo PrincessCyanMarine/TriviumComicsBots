@@ -5,7 +5,6 @@
     "description": "Ask Krystal to unalive an unattractive weeb (unless they are being spared)",
     "dataType": "command",
     "type": "conditional",
-    "manaCost": 50,
     "conditions": [
         {
             "value": {
