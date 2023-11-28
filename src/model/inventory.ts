@@ -14,6 +14,7 @@ export namespace Inventory {
         amount: number;
         target: "self";
         effect: "buff" | "debuff" | "heal" | "damage";
+        item?: Item;
     };
 
     export type Item = {
@@ -124,7 +125,7 @@ export namespace Inventory {
         let effects: ItemEffect[] = [];
         for (let item of inventory.items) {
             if (item.equipped) {
-                effects.push(...item.effects);
+                effects.push(...item.effects.map((e) => ({ ...e, item })));
             }
         }
         return effects;

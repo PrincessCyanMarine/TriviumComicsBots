@@ -1935,17 +1935,32 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
     let oldMana = mana?.value || 0;
 
     let effects = await Inventory.activeEffects(moi, target);
+    let effectsText = {
+        mana: [] as [string, Inventory.Item | undefined][],
+        regen: [] as [string, Inventory.Item | undefined][],
+    };
 
     for (let effect of effects) {
         if (!["mana", "manaRegen"].includes(effect.type)) continue;
         switch (effect.effect) {
             case "buff":
-                if (effect.type == "mana") max += effect.amount;
-                else regen += effect.amount / 60;
+                if (effect.type == "mana") {
+                    max += effect.amount;
+                    effectsText.mana.push([`+${effect.amount}`, effect.item]);
+                } else {
+                    regen += effect.amount / 60;
+                    effectsText.regen.push([`+${effect.amount}/m`, effect.item]);
+                }
+
                 break;
             case "debuff":
-                if (effect.type == "mana") max -= effect.amount;
-                else regen -= effect.amount / 60;
+                if (effect.type == "mana") {
+                    max -= effect.amount;
+                    effectsText.mana.push([`-${effect.amount}`, effect.item]);
+                } else {
+                    regen -= effect.amount / 60;
+                    effectsText.regen.push([`-${effect.amount}/m`, effect.item]);
+                }
                 break;
         }
     }
@@ -1970,6 +1985,7 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
         level,
         prestige,
         oldTimestamp,
+        effectsText,
     };
 }
 

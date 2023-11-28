@@ -63,6 +63,7 @@ import { Harem } from "./harem";
 import axios from "axios";
 import { EmojiCycler } from "../d20/EmojiCycler";
 import { spawn } from "child_process";
+import { Inventory } from "../model/inventory";
 
 const _commands: { names: string[]; callback: (msg: Message, args: string[]) => Promise<void> }[] = [];
 export const addExclamationCommand = (names: string | string[], callback: (msg: Message, args: string[]) => Promise<void>) => {
@@ -268,7 +269,10 @@ d20.on("messageCreate", async (msg) => {
                     let target = msg.mentions.users.first() || msg.author;
                     await setMana(msg, parseInt(val), target);
                 }
-                let { level, max, prestige, regen, oldTimestamp, value, timestamp, oldMana } = await getMana(msg, msg.mentions.users.first());
+                let { effectsText, level, max, prestige, regen, oldTimestamp, value, timestamp, oldMana } = await getMana(
+                    msg,
+                    msg.mentions.users.first()
+                );
                 let timeDifference = Math.floor((timestamp - oldTimestamp) / 1000);
                 let timeStr = "";
                 if (timeDifference > 3600) {
@@ -283,10 +287,17 @@ d20.on("messageCreate", async (msg) => {
 
                 if (timeStr == "") timeStr = " 0s";
 
+                let convertEffectText = (effects: [string, Inventory.Item | undefined][]) =>
+                    effects.length > 0
+                        ? effects.length > 1
+                            ? " " + effects.map(([v]) => v).join(", ")
+                            : " " + effects.map(([v, i]) => (i ? `${v} ${i?.name}` : v)).join(", ")
+                        : "";
+
                 msg.reply(
-                    `Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}\nRegen: ${
+                    `Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}${convertEffectText(effectsText.mana)}\nRegen: ${
                         regen * 60
-                    }/m\nTime passed since last mana change:${timeStr}\nMana gained: ${Math.floor(
+                    }/m${convertEffectText(effectsText.regen)}\nTime passed since last mana change:${timeStr}\nMana gained: ${Math.floor(
                         Math.min(value - oldMana, ((timestamp - oldTimestamp) / 1000) * regen)
                     )}`
                 );
