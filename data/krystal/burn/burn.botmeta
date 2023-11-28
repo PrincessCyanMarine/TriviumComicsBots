@@ -2,6 +2,7 @@
     "dataType": "command",
     "type": "conditional",
     "name": "burn",
+    "manaCost": 30,
     "condition": {
         "values": [
             {

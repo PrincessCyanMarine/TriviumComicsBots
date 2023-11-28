@@ -7,6 +7,7 @@
     "match": "swim",
     "botName": true,
     "command": {
+        "manaCost": 10,
         "type": "conditional",
         "condition": {
             "values": [

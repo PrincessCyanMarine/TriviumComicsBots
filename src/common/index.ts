@@ -263,8 +263,14 @@ d20.on("messageCreate", async (msg) => {
                 break;
             case "mana": {
                 if (msg.author.id == marineId && options[1]) await setMana(msg, parseInt(options[1]));
-                let { level, max, prestige, regen, timestamp, value } = await getMana(msg, msg.mentions.users.first());
-                msg.reply(`Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}\nRegen: ${regen * 60}/m`);
+                let { level, max, prestige, regen, oldTimestamp, value, timestamp } = await getMana(msg, msg.mentions.users.first());
+                msg.reply(
+                    `Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}\nRegen: ${
+                        regen * 60
+                    }/m\nTime passed since last mana change: ${Math.floor((timestamp - oldTimestamp) / 1000)}s\nMana gained: ${Math.floor(
+                        ((timestamp - oldTimestamp) / 1000) * regen
+                    )}`
+                );
                 break;
             }
             case "summon":

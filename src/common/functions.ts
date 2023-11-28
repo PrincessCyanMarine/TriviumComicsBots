@@ -1022,7 +1022,7 @@ function runDataCommand<T>(
     return new Promise<any>(async (resolve, reject) => {
         try {
             if (command.manaCost) {
-                let [canUse] = await useMana(moi, command.manaCost);
+                let [canUse, mana] = await useMana(moi, command.manaCost);
                 if (!canUse) {
                     if (command.noManaCommand) {
                         resolve(await runDataCommand(command.noManaCommand, moi, args, startTime, rootCommand));
@@ -1030,7 +1030,14 @@ function runDataCommand<T>(
                     }
                     resolve(
                         await runDataCommand(
-                            { type: "message", text: "You don't have enough mana to use this command" },
+                            {
+                                type: "message",
+                                text: `You don't have enough mana to use this command (${Math.floor(mana.value)}/${
+                                    command.manaCost
+                                })\nYou will be able to use this command in <t:${
+                                    Math.ceil(Date.now() / 1000) + Math.ceil((command.manaCost - mana.value) / (mana.regen * 60)) * 60
+                                }:R>`,
+                            },
                             moi,
                             args,
                             startTime,
@@ -1912,7 +1919,7 @@ export const createCharacterCard = async (
     return canvas.toBuffer();
 };
 
-export async function getMana(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
+export async function getMana(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user, update = false) {
     let time = Date.now();
     let level = (await database.child(`level/${moi.guild?.id}/${target.id}`).once("value")).val() || 1;
     let prestige = (await database.child(`prestige/${moi.guild?.id}/${target.id}`).once("value")).val() || 0;
@@ -1926,13 +1933,21 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
     else mana.value += ((time - mana.timestamp) / 1000) * regen;
 
     mana.value = Math.min(mana.value, max);
+    let oldTimestamp = mana.timestamp;
     mana.timestamp = time;
+    if (update) {
+        await database.child(`mana/${moi.guild?.id}/${target.id}`).set({
+            value: mana.value,
+            timestamp: mana.timestamp,
+        });
+    }
     return {
         ...mana,
         regen,
         max,
         level,
         prestige,
+        oldTimestamp,
     };
 }
 

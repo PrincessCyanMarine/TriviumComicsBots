@@ -1,5 +1,6 @@
 {
     "dataType": "command",
+    "manaCost": 25,
     "name": "eat",
     "bot": "krystal",
     "type": "targeted",

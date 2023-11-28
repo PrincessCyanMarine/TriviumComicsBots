@@ -13,6 +13,7 @@
     ],
     "botName": true,
     "command": {
+        "manaCost": 10,
         "type": "message",
         "image": {
             "url": "./assets/krystal/runngun.png",

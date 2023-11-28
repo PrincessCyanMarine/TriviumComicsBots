@@ -12,6 +12,7 @@
     ],
     "type": "command",
     "command": {
+        "manaCost": 100,
         "type": "conditional",
         "condition": {
             "value": {

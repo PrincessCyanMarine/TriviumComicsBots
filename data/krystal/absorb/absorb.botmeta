@@ -1,6 +1,7 @@
 {
     "dataType": "command",
     "type": "conditional",
+    "manaCost": 35,
     "name": "absorb",
     "condition": {
         "value": {

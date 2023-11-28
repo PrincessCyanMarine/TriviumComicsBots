@@ -8,6 +8,7 @@
     "name": "18?",
     "priority": 30,
     "command": {
+        "manaCost": 18,
         "type": "conditional",
         "condition": {
             "values": [
