@@ -21,7 +21,6 @@
     "type": "command",
     "bot": "krystal",
     "command": {
-        "manaCost": 50,
         "type": "targeted",
         "hasTarget": {
             "type": "command",
@@ -49,6 +48,7 @@
             ]
         },
         "noTarget": {
+            "manaCost": 15,
             "type": "message",
             "text": "***I will unalive now :GMKrystalDevious:***",
             "image": {
