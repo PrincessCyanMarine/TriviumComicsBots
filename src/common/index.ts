@@ -261,8 +261,8 @@ d20.on("messageCreate", async (msg) => {
                 );
                 break;
             case "mana": {
-                let { level, maxMana, prestige, regen, timestamp, value } = await getMana(msg, msg.mentions.users.first());
-                msg.reply(`Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${maxMana}\nRegen: ${regen * 60}/m`);
+                let { level, max, prestige, regen, timestamp, value } = await getMana(msg, msg.mentions.users.first());
+                msg.reply(`Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}\nRegen: ${regen * 60}/m`);
                 break;
             }
             case "summon":

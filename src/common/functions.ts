@@ -1902,16 +1902,16 @@ export async function getMana(msg: Message, target = msg.author) {
         timestamp: number;
     } | null = (await database.child(`mana/${msg.guild?.id}/${target.id}`).once("value")).val();
     let regen = (prestige + 1) / 60;
-    let maxMana = 100 + level * 10 + prestige * 50;
-    if (mana == null || mana == undefined) mana = { value: maxMana, timestamp: time };
+    let max = 100 + level * 10 + prestige * 50;
+    if (mana == null || mana == undefined) mana = { value: max, timestamp: time };
     else mana.value += ((time - mana.timestamp) / 1000) * regen;
 
-    mana.value = Math.min(mana.value, maxMana);
+    mana.value = Math.min(mana.value, max);
     mana.timestamp = time;
     return {
         ...mana,
         regen,
-        maxMana,
+        max,
         level,
         prestige,
     };
