@@ -108,6 +108,7 @@ import path, { parse } from "path";
 import { addSlashCommand, slash_commands } from "../interactions/slash/common";
 import { writeFile } from "fs/promises";
 import { timeStamp } from "console";
+import { Inventory } from "../model/inventory";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");
@@ -1932,6 +1933,23 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
     let regen = (prestige + 1) / 60;
     let max = 100 + level * 10 + prestige * 50;
     let oldMana = mana?.value || 0;
+
+    let effects = await Inventory.activeEffects(moi, target);
+
+    for (let effect of effects) {
+        if (!["mana", "manaRegen"].includes(effect.type)) continue;
+        switch (effect.effect) {
+            case "buff":
+                if (effect.type == "mana") max += effect.amount;
+                else regen += effect.amount / 60;
+                break;
+            case "debuff":
+                if (effect.type == "mana") max -= effect.amount;
+                else regen -= effect.amount / 60;
+                break;
+        }
+    }
+
     if (mana == null || mana == undefined) mana = { value: max, timestamp: time };
     else mana.value += ((time - mana.timestamp) / 1000) * regen;
 
@@ -1956,7 +1974,6 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
 }
 
 export async function useMana(moi: Message | CommandInteraction, amount: number) {
-    console.log("Using " + amount + " mana");
     let mana = await getMana(moi);
     let target = moi instanceof Message ? moi.author : moi.user;
     if (mana.value < amount) return [false, mana] as const;
@@ -1974,4 +1991,9 @@ export async function setMana(moi: Message | CommandInteraction, amount: number,
         timestamp: Date.now(),
     });
     return amount;
+}
+
+export async function addMana(moi: Message | CommandInteraction, amount: number, target = moi instanceof Message ? moi.author : moi.user) {
+    let mana = await getMana(moi, target);
+    return setMana(moi, mana.value + amount, target);
 }
