@@ -52,6 +52,7 @@ export type CommandCondition = { not?: boolean } & (
 
 export type CommandType<T = any, V extends any[] = any[]> = {
     manaCost?: number;
+    manaSpent?: boolean;
     noManaCommand?: CommandType<T, V>;
     dataType?: "command";
     name?: string;

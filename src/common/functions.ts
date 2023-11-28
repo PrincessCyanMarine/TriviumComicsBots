@@ -1021,8 +1021,9 @@ function runDataCommand<T>(
 ) {
     return new Promise<any>(async (resolve, reject) => {
         try {
-            if (command.manaCost) {
+            if (command.manaCost && !command.manaSpent) {
                 let [canUse, mana] = await useMana(moi, command.manaCost);
+                command.manaSpent = true;
                 if (!canUse) {
                     if (command.noManaCommand) {
                         resolve(await runDataCommand(command.noManaCommand, moi, args, startTime, rootCommand));
