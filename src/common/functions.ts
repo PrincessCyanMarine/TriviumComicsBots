@@ -1021,6 +1021,25 @@ function runDataCommand<T>(
 ) {
     return new Promise<any>(async (resolve, reject) => {
         try {
+            if (command.manaCost) {
+                let [canUse] = await useMana(moi, command.manaCost);
+                if (!canUse) {
+                    if (command.noManaCommand) {
+                        resolve(await runDataCommand(command.noManaCommand, moi, args, startTime, rootCommand));
+                        return;
+                    }
+                    resolve(
+                        await runDataCommand(
+                            { type: "message", text: "You don't have enough mana to use this command" },
+                            moi,
+                            args,
+                            startTime,
+                            rootCommand
+                        )
+                    );
+                    return;
+                }
+            }
             // console.log(command);
             if (!command) return reject("No command provided");
             if (command.clearArgs) args = [];
@@ -1893,14 +1912,14 @@ export const createCharacterCard = async (
     return canvas.toBuffer();
 };
 
-export async function getMana(msg: Message, target = msg.author) {
+export async function getMana(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
     let time = Date.now();
-    let level = (await database.child(`level/${msg.guild?.id}/${target.id}`).once("value")).val() || 1;
-    let prestige = (await database.child(`prestige/${msg.guild?.id}/${target.id}`).once("value")).val() || 0;
+    let level = (await database.child(`level/${moi.guild?.id}/${target.id}`).once("value")).val() || 1;
+    let prestige = (await database.child(`prestige/${moi.guild?.id}/${target.id}`).once("value")).val() || 0;
     let mana: {
         value: number;
         timestamp: number;
-    } | null = (await database.child(`mana/${msg.guild?.id}/${target.id}`).once("value")).val();
+    } | null = (await database.child(`mana/${moi.guild?.id}/${target.id}`).once("value")).val();
     let regen = (prestige + 1) / 60;
     let max = 100 + level * 10 + prestige * 50;
     if (mana == null || mana == undefined) mana = { value: max, timestamp: time };
@@ -1917,13 +1936,23 @@ export async function getMana(msg: Message, target = msg.author) {
     };
 }
 
-export async function useMana(msg: Message, amount: number) {
-    let mana = await getMana(msg);
+export async function useMana(moi: Message | CommandInteraction, amount: number) {
+    let mana = await getMana(moi);
+    let target = moi instanceof Message ? moi.author : moi.user;
     if (mana.value < amount) return [false, mana] as const;
     mana.value -= amount;
-    await database.child(`mana/${msg.guild?.id}/${msg.author.id}`).set({
+    await database.child(`mana/${moi.guild?.id}/${target.id}`).set({
         value: mana.value,
         timestamp: mana.timestamp,
     });
     return [true, mana] as const;
+}
+
+export async function setMana(moi: Message | CommandInteraction, amount: number) {
+    let target = moi instanceof Message ? moi.author : moi.user;
+    await database.child(`mana/${moi.guild?.id}/${target.id}`).set({
+        value: amount,
+        timestamp: Date.now(),
+    });
+    return amount;
 }

@@ -51,6 +51,8 @@ export type CommandCondition = { not?: boolean } & (
 );
 
 export type CommandType<T = any, V extends any[] = any[]> = {
+    manaCost?: number;
+    noManaCommand?: CommandType<T, V>;
     dataType?: "command";
     name?: string;
     description?: string;
@@ -137,6 +139,7 @@ export type CommandType<T = any, V extends any[] = any[]> = {
 );
 
 export type ActivatorType = {
+    // manaCost?: number;
     dataType?: "activator";
     name?: string;
     description?: string;
