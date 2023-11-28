@@ -23,7 +23,7 @@ export namespace Inventory {
         description: string;
         effects: ItemEffect[];
         equipped?: boolean;
-        index: number;
+        id: number;
     } & (
         | {
               type: "weapon";
@@ -61,6 +61,10 @@ export namespace Inventory {
         gold: number;
     };
 
+    function getItemById(index: number) {
+        return ITEMS[index];
+    }
+
     export async function get(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
         let inventory: Inventory = (await database.child(`inventory/` + moi.guild?.id + "/" + target.id).once("value")).val();
         if (!inventory) {
@@ -73,11 +77,21 @@ export namespace Inventory {
                 gold: 0,
             };
             // await set(moi, target, inventory);
+        } else {
+            inventory.items = inventory.items.map((item) => {
+                return { ...item, ...getItemById(item.id) };
+            });
         }
         return inventory;
     }
 
     export async function set(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user, inventory: Inventory) {
+        inventory.items = inventory.items.map((item) => {
+            return {
+                id: item.id,
+                equipped: item.equipped,
+            } as Item;
+        });
         return database.child(`inventory/` + moi.guild?.id + "/" + target.id).set(inventory);
     }
 
@@ -114,7 +128,6 @@ export namespace Inventory {
     ) {
         if (!inventory) inventory = await get(moi, target);
         let index = inventory.items.length;
-        item.index = index;
         inventory.items.push(item);
         await set(moi, target, inventory);
         return inventory;
@@ -130,4 +143,24 @@ export namespace Inventory {
         }
         return effects;
     }
+
+    export const ITEMS: Record<number, Item> = {
+        0: {
+            description: "A ring specially forged for Razraz. It increases his mana by 20",
+            effects: [
+                {
+                    amount: 20,
+                    effect: "buff",
+                    target: "self",
+                    type: "mana",
+                },
+            ],
+            equipped: true,
+            name: "AC's Helpful Ring",
+            rarity: "uncommon",
+            slot: "ring",
+            type: "armor",
+            id: 0,
+        },
+    };
 }
