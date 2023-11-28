@@ -1931,6 +1931,7 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
     } | null = (await database.child(`mana/${moi.guild?.id}/${target.id}`).once("value")).val();
     let regen = (prestige + 1) / 60;
     let max = 100 + level * 10 + prestige * 50;
+    let oldMana = mana?.value || 0;
     if (mana == null || mana == undefined) mana = { value: max, timestamp: time };
     else mana.value += ((time - mana.timestamp) / 1000) * regen;
 
@@ -1945,6 +1946,7 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
     }
     return {
         ...mana,
+        oldMana,
         regen,
         max,
         level,

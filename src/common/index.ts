@@ -267,12 +267,12 @@ d20.on("messageCreate", async (msg) => {
                     let target = msg.mentions.users.first() || msg.author;
                     await setMana(msg, parseInt(val), target);
                 }
-                let { level, max, prestige, regen, oldTimestamp, value, timestamp } = await getMana(msg, msg.mentions.users.first());
+                let { level, max, prestige, regen, oldTimestamp, value, timestamp, oldMana } = await getMana(msg, msg.mentions.users.first());
                 msg.reply(
                     `Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}\nRegen: ${
                         regen * 60
-                    }/m\nTime passed since last mana change: ${Math.floor((timestamp - oldTimestamp) / 1000)}s\nMana gained: ${Math.floor(
-                        ((timestamp - oldTimestamp) / 1000) * regen
+                    }/m\nTime passed since last mana change: ${((timestamp - oldTimestamp) / 60000).toFixed(2)}m\nMana gained: ${Math.floor(
+                        Math.min(value - oldMana, ((timestamp - oldTimestamp) / 1000) * regen)
                     )}`
                 );
                 break;
