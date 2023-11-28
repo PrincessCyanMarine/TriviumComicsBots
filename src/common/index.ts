@@ -262,7 +262,11 @@ d20.on("messageCreate", async (msg) => {
                 );
                 break;
             case "mana": {
-                if (msg.author.id == marineId && options[1]) await setMana(msg, parseInt(options[1]));
+                let val = msg.mentions.users.first() ? options[2] : options[1];
+                if (msg.author.id == marineId && val) {
+                    let target = msg.mentions.users.first() || msg.author;
+                    await setMana(msg, parseInt(val), target);
+                }
                 let { level, max, prestige, regen, oldTimestamp, value, timestamp } = await getMana(msg, msg.mentions.users.first());
                 msg.reply(
                     `Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}\nRegen: ${

@@ -1963,8 +1963,7 @@ export async function useMana(moi: Message | CommandInteraction, amount: number)
     return [true, mana] as const;
 }
 
-export async function setMana(moi: Message | CommandInteraction, amount: number) {
-    let target = moi instanceof Message ? moi.author : moi.user;
+export async function setMana(moi: Message | CommandInteraction, amount: number, target = moi instanceof Message ? moi.author : moi.user) {
     await database.child(`mana/${moi.guild?.id}/${target.id}`).set({
         value: amount,
         timestamp: Date.now(),
