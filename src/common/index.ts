@@ -34,6 +34,7 @@ import {
     createCharacterCard,
     getMana,
     setMana,
+    useMana,
 } from "./functions";
 import {
     colors,
@@ -268,10 +269,24 @@ d20.on("messageCreate", async (msg) => {
                     await setMana(msg, parseInt(val), target);
                 }
                 let { level, max, prestige, regen, oldTimestamp, value, timestamp, oldMana } = await getMana(msg, msg.mentions.users.first());
+                let timeDifference = Math.floor((timestamp - oldTimestamp) / 1000);
+                let timeStr = "";
+                if (timeDifference > 3600) {
+                    timeStr += ` ${Math.floor(timeDifference / 3600)}h`;
+                    timeDifference %= 3600;
+                }
+                if (timeDifference > 60) {
+                    timeStr += ` ${Math.floor(timeDifference / 60)}m`;
+                    timeDifference %= 60;
+                }
+                if (timeDifference > 0) timeStr += ` ${Math.floor(timeDifference)}s`;
+
+                if (timeStr == "") timeStr = " 0s";
+
                 msg.reply(
                     `Level: ${level}\nPrestige: ${prestige}\nMana: ${Math.floor(value)}/${max}\nRegen: ${
                         regen * 60
-                    }/m\nTime passed since last mana change: ${((timestamp - oldTimestamp) / 60000).toFixed(2)}m\nMana gained: ${Math.floor(
+                    }/m\nTime passed since last mana change:${timeStr}\nMana gained: ${Math.floor(
                         Math.min(value - oldMana, ((timestamp - oldTimestamp) / 1000) * regen)
                     )}`
                 );

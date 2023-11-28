@@ -48,7 +48,6 @@ What command do you want more info about?
 - my-xp (d20)
 - remove-cache (d20)
 - help (d20)
-- help (d20)
 
 
 </details>
