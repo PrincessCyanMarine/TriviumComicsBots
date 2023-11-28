@@ -45,16 +45,16 @@ export namespace Inventory {
     export type Inventory = {
         items: Item[];
         equipped: {
-            weapon?: Item | null;
+            weapon?: number | null;
             armor: {
-                head?: Item | null;
-                chest?: Item | null;
-                legs?: Item | null;
-                feet?: Item | null;
-                ring?: Item | null;
-                neck?: Item | null;
-                offhand?: Item | null;
-                mainhand?: Item | null;
+                head?: number | null;
+                chest?: number | null;
+                legs?: number | null;
+                feet?: number | null;
+                ring?: number | null;
+                neck?: number | null;
+                offhand?: number | null;
+                mainhand?: number | null;
             };
         };
         gold: number;
@@ -93,10 +93,10 @@ export namespace Inventory {
         inventory.items[index].equipped = true;
         switch (item.type) {
             case "armor":
-                inventory.equipped.armor[item.slot] = item;
+                inventory.equipped.armor[item.slot] = index;
                 break;
             case "weapon":
-                inventory.equipped.weapon = item;
+                inventory.equipped.weapon = index;
                 break;
             default:
                 throw new Error("Invalid item type: " + item.type);
