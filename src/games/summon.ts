@@ -55,17 +55,18 @@ export async function summon(msg: Message, options: string[]) {
             say(sadie, msg.channel, "no");
             summoned_name = SUMMON_NAMES.NO;
         } else {
+            let text = random_from_array([
+                `*You draw a magic circle on the ground, consuming 30 mana…*`,
+                `*You draw a magic circle on the ground, and pour 30 mana into it*`,
+                `*You waste 30 of your hard earned mana to conjure a magic circle*`,
+                `Mana go. Circle appear.`,
+                `Circle appear. Mana go.`,
+            ]);
             await say(
                 sadie,
                 msg.channel,
                 {
-                    content: random_from_array([
-                        `*You draw a magic circle on the ground, consuming 30 mana…*\n(${mana.value}/${mana.max} mana remaining)`,
-                        `*You draw a magic circle on the ground, and pour 30 mana into it*\n(${mana.value}/${mana.max} mana remaining)`,
-                        `*You waste 30 of your hard earned mana to conjure a magic circle*\n(${mana.value}/${mana.max} mana remaining)`,
-                        `Mana go. Circle appear.\n(${mana.value}/${mana.max} mana remaining)`,
-                        `Circle appear. Mana go.\n(${mana.value}/${mana.max} mana remaining)`,
-                    ]),
+                    content: text + `\n(${Math.floor(mana.value)}/${mana.max} mana remaining)`,
                     files: [new MessageAttachment(`./assets/ray/roll/${summoned_creature}.gif`, "Roll.gif")],
                 },
                 500
