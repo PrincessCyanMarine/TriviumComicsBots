@@ -331,7 +331,7 @@ export namespace Inventory {
             effects: [
                 {
                     amount: 10,
-                    effect: "buff",
+                    effect: "debuff",
                     target: "self",
                     type: "mana",
                 },
