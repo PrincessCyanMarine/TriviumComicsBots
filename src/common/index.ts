@@ -292,7 +292,7 @@ d20.on("messageCreate", async (msg) => {
                     effects.length > 0
                         ? /* effects.length > 1
                             ? " " + effects.map(([v]) => v).join(", ")
-                            : */ " " + effects.map(([v, i]) => (i ? `${v} ${i?.name}` : v)).join(", ")
+                            : */ " " + effects.map(([v, i]) => (i ? `${v} (${i?.name})` : v)).join(", ")
                         : "";
 
                 msg.reply(

@@ -1647,6 +1647,7 @@ export const gitpull = async (msg?: Message) => {
         await mod_alert_webhook(testing).send("Reloaded command data");
         await setRestarting(false);
     } catch (err) {
+        setRestarting(false);
         console.log("Something went wrong while updating");
         if (msg) await say(d20, msg.channel, "Something went wrong while updating");
     }
@@ -1665,7 +1666,9 @@ export const update = async (msg?: Message) => {
         await spawnAsync("pnpm", ["install"]);
         await spawnAsync("tsc");
         await spawnAsync("pm2", ["restart", "all"]);
+        setRestarting(false);
     } catch (err) {
+        setRestarting(false);
         console.log("Something went wrong while updating");
         if (msg) await say(d20, msg.channel, "Something went wrong while updating");
     }
@@ -1680,6 +1683,7 @@ export const restart = async (msg?: Message) => {
     console.log("Restarting...");
     if (msg) await say(d20, msg.channel, "Restarting...", 0);
     await spawnAsync("pm2", ["restart", "all"]);
+    setRestarting(false);
 };
 
 export const stop = async (msg?: Message) => {
@@ -1691,6 +1695,7 @@ export const stop = async (msg?: Message) => {
     console.log("Stopping...");
     if (msg) await say(d20, msg.channel, "Stopping...", 0);
     await spawnAsync("pm2", ["stop", "all"]);
+    setRestarting(false);
 };
 
 export async function getCardStyle(userId: string) {
