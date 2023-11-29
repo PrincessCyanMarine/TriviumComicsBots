@@ -336,17 +336,19 @@ d20.on("messageCreate", async (msg) => {
                     if (msg.author.id != marineId) new Error("You don't have the permission to use that command");
                     let target = msg.mentions.users?.first() || msg.author;
                     let itemId = parseInt(options[1]);
-                    if (isNaN(itemId)) new Error("Invalid item id");
+                    console.log(options[1], itemId);
+                    if (!itemId || isNaN(itemId)) new Error("Invalid item id");
                     let amount = parseInt(options[2] || "1") || 1;
                     if (isNaN(amount)) new Error("Invalid amount");
                     let item = Inventory.getItemById(itemId);
+                    console.log(item);
                     if (!item) new Error("Invalid item id");
 
                     if (command == "take") amount = -amount;
                     let inventory = await Inventory.give(msg, item, amount, target);
                     msg.reply(amount > 0 ? `Gave ${amount} ${item.name} to ${target}` : `Took ${-amount} ${item.name} from ${target}`);
                 } catch (err: any) {
-                    console.error(err)
+                    console.error(err);
                     msg.reply(err.message || "Something went wrong");
                 }
                 break;

@@ -646,7 +646,7 @@ export async function commandTextConverter(
                 .replace(/\\\:/g, "%3A")
                 .replace(/http\:\/\//g, "http%3A%2F%2F")
                 .replace(/https\:\/\//g, "https%3A%2F%2F");
-            console.log("text", text);
+            // console.log("text", text);
 
             // let m = text.match(/\${[^$]+?\}\$/gi);
             // if (!m) break;
@@ -860,7 +860,7 @@ export async function commandTextConverter(
                             break;
                         }
                         if (typeof obj != "object") break;
-                        console.log("obj", obj);
+                        //console.log("obj", obj);
 
                         let fun: (() => Promise<string | undefined> | undefined | string) | undefined = {
                             keys: () => JSON.stringify(Object.keys(obj)),
@@ -879,9 +879,9 @@ export async function commandTextConverter(
                         break;
                     }
                     case "array": {
-                        console.log("keys[1]", keys[1]);
+                        //console.log("keys[1]", keys[1]);
                         let val = (await commandTextConverter(keys[1], command, moi, args, startTime, rootCommand)) || "[]";
-                        console.log("val", val);
+                        //console.log("val", val);
                         let array: unknown[] | undefined;
                         if (typeof val == "string")
                             try {
@@ -892,7 +892,7 @@ export async function commandTextConverter(
                             }
                         else if (Array.isArray(val)) array = val;
                         else array = [val];
-                        console.log("array", array);
+                        //console.log("array", array);
                         let fun: (() => Promise<string | undefined> | undefined | string) | undefined = {
                             get: () => {
                                 let index = parseInt(keys![3] || "0") || 0;
@@ -905,7 +905,7 @@ export async function commandTextConverter(
                             length: () => (array?.length || 0).toString(),
                             join: () => array?.join(keys![3] || ", "),
                             map: () => {
-                                console.log("keys[3]", keys![3]);
+                                //console.log("keys[3]", keys![3]);
                                 return commandTextConverter(
                                     JSON.stringify(
                                         array?.map((v, i) =>

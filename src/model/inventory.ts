@@ -64,8 +64,8 @@ export namespace Inventory {
     };
 
     export function getItemById<T extends number | null | undefined, R extends T extends number ? Item : null>(id: T): R {
-        if (!id) return null as R;
-        let item = ITEMS[id] as R;
+        if (!id && id != 0) return null as R;
+        let item = ITEMS[id!] as R;
         if (!item) throw new Error("No item with id " + id);
         return item;
     }
@@ -177,7 +177,9 @@ export namespace Inventory {
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
     ): Promise<Inventory> {
+        console.log(item);
         if (typeof item == "number") item = getItemById(item);
+        if (!item) throw new Error("Invalid item id " + item);
         if (!inventory) inventory = await get(moi, target);
         if (count < 0) return take(moi, item, -count, target, inventory);
         if (count == 0) return inventory;
