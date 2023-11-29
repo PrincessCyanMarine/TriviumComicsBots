@@ -500,12 +500,13 @@ d20.on("messageCreate", async (msg) => {
                     if (options[1] == "potion") {
                         item = { ...item };
                         let effect = options[2] as Inventory.ItemEffect["effect"];
-                        if (!effect || !Inventory.ItemEffects.includes(effect)) {
+                        if (!effect || !Inventory.ItemEffects.map((b) => b.toLowerCase()).includes(effect)) {
                             msg.reply("Invalid effect\nAvailable effects:\n" + Inventory.ItemEffects.map((e) => `- ${e}`).join("\n"));
                             return;
                         }
                         let type = options[3] as Inventory.ItemEffect["type"];
-                        if (!type || !Inventory.ItemEffectTypes.includes(type)) {
+                        console.log(type);
+                        if (!type || !Inventory.ItemEffectTypes.map((b) => b.toLowerCase()).includes(type)) {
                             msg.reply("Invalid type\nAvailable types:\n" + Inventory.ItemEffectTypes.map((e) => `- ${e}`).join("\n"));
                             return;
                         }
