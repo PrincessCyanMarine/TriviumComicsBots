@@ -346,7 +346,7 @@ d20.on("messageCreate", async (msg) => {
                     msg.reply(
                         `# ${item.name}\n## ${item.description}\nType: ${item.type == "armor" ? item.slot : item.type}\nRarity: ${
                             item.rarity
-                        }\nMax count: ${item.maxCount}${Inventory.canEquip(item) ? `\nEquippable` : ""}${
+                        }\nMax count: ${item.maxCount || "∞"}${Inventory.canEquip(item) ? `\nEquippable` : ""}${
                             item.effects.length > 0
                                 ? `\n## Effects:\n${item.effects
                                       .map((e) => `- ${capitalize(e.effect)} ${e.type} by ${e.amount} on ${e.target}`)
