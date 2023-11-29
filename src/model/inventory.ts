@@ -131,8 +131,7 @@ export namespace Inventory {
         if (!inventory.equipped) inventory.equipped = {};
         switch (item.type) {
             case "armor":
-                if (!inventory.equipped.armor) inventory.equipped.armor = {};
-                inventory.equipped.armor[item.slot] = null;
+                if (inventory.equipped.armor) inventory.equipped.armor[item.slot] = null;
                 break;
             case "weapon":
                 inventory.equipped.weapon = null;
@@ -156,24 +155,27 @@ export namespace Inventory {
         if (!item) throw new Error("No item at index " + index);
         if (item.equipped) throw new Error("Item at index " + index + " is already equipped");
         inventory.items[index].equipped = true;
-        let alredyEquipped = -1;
+        let alredyEquipped = null;
         if (!inventory.equipped) inventory.equipped = {};
         switch (item.type) {
             case "armor":
                 if (!inventory.equipped.armor) inventory.equipped.armor = {};
-                alredyEquipped = (inventory.equipped.armor[item.slot] ?? -1) * 1;
-                inventory.equipped.armor[item.slot] = index;
+                alredyEquipped = inventory.equipped.armor[item.slot] ?? null;
+                inventory.equipped.armor[item.slot] = item.id;
                 break;
             case "weapon":
-                alredyEquipped = (inventory.equipped.weapon ?? -1) * 1;
-                inventory.equipped.weapon = index;
+                alredyEquipped = inventory.equipped.weapon ?? null;
+                inventory.equipped.weapon = item.id;
                 break;
             default:
                 throw new Error("Invalid item type: " + item.type);
         }
         console.log("alredyEquipped", alredyEquipped);
-        if (alredyEquipped >= 0) inventory.items[alredyEquipped].equipped = false;
 
+        if (alredyEquipped != null) {
+            let aeIndex = inventory.items.findIndex((i) => i.id == alredyEquipped!);
+            inventory.items[aeIndex].equipped = false;
+        }
         await set(moi, target, inventory);
         return inventory;
     }
