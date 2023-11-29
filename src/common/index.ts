@@ -323,11 +323,55 @@ d20.on("messageCreate", async (msg) => {
                             }[${item.type == "armor" ? item.slot : item.type}]\n- (${item.id}) ${item.description}`
                         );
                     }
-                    msg.reply(`${target}'s inventory\n\`\`\`\n${inventoryStr.join("\n\n")}\n\`\`\``);
+                    msg.reply(`${target}'s inventory\n\`\`\`\nGold: ${inventory.gold}\n\n${inventoryStr.join("\n\n")}\n\`\`\``);
                 } catch (err: any) {
                     console.error(err);
                     msg.reply(err.message || "Something went wrong");
                 }
+                break;
+            }
+            case "adventure":
+            case "adv": {
+                let num = parseInt(options[1]) as 6 | 20 | 100;
+                if (!num || isNaN(num) || ![6, 20, 100].includes(num)) {
+                    msg.reply("Select a valid die (6, 20 or 100)");
+                    return;
+                }
+                let cost = {
+                    6: 30,
+                    20: 35,
+                    100: 40,
+                }[num];
+                let payout = {
+                    6: 10,
+                    20: 50,
+                    100: 300,
+                }[num];
+                let canUse = useMana(msg, cost);
+                if (!canUse) {
+                    msg.reply(`Not enough mana\nCost: ${cost}`);
+                    return;
+                }
+                let roll = Math.ceil(Math.random() * num);
+                let result = ({
+                    1: [`Critical fail! You lost ${payout / 2} gold!`, -payout / 2],
+                    69: [`Nice! You won 69 gold!`, 69],
+                    [num - 1]: [`Almost! You won ${payout / 2} gold!`, payout / 2],
+                    [num]: [`Critical success! You won ${payout} gold!`, payout],
+                    15: [`You found a Shiny Rock`, 0, () => Inventory.give(msg, Inventory.ITEM_DICT["Shiny rock"], 1)],
+                }[roll] || [`You won nothing`, 0]) as [string, number, undefined | (() => Promise<void | any>)];
+                let text = result[0];
+                let pay = result[1];
+                if (result[2]) await result[2]();
+                if (pay != 0) await Inventory.addGold(msg, pay);
+                let mana = await getMana(msg);
+                msg.reply(`You consumed ${cost} mana (${Math.floor(mana.value)}/${mana.max}) to roll a d${num} and got a ${roll}\n${text}`);
+                break;
+            }
+            case "money": {
+                let target = msg.mentions.users?.first() || msg.author;
+                let gold = await Inventory.getGold(msg, target);
+                msg.reply(`${target} has ${gold} gold`);
                 break;
             }
             case "item":

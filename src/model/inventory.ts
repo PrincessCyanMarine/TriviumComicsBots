@@ -6,7 +6,7 @@ export namespace Inventory {
     export type ArmorSlot = "head" | "chest" | "legs" | "feet" | "ring" | "neck" | "offhand" | "mainhand";
     export type WeaponType = "sword" | "axe" | "bow" | "staff" | "dagger";
     export type ConsumableType = "potion" | "food" | "scroll";
-    export type MiscType = "material" | "other";
+    export type MiscType = "material" | "other" | "valuable" | "quest" | "key";
     export type ItemRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
     export type ItemEffect = {
@@ -69,6 +69,35 @@ export namespace Inventory {
         let item = ITEMS[id!] as R;
         if (!item) throw new Error("No item with id " + id);
         return item;
+    }
+
+    export async function getGold(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user, inventory?: Inventory) {
+        let gold;
+        if (!inventory) gold = (await database.child(`inventory/` + moi.guild?.id + "/" + target.id + "/gold").once("value")).val();
+        else gold = inventory.gold;
+        return (gold || 0) as number;
+    }
+    export async function addGold(
+        moi: Message | CommandInteraction,
+        amount: number,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory?: Inventory
+    ) {
+        let gold = await getGold(moi, target, inventory);
+        await setGold(moi, gold + amount, target, inventory);
+    }
+    export async function setGold(
+        moi: Message | CommandInteraction,
+        amount: number,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory?: Inventory
+    ) {
+        if (!inventory) {
+            await database.child(`inventory/` + moi.guild?.id + "/" + target.id + "/gold").set(amount);
+            return;
+        }
+        inventory.gold = amount;
+        await set(moi, target, inventory);
     }
 
     export async function get(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
@@ -274,6 +303,17 @@ export namespace Inventory {
         return false;
     }
 
+    export enum ITEM_DICT {
+        "AC's Helpful Ring" = 0,
+        "AC's Unhelpful Ring" = 1,
+        "Wedding Rings" = 2,
+        "Divorce papers" = 3,
+        "Rings of destruction" = 4,
+        "The test stick" = -1,
+        "Shiny rock" = 5,
+        "D20 of perfect rolls" = 20,
+    }
+
     export const ITEMS: Record<number, Item> = {
         0: {
             description: "A ring specially forged for Razraz. It increases his mana by 20",
@@ -369,6 +409,16 @@ export namespace Inventory {
             ],
             weaponType: "sword",
             maxCount: 64,
+        },
+        5: {
+            name: "Shiny rock",
+            description: "A shiny rock. Can be sold for cheap at Sadie's shop",
+            id: 5,
+            rarity: "common",
+            type: "misc",
+            effects: [],
+            miscType: "valuable",
+            maxCount: 999,
         },
         20: {
             name: "D20 of perfect rolls",
