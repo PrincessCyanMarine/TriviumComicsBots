@@ -196,6 +196,7 @@ export namespace Inventory {
         if ((inventory.items[index].count || 1) > count) {
             inventory.items[index].count = (inventory.items[index].count || 1) - count;
         } else {
+            if (inventory.items[index].equipped) await unequip(moi, index, target, inventory);
             inventory.items.splice(index, 1);
         }
         await set(moi, target, inventory);
