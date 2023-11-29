@@ -333,7 +333,7 @@ d20.on("messageCreate", async (msg) => {
             case "items": {
                 let items = Object.entries(Inventory.ITEMS)
                     .sort((a, b) => a[1].id - b[1].id)
-                    .map(([id, item]) => `${item.id}: ${item.name}`);
+                    .map(([id, item]) => `${item.id}: ${item.name} (${item.maxCount ?? 1})`);
                 msg.reply(`\`\`\`\n${items.join("\n")}\n\`\`\``);
                 break;
             }
