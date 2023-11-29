@@ -320,7 +320,7 @@ d20.on("messageCreate", async (msg) => {
                         inventoryStr.push(
                             `${i++}: ${item.equipped ? "(equipped) " : ""}[${item.rarity}] ${item.name} ${
                                 item.count && item.count > 1 ? `x${item.count} ` : ``
-                            }[${item.type == "armor" ? item.slot : item.type}]\n- ${item.description}`
+                            }[${item.type == "armor" ? item.slot : item.type}]\n- (${item.id}) ${item.description}`
                         );
                     }
                     msg.reply(`${target}'s inventory\n\`\`\`\n${inventoryStr.join("\n\n")}\n\`\`\``);
@@ -330,11 +330,32 @@ d20.on("messageCreate", async (msg) => {
                 }
                 break;
             }
+            case "item":
             case "items": {
-                let items = Object.entries(Inventory.ITEMS)
-                    .sort((a, b) => a[1].id - b[1].id)
-                    .map(([id, item]) => `${item.id}: ${item.name} (${item.maxCount ?? 1})`);
-                msg.reply(`\`\`\`\n${items.join("\n")}\n\`\`\``);
+                let id = parseInt(options[1]);
+                let item;
+                try {
+                    item = Inventory.getItemById(id);
+                } catch (err) {}
+                if (!options[1] || (!id && id != 0) || isNaN(id) || !item) {
+                    let items = Object.entries(Inventory.ITEMS)
+                        .sort((a, b) => a[1].id - b[1].id)
+                        .map(([id, item]) => `${item.id}: ${item.name} (${item.maxCount || "∞"})`);
+                    msg.reply(`\`\`\`\n${items.join("\n")}\n\`\`\``);
+                } else {
+                    msg.reply(
+                        `# ${item.name}\n## ${item.description}\nType: ${item.type == "armor" ? item.slot : item.type}\nRarity: ${
+                            item.rarity
+                        }\nMax count: ${item.maxCount}${Inventory.canEquip(item) ? `\nEquippable` : ""}${
+                            item.effects.length > 0
+                                ? `\n## Effects:\n${item.effects
+                                      .map((e) => `- ${capitalize(e.effect)} ${e.type} by ${e.amount} on ${e.target}`)
+                                      .join("\n")}`
+                                : ""
+                        }`
+                    );
+                }
+
                 break;
             }
             case "unequip":

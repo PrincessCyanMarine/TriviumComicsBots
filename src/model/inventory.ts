@@ -267,7 +267,7 @@ export namespace Inventory {
         return effects;
     }
 
-    export async function canEquip(item: Item | number) {
+    export function canEquip(item: Item | number) {
         if (typeof item == "number") item = getItemById(item);
         if (item.equippable) return true;
         if (["armor", "weapon"].includes(item.type) && !(item.equippable == false)) return true;
