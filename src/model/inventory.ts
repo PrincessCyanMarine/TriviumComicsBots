@@ -155,7 +155,7 @@ export namespace Inventory {
         if (!item) throw new Error("No item at index " + index);
         if (item.equipped) throw new Error("Item at index " + index + " is already equipped");
         inventory.items[index].equipped = true;
-        let alredyEquipped = null;
+        let alredyEquipped: number | null = null;
         if (!inventory.equipped) inventory.equipped = {};
         switch (item.type) {
             case "armor":
