@@ -378,6 +378,7 @@ export function readAllBotData() {
             bot: "d20",
             version: "1.0.0",
             type: "command",
+            hideFromHelp: true,
             command: {
                 type: "message",
                 delay: 0,
@@ -461,116 +462,121 @@ function readData(bot: keyof typeof botData) {
 }
 
 function clearActivator(activator: ActivatorType) {
-    if (!activator.dataType) activator.dataType = "activator";
-    switch (activator.method) {
-        case "slash":
-            let description = activator.description || "NO DESCRIPTION";
-            if (description.length > 100) description = description.slice(0, 97) + "...";
-            let slashCommand = new SlashCommandBuilder().setName(activator.activator).setDescription(description);
-            if (activator.args)
-                for (let arg of activator.args) {
-                    // console.log(arg);
-                    let option;
-                    switch (arg.type) {
-                        case "string":
-                        case "integer":
-                        case "number":
-                            switch (arg.type) {
-                                case "integer":
-                                    option = new SlashCommandIntegerOption();
-                                case "number":
-                                    option = new SlashCommandNumberOption();
-                                case "string":
-                                    option = new SlashCommandStringOption();
-                            }
-                            for (let [key, fun] of [
-                                ["max", "setMaxValue"],
-                                ["min", "setMinValue"],
-                                ["autocomplete", "setAutocomplete"],
-                            ] as const)
-                                if (key in arg && fun in option && typeof option[fun] == "function")
-                                    option = (option as any)[fun](arg[key as keyof typeof arg]);
-                            if (arg.choices) option.addChoices(...arg.choices);
+    try {
+        if (!activator.dataType) activator.dataType = "activator";
+        switch (activator.method) {
+            case "slash":
+                let description = activator.description || "NO DESCRIPTION";
+                if (description.length > 100) description = description.slice(0, 97) + "...";
+                let slashCommand = new SlashCommandBuilder().setName(activator.activator).setDescription(description);
+                if (activator.args)
+                    for (let arg of activator.args) {
+                        // console.log(arg);
+                        let option;
+                        switch (arg.type) {
+                            case "string":
+                            case "integer":
+                            case "number":
+                                switch (arg.type) {
+                                    case "integer":
+                                        option = new SlashCommandIntegerOption();
+                                    case "number":
+                                        option = new SlashCommandNumberOption();
+                                    case "string":
+                                        option = new SlashCommandStringOption();
+                                }
+                                for (let [key, fun] of [
+                                    ["max", "setMaxValue"],
+                                    ["min", "setMinValue"],
+                                    ["autocomplete", "setAutocomplete"],
+                                ] as const)
+                                    if (key in arg && fun in option && typeof option[fun] == "function")
+                                        option = (option as any)[fun](arg[key as keyof typeof arg]);
+                                if (arg.choices) option.addChoices(...arg.choices);
 
-                            break;
-                        case "attachment":
-                            option = new SlashCommandAttachmentOption();
-                            break;
-                        case "boolean":
-                            option = new SlashCommandBooleanOption();
-                            break;
-                        case "channel":
-                            option = new SlashCommandChannelOption();
-                            break;
-                        case "mentionable":
-                            option = new SlashCommandMentionableOption();
-                            break;
-                        case "role":
-                            option = new SlashCommandRoleOption();
-                            break;
-                        case "user":
-                            option = new SlashCommandUserOption();
-                            break;
-                        default:
-                            throw new Error(`Unknown slash command option type ${(arg as any)?.type}`);
+                                break;
+                            case "attachment":
+                                option = new SlashCommandAttachmentOption();
+                                break;
+                            case "boolean":
+                                option = new SlashCommandBooleanOption();
+                                break;
+                            case "channel":
+                                option = new SlashCommandChannelOption();
+                                break;
+                            case "mentionable":
+                                option = new SlashCommandMentionableOption();
+                                break;
+                            case "role":
+                                option = new SlashCommandRoleOption();
+                                break;
+                            case "user":
+                                option = new SlashCommandUserOption();
+                                break;
+                            default:
+                                throw new Error(`Unknown slash command option type ${(arg as any)?.type}`);
+                        }
+                        option?.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
+                        switch (arg.type) {
+                            case "string":
+                                slashCommand.addStringOption(option);
+                                break;
+                            case "integer":
+                                slashCommand.addIntegerOption(option);
+                                break;
+                            case "number":
+                                slashCommand.addNumberOption(option);
+                                break;
+                            case "boolean":
+                                slashCommand.addBooleanOption(option);
+                                break;
+                            case "channel":
+                                slashCommand.addChannelOption(option);
+                                break;
+                            case "mentionable":
+                                slashCommand.addMentionableOption(option);
+                                break;
+                            case "role":
+                                slashCommand.addRoleOption(option);
+                                break;
+                            case "user":
+                                slashCommand.addUserOption(option);
+                                break;
+                            case "attachment":
+                                slashCommand.addAttachmentOption(option);
+                                break;
+                        }
                     }
-                    option?.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
-                    switch (arg.type) {
-                        case "string":
-                            slashCommand.addStringOption(option);
-                            break;
-                        case "integer":
-                            slashCommand.addIntegerOption(option);
-                            break;
-                        case "number":
-                            slashCommand.addNumberOption(option);
-                            break;
-                        case "boolean":
-                            slashCommand.addBooleanOption(option);
-                            break;
-                        case "channel":
-                            slashCommand.addChannelOption(option);
-                            break;
-                        case "mentionable":
-                            slashCommand.addMentionableOption(option);
-                            break;
-                        case "role":
-                            slashCommand.addRoleOption(option);
-                            break;
-                        case "user":
-                            slashCommand.addUserOption(option);
-                            break;
-                        case "attachment":
-                            slashCommand.addAttachmentOption(option);
-                            break;
-                    }
-                }
-            addSlashCommand(activator.bot, slashCommand, async (interaction) =>
-                // console.log("Running command " + activator.activator);
-                runDataCommand(activator.command, interaction, [], Date.now()).catch((err) => {
-                    console.error(err);
-                    interaction.reply({
-                        content: `${userMention(marineId)}\nAn error occured while running this command`,
-                        embeds: [new MessageEmbed().addFields([{ name: "Error", value: `${err || "No error message"}` }]).setColor("RED")],
-                    });
-                })
-            );
-            break;
-        case "exclamation":
-            addExclamationCommand(activator.bot, activator);
-            break;
-        case "message":
-            addMessageCommand(activator.bot, activator);
-            break;
-        default:
-            throw new Error(`Unknown activator method ${activator.method}\n${JSON.stringify(activator, null, 2)}`);
-            break;
-    }
-    if (activator.type == "command") {
-        activator.command = clearCommand(activator.command, {
-            bot: activator.command.bot || activator.bot,
-            name: activator.command.name || activator.name!,
-        });
+                addSlashCommand(activator.bot, slashCommand, async (interaction) =>
+                    // console.log("Running command " + activator.activator);
+                    runDataCommand(activator.command, interaction, [], Date.now()).catch((err) => {
+                        console.error(err);
+                        interaction.reply({
+                            content: `${userMention(marineId)}\nAn error occured while running this command`,
+                            embeds: [new MessageEmbed().addFields([{ name: "Error", value: `${err || "No error message"}` }]).setColor("RED")],
+                        });
+                    })
+                );
+                break;
+            case "exclamation":
+                addExclamationCommand(activator.bot, activator);
+                break;
+            case "message":
+                addMessageCommand(activator.bot, activator);
+                break;
+            default:
+                throw new Error(`Unknown activator method ${activator.method}\n${JSON.stringify(activator, null, 2)}`);
+                break;
+        }
+        if (activator.type == "command") {
+            activator.command = clearCommand(activator.command, {
+                bot: activator.command.bot || activator.bot,
+                name: activator.command.name || activator.name!,
+            });
+        }
+    } catch (err) {
+        console.error("Error clearing activator", activator);
+        console.error(err);
     }
     return activator;
 }
@@ -640,8 +646,16 @@ export async function commandTextConverter(
                 .replace(/\\\:/g, "%3A")
                 .replace(/http\:\/\//g, "http%3A%2F%2F")
                 .replace(/https\:\/\//g, "https%3A%2F%2F");
-            // console.log(text);
+            console.log("text", text);
 
+            // let m = text.match(/\${[^$]+?\}\$/gi);
+            // if (!m) break;
+            // console.log(text, m);
+            // for (let match of m) {
+            //     let keys = match
+            //         .match(/(?<=(\${)|\|)([^$]+?)(?=(}\$)|\|)/gi)
+            //         ?.map((a) => a.split("|"))
+            //         .flat();
             let m = text.match(/\{[^{}]+?\}/gi);
             if (!m) break;
             // console.log(text, m);
@@ -650,6 +664,7 @@ export async function commandTextConverter(
                     .match(/(?<=[{:])([^{}]+?)(?=[:}])/gi)
                     ?.map((a) => a.split(":"))
                     .flat();
+
                 let replaced = false;
                 let replace = (str = "") => {
                     replaced = true;
@@ -789,14 +804,95 @@ export async function commandTextConverter(
                         if (fun) replace(await fun());
                         break;
                     }
+                    case "mana": {
+                        let target = getTarget(moi as Message);
+                        let mana = await getMana(moi, target);
+                        let fun: (() => Promise<string | undefined> | undefined | string) | undefined = {
+                            current: () => mana?.value.toString(),
+                            max: () => mana?.max.toString(),
+                            percent: () => Math.floor((mana.value / mana.max) * 100).toString(),
+                            regen: () => Math.floor(mana?.regen * 60).toString(),
+                        }[keys[1]];
+                        if (fun) replace(await fun());
+                        break;
+                    }
+                    case "item": {
+                        let id = parseInt(keys[1]);
+                        if (!id || isNaN(id)) break;
+                        let item = Inventory.getItemById(id);
+                        let fun: (() => Promise<string | undefined> | undefined | string) | undefined = {
+                            name: () => item?.name,
+                            description: () => item?.description,
+                            // price: () => item?.price.toString(),
+                            id: () => item?.id.toString(),
+                            type: () => item?.type,
+                            rarity: () => item?.rarity,
+                            // emoji: () => item?.emoji,
+                            // image: () => item?.image,
+                        }[keys[2]];
+                        if (fun) replace(await fun());
+                        break;
+                    }
+                    case "inventory": {
+                        let target = getTarget(moi as Message);
+                        let inventory = await Inventory.get(moi, target);
+                        let fun: (() => Promise<string | undefined> | undefined | string) | undefined = {
+                            items: () => JSON.stringify(inventory?.items),
+                            size: () => inventory?.items.length.toString(),
+                            gold: () => inventory?.gold.toString(),
+                            equipped: () =>
+                                JSON.stringify({
+                                    weapon: Inventory.getItemById(inventory?.equipped.weapon),
+                                    armor: Object.fromEntries(
+                                        Object.entries(inventory?.equipped.armor).map(([k, v]) => [k, Inventory.getItemById(v)])
+                                    ),
+                                }),
+                        }[keys[1]];
+                        if (fun) replace(await fun());
+                        break;
+                    }
+                    case "object": {
+                        let obj: Record<string, unknown> = (await commandTextConverter(keys[1], command, moi, args, startTime, rootCommand)) as any;
+                        try {
+                            if (typeof obj == "string") obj = JSON.parse(obj);
+                        } catch (err) {
+                            console.error(err);
+                            break;
+                        }
+                        if (typeof obj != "object") break;
+                        console.log("obj", obj);
+
+                        let fun: (() => Promise<string | undefined> | undefined | string) | undefined = {
+                            keys: () => JSON.stringify(Object.keys(obj)),
+                            values: () => JSON.stringify(Object.values(obj)),
+                            entries: () => JSON.stringify(Object.entries(obj)),
+                            length: () => Object.keys(obj).length.toString(),
+                            stringify: () => JSON.stringify(obj),
+                            get: () => {
+                                let key = keys![3];
+                                let value = obj[key];
+                                if (typeof value == "object") return JSON.stringify(value);
+                                else return `${value}`;
+                            },
+                        }[keys[2]];
+                        if (fun) replace(await fun());
+                        break;
+                    }
                     case "array": {
+                        console.log("keys[1]", keys[1]);
                         let val = (await commandTextConverter(keys[1], command, moi, args, startTime, rootCommand)) || "[]";
-                        // console.log("val", val);
+                        console.log("val", val);
                         let array: unknown[] | undefined;
-                        if (typeof val == "string") array = JSON.parse(val);
+                        if (typeof val == "string")
+                            try {
+                                array = JSON.parse(val);
+                            } catch (err) {
+                                console.error(err);
+                                return;
+                            }
                         else if (Array.isArray(val)) array = val;
                         else array = [val];
-                        // console.log("array", array);
+                        console.log("array", array);
                         let fun: (() => Promise<string | undefined> | undefined | string) | undefined = {
                             get: () => {
                                 let index = parseInt(keys![3] || "0") || 0;
@@ -808,11 +904,25 @@ export async function commandTextConverter(
                             },
                             length: () => (array?.length || 0).toString(),
                             join: () => array?.join(keys![3] || ", "),
-                            map: () =>
-                                commandTextConverter(
+                            map: () => {
+                                console.log("keys[3]", keys![3]);
+                                return commandTextConverter(
                                     JSON.stringify(
                                         array?.map((v, i) =>
-                                            (keys![3] || "").replace(/\[[0-9]\]/g, (a) => (Array.isArray(v) ? v[parseInt(a[1]) || 0] || "" : v))
+                                            (keys![3] || "").replace(/(\[[0-9]\])(\.[A-Z.]+)?/gi, (a, a1, a2) => {
+                                                try {
+                                                    v = JSON.parse(v as any);
+                                                } catch (err) {}
+                                                let res = Array.isArray(v) ? v[parseInt(a[1]) || 0] || "" : v;
+                                                console.log(a1, a2);
+                                                if (a2 && typeof res == "object") {
+                                                    let keys = a2.replace(".", "").split(".");
+                                                    for (let key of keys) res = res[key];
+                                                    console.log(res);
+                                                }
+                                                if (typeof res == "object") return JSON.stringify(res);
+                                                else return `${res}`;
+                                            })
                                         )
                                     ),
                                     command,
@@ -820,7 +930,8 @@ export async function commandTextConverter(
                                     args,
                                     startTime,
                                     rootCommand
-                                ),
+                                );
+                            },
                         }[keys[2]];
                         if (fun) replace(await fun());
                         break;

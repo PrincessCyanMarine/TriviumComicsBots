@@ -265,7 +265,7 @@ d20.on("messageCreate", async (msg) => {
                 break;
             case "mana": {
                 let val = msg.mentions.users.first() ? options[2] : options[1];
-                if (msg.author.id == marineId && val) {
+                if (msg.member.permissions.has("KICK_MEMBERS") && val) {
                     let target = msg.mentions.users.first() || msg.author;
                     await setMana(msg, parseInt(val), target);
                 }
@@ -303,6 +303,53 @@ d20.on("messageCreate", async (msg) => {
                 );
                 break;
             }
+
+            case "inventory": {
+                try {
+                    let target = msg.mentions.users?.first() || msg.author;
+                    let inventory = await Inventory.get(msg, target);
+                    let inventoryStr = [];
+                    let i = 0;
+                    if (inventory.items.length == 0) {
+                        msg.reply(`${target}'s inventory is empty`);
+                        return;
+                    }
+                    for (let item of inventory.items) {
+                        if (item.count == 0) continue;
+                        inventoryStr.push(
+                            `${i++}: ${item.equipped ? "(equipped) " : ""}[${item.rarity}] ${item.name} ${
+                                item.count && item.count > 1 ? `x${item.count} ` : ``
+                            }[${item.type}]\n- ${item.description}`
+                        );
+                    }
+                    msg.reply(`${target}'s inventory\n\`\`\`\n${inventoryStr.join("\n\n")}\n\`\`\``);
+                } catch (err: any) {
+                    console.error(err);
+                    msg.reply(err.message || "Something went wrong");
+                }
+                break;
+            }
+            case "take":
+            case "give":
+                console.log(msg.content);
+                try {
+                    if (msg.author.id != marineId) new Error("You don't have the permission to use that command");
+                    let target = msg.mentions.users?.first() || msg.author;
+                    let itemId = parseInt(options[1]);
+                    if (isNaN(itemId)) new Error("Invalid item id");
+                    let amount = parseInt(options[2] || "1") || 1;
+                    if (isNaN(amount)) new Error("Invalid amount");
+                    let item = Inventory.getItemById(itemId);
+                    if (!item) new Error("Invalid item id");
+
+                    if (command == "take") amount = -amount;
+                    let inventory = await Inventory.give(msg, item, amount, target);
+                    msg.reply(amount > 0 ? `Gave ${amount} ${item.name} to ${target}` : `Took ${-amount} ${item.name} from ${target}`);
+                } catch (err: any) {
+                    console.error(err)
+                    msg.reply(err.message || "Something went wrong");
+                }
+                break;
             case "summon":
                 summon(msg, options);
                 break;

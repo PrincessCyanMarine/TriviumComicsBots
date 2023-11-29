@@ -24,6 +24,8 @@ export namespace Inventory {
         effects: ItemEffect[];
         equipped?: boolean;
         id: number;
+        maxCount?: number;
+        count?: number;
     } & (
         | {
               type: "weapon";
@@ -61,8 +63,11 @@ export namespace Inventory {
         gold: number;
     };
 
-    function getItemById(index: number) {
-        return ITEMS[index];
+    export function getItemById<T extends number | null | undefined, R extends T extends number ? Item : null>(id: T): R {
+        if (!id) return null as R;
+        let item = ITEMS[id] as R;
+        if (!item) throw new Error("No item with id " + id);
+        return item;
     }
 
     export async function get(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
@@ -78,20 +83,36 @@ export namespace Inventory {
             };
             // await set(moi, target, inventory);
         } else {
-            inventory.items = inventory.items.map((item) => {
-                return { ...item, ...getItemById(item.id) };
-            });
+            if (!inventory?.items?.length) inventory.items = [];
+            else
+                inventory.items = await Promise.all(
+                    inventory.items
+                        .map((item) => {
+                            return { ...item, ...getItemById(item.id) };
+                        })
+                        .filter((item) => item != null)
+                        .filter((item, i, a) => a.findIndex((i2) => i2.id == item.id) == i)
+                        .map(async (item) => {
+                            return { ...item, count: await itemCount(moi, item, target, inventory) };
+                        })
+                );
         }
         return inventory;
     }
 
     export async function set(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user, inventory: Inventory) {
-        inventory.items = inventory.items.map((item) => {
-            return {
-                id: item.id,
-                equipped: item.equipped,
-            } as Item;
-        });
+        inventory.items = inventory.items
+            .filter((item) => {
+                if (item.count && item.count <= 0) return false;
+                return true;
+            })
+            .map((item) => {
+                return {
+                    id: item.id,
+                    count: item.count || 1,
+                    equipped: item.equipped || false,
+                } as Item;
+            });
         return database.child(`inventory/` + moi.guild?.id + "/" + target.id).set(inventory);
     }
 
@@ -125,17 +146,78 @@ export namespace Inventory {
         return inventory;
     }
 
-    export async function give(
+    export async function take(
         moi: Message | CommandInteraction,
+        item: Item | number,
+        count = 1,
         target = moi instanceof Message ? moi.author : moi.user,
-        item: Item,
         inventory?: Inventory
-    ) {
+    ): Promise<Inventory> {
+        if (typeof item == "number") item = getItemById(item);
         if (!inventory) inventory = await get(moi, target);
-        let index = inventory.items.length;
-        inventory.items.push(item);
+        if (count < 0) return give(moi, item, -count, target, inventory);
+        if (count == 0) return inventory;
+        let index = inventory.items.findIndex((i) => i.id == (item as Item).id);
+        if (index < 0) throw new Error("Can't take item " + item.name + " from " + target.username + " because they don't have it");
+        let iCount = await itemCount(moi, item, target, inventory);
+        if (iCount < count) count = iCount;
+        if ((inventory.items[index].count || 1) > count) {
+            inventory.items[index].count = (inventory.items[index].count || 1) - count;
+        } else {
+            inventory.items.splice(index, 1);
+        }
         await set(moi, target, inventory);
         return inventory;
+    }
+
+    export async function give(
+        moi: Message | CommandInteraction,
+        item: Item | number,
+        count = 1,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory?: Inventory
+    ): Promise<Inventory> {
+        if (typeof item == "number") item = getItemById(item);
+        if (!inventory) inventory = await get(moi, target);
+        if (count < 0) return take(moi, item, -count, target, inventory);
+        if (count == 0) return inventory;
+        if (item.maxCount && item.maxCount > 0) {
+            let hasCount = await itemCount(moi, item, target, inventory);
+            if (hasCount + count > item.maxCount) throw new Error("Can't have more than " + item.maxCount + " of item " + item.name);
+        }
+        if (count != 1) item.count = count;
+        let index = await hasItem(moi, item, target, inventory);
+        if (index >= 0) {
+            inventory.items[index].count = (inventory.items[index].count || 1) + count;
+        } else {
+            inventory.items.push(item);
+        }
+        await set(moi, target, inventory);
+        return inventory;
+    }
+
+    export async function hasItem(
+        moi: Message | CommandInteraction,
+        item: Item | number,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory?: Inventory
+    ) {
+        if (typeof item == "number") item = getItemById(item);
+        if (!inventory) inventory = await get(moi, target);
+        return inventory.items.findIndex((i) => i.id == (item as Item).id);
+    }
+
+    export async function itemCount(
+        moi: Message | CommandInteraction,
+        item: Item | number,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory?: Inventory
+    ) {
+        if (typeof item != "number") item = item.id;
+        if (!inventory) inventory = await get(moi, target);
+        let match = inventory.items.filter((i) => i.id == (item as number));
+        let num = match.reduce((a, b) => a + (b.count || 1), 0);
+        return num;
     }
 
     export async function activeEffects(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
@@ -166,6 +248,42 @@ export namespace Inventory {
             slot: "ring",
             type: "armor",
             id: 0,
+            maxCount: 1,
+        },
+        "-1": {
+            name: "The test stick",
+            description: "A stick forged by D20 himself. It is said to be able to do ~~anything~~ nothing",
+            id: -1,
+            rarity: "common",
+            type: "weapon",
+            effects: [
+                {
+                    amount: 100,
+                    effect: "buff",
+                    target: "self",
+                    type: "attack",
+                },
+            ],
+            weaponType: "sword",
+            maxCount: 64,
+        },
+        20: {
+            name: "D20 of perfect rolls",
+            description: "A magical D20 that guarantees only the best of rolls",
+            id: 20,
+            rarity: "legendary",
+            type: "misc",
+            equipped: true,
+            effects: [
+                {
+                    amount: 100,
+                    effect: "buff",
+                    target: "self",
+                    type: "luck",
+                },
+            ],
+            miscType: "other",
+            maxCount: 1,
         },
     };
 }

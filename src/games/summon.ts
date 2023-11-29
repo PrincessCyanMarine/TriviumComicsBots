@@ -42,11 +42,6 @@ export enum SUMMON_NAMES {
 
 export async function summon(msg: Message, options: string[]) {
     try {
-        let [canUse, mana] = await useMana(msg, 30);
-        if (!canUse) {
-            say(sadie, msg.channel, `Not enough mana to summon!\nSummoning cost: 30\nCurrent mana: ${mana.value}`);
-            return;
-        }
         // console.log(SUMMON_NAMES);
         let summoned_creature = Math.floor(Math.random() * 21);
         let summoned_name: number | string | undefined = undefined;
@@ -55,6 +50,11 @@ export async function summon(msg: Message, options: string[]) {
             say(sadie, msg.channel, "no");
             summoned_name = SUMMON_NAMES.NO;
         } else {
+            let [canUse, mana] = await useMana(msg, 30);
+            if (!canUse) {
+                say(sadie, msg.channel, `Not enough mana to summon!\nSummoning cost: 30\nCurrent mana: ${mana.value}`);
+                return;
+            }
             let text = random_from_array([
                 `*You draw a magic circle on the ground, consuming 30 mana…*`,
                 `*You draw a magic circle on the ground, and pour 30 mana into it*`,
