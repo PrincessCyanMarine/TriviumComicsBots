@@ -153,6 +153,7 @@ export namespace Inventory {
         if (!inventory) inventory = await get(moi, target);
         let item = inventory.items[index];
         if (!item) throw new Error("No item at index " + index);
+        if (!(await canEquip(item))) throw new Error("Can't equip item " + item.name);
         if (item.equipped) throw new Error("Item at index " + index + " is already equipped");
         inventory.items[index].equipped = true;
         let alredyEquipped: number | null = null;
@@ -167,8 +168,6 @@ export namespace Inventory {
                 alredyEquipped = inventory.equipped.weapon ?? null;
                 inventory.equipped.weapon = item.id;
                 break;
-            default:
-                throw new Error("Invalid item type: " + item.type);
         }
         console.log("alredyEquipped", alredyEquipped);
 
