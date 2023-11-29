@@ -368,23 +368,23 @@ d20.on("messageCreate", async (msg) => {
                     let target = msg.mentions.users?.first() || msg.author;
                     let itemId = parseInt(options[1]);
                     console.log(options[1], itemId);
-                    if (!itemId || isNaN(itemId)) {
+                    if ((!itemId && itemId != 0) || isNaN(itemId)) {
                         msg.reply("Invalid item id");
-                        return;
-                    }
-                    if ([0, 1].includes(itemId) && target.id != "852639258690191370") {
-                        msg.reply("That item is exclusive to AC");
                         return;
                     }
                     let amount = parseInt(options[2] || "1") || 1;
                     if (isNaN(amount)) new Error("Invalid amount");
+                    if (command == "take") amount = -amount;
+                    if (amount > 1 && [0, 1].includes(itemId) && target.id != "852639258690191370") {
+                        msg.reply("That item is exclusive to AC");
+                        return;
+                    }
                     let item = Inventory.getItemById(itemId);
                     console.log(item);
                     if (!item) {
                         msg.reply("Invalid item id");
                         return;
                     }
-                    if (command == "take") amount = -amount;
                     let inventory = await Inventory.give(msg, item, amount, target);
                     msg.reply(amount > 0 ? `Gave ${amount} ${item.name} to ${target}` : `Took ${-amount} ${item.name} from ${target}`);
                 } catch (err: any) {
