@@ -842,9 +842,9 @@ export async function commandTextConverter(
                             gold: () => inventory?.gold.toString(),
                             equipped: () =>
                                 JSON.stringify({
-                                    weapon: Inventory.getItemById(inventory?.equipped.weapon),
+                                    weapon: Inventory.getItemById(inventory?.equipped?.weapon),
                                     armor: Object.fromEntries(
-                                        Object.entries(inventory?.equipped.armor).map(([k, v]) => [k, Inventory.getItemById(v)])
+                                        Object.entries(inventory?.equipped?.armor ?? {}).map(([k, v]) => [k, Inventory.getItemById(v)])
                                     ),
                                 }),
                         }[keys[1]];

@@ -22,6 +22,7 @@ export namespace Inventory {
         rarity: ItemRarity;
         description: string;
         effects: ItemEffect[];
+        equippable?: boolean;
         equipped?: boolean;
         id: number;
         maxCount?: number;
@@ -47,9 +48,9 @@ export namespace Inventory {
 
     export type Inventory = {
         items: Item[];
-        equipped: {
+        equipped?: {
             weapon?: number | null;
-            armor: {
+            armor?: {
                 head?: number | null;
                 chest?: number | null;
                 legs?: number | null;
@@ -116,10 +117,38 @@ export namespace Inventory {
         return database.child(`inventory/` + moi.guild?.id + "/" + target.id).set(inventory);
     }
 
+    export async function unequip(
+        moi: Message | CommandInteraction,
+        index: number,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory?: Inventory
+    ) {
+        if (!inventory) inventory = await get(moi, target);
+        let item = inventory.items[index];
+        if (!item) throw new Error("No item at index " + index);
+        if (!item.equipped) throw new Error("Item at index " + index + " is not equipped");
+        inventory.items[index].equipped = false;
+        if (!inventory.equipped) inventory.equipped = {};
+        switch (item.type) {
+            case "armor":
+                if (!inventory.equipped.armor) inventory.equipped.armor = {};
+                inventory.equipped.armor[item.slot] = null;
+                break;
+            case "weapon":
+                inventory.equipped.weapon = null;
+                break;
+            default:
+                throw new Error("Invalid item type: " + item.type);
+        }
+
+        await set(moi, target, inventory);
+        return inventory;
+    }
+
     export async function equip(
         moi: Message | CommandInteraction,
-        target = moi instanceof Message ? moi.author : moi.user,
         index: number,
+        target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
     ) {
         if (!inventory) inventory = await get(moi, target);
@@ -128,18 +157,21 @@ export namespace Inventory {
         if (item.equipped) throw new Error("Item at index " + index + " is already equipped");
         inventory.items[index].equipped = true;
         let alredyEquipped = -1;
+        if (!inventory.equipped) inventory.equipped = {};
         switch (item.type) {
             case "armor":
-                alredyEquipped = inventory.equipped.armor[item.slot] || -1;
+                if (!inventory.equipped.armor) inventory.equipped.armor = {};
+                alredyEquipped = (inventory.equipped.armor[item.slot] ?? -1) * 1;
                 inventory.equipped.armor[item.slot] = index;
                 break;
             case "weapon":
-                alredyEquipped = inventory.equipped.weapon || -1;
+                alredyEquipped = (inventory.equipped.weapon ?? -1) * 1;
                 inventory.equipped.weapon = index;
                 break;
             default:
                 throw new Error("Invalid item type: " + item.type);
         }
+        console.log("alredyEquipped", alredyEquipped);
         if (alredyEquipped >= 0) inventory.items[alredyEquipped].equipped = false;
 
         await set(moi, target, inventory);
@@ -233,6 +265,13 @@ export namespace Inventory {
         return effects;
     }
 
+    export async function canEquip(item: Item | number) {
+        if (typeof item == "number") item = getItemById(item);
+        if (item.equippable) return true;
+        if (["armor", "weapon"].includes(item.type) && !(item.equippable == false)) return true;
+        return false;
+    }
+
     export const ITEMS: Record<number, Item> = {
         0: {
             description: "A ring specially forged for Razraz. It increases his mana by 20",
@@ -244,12 +283,28 @@ export namespace Inventory {
                     type: "mana",
                 },
             ],
-            equipped: true,
             name: "AC's Helpful Ring",
             rarity: "uncommon",
             slot: "ring",
             type: "armor",
             id: 0,
+            maxCount: 1,
+        },
+        1: {
+            description: "A ring specially forged for Razraz. It decreases his mana by 20",
+            effects: [
+                {
+                    amount: 20,
+                    effect: "debuff",
+                    target: "self",
+                    type: "mana",
+                },
+            ],
+            name: "AC's Unhelpful Ring",
+            rarity: "uncommon",
+            slot: "ring",
+            type: "armor",
+            id: 1,
             maxCount: 1,
         },
         "-1": {
@@ -273,6 +328,7 @@ export namespace Inventory {
             name: "D20 of perfect rolls",
             description: "A magical D20 that guarantees only the best of rolls",
             id: 20,
+            equippable: true,
             rarity: "legendary",
             type: "misc",
             equipped: true,

@@ -35,6 +35,7 @@ import {
     getMana,
     setMana,
     useMana,
+    capitalize,
 } from "./functions";
 import {
     colors,
@@ -319,7 +320,7 @@ d20.on("messageCreate", async (msg) => {
                         inventoryStr.push(
                             `${i++}: ${item.equipped ? "(equipped) " : ""}[${item.rarity}] ${item.name} ${
                                 item.count && item.count > 1 ? `x${item.count} ` : ``
-                            }[${item.type}]\n- ${item.description}`
+                            }[${item.type == "armor" ? item.slot : item.type}]\n- ${item.description}`
                         );
                     }
                     msg.reply(`${target}'s inventory\n\`\`\`\n${inventoryStr.join("\n\n")}\n\`\`\``);
@@ -329,21 +330,60 @@ d20.on("messageCreate", async (msg) => {
                 }
                 break;
             }
+            case "unequip":
+            case "equip": {
+                let index = parseInt(options[1]);
+                let inventory = await Inventory.get(msg);
+                if (isNaN(index) || index < 0 || index > inventory.items.length - 1) {
+                    msg.reply("Invalid index");
+                    return;
+                }
+                let item = inventory.items[index];
+                if (!item) {
+                    msg.reply("Invalid index");
+                    return;
+                }
+                if (!Inventory.canEquip(item)) {
+                    msg.reply("That item can't be equipped");
+                    return;
+                }
+                if (command == "equip" && item.equipped) {
+                    msg.reply("That item is already equipped");
+                    return;
+                } else if (command == "unequip" && !item.equipped) {
+                    msg.reply("That item is not equipped");
+                    return;
+                }
+                await Inventory[command](msg, index);
+                msg.reply(`${capitalize(command)}ed ${item.name}`);
+                break;
+            }
             case "take":
             case "give":
-                console.log(msg.content);
+                if (!msg.member.permissions.has("KICK_MEMBERS")) {
+                    msg.reply("You don't have the permission to use that command");
+                    return;
+                }
                 try {
-                    if (msg.author.id != marineId) new Error("You don't have the permission to use that command");
                     let target = msg.mentions.users?.first() || msg.author;
                     let itemId = parseInt(options[1]);
                     console.log(options[1], itemId);
-                    if (!itemId || isNaN(itemId)) new Error("Invalid item id");
+                    if (!itemId || isNaN(itemId)) {
+                        msg.reply("Invalid item id");
+                        return;
+                    }
+                    if ([0, 1].includes(itemId) && target.id != "852639258690191370") {
+                        msg.reply("That item is exclusive to AC");
+                        return;
+                    }
                     let amount = parseInt(options[2] || "1") || 1;
                     if (isNaN(amount)) new Error("Invalid amount");
                     let item = Inventory.getItemById(itemId);
                     console.log(item);
-                    if (!item) new Error("Invalid item id");
-
+                    if (!item) {
+                        msg.reply("Invalid item id");
+                        return;
+                    }
                     if (command == "take") amount = -amount;
                     let inventory = await Inventory.give(msg, item, amount, target);
                     msg.reply(amount > 0 ? `Gave ${amount} ${item.name} to ${target}` : `Took ${-amount} ${item.name} from ${target}`);
