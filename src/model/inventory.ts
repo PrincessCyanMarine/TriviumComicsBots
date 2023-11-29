@@ -106,16 +106,21 @@ export namespace Inventory {
         if (!item) throw new Error("No item at index " + index);
         if (item.equipped) throw new Error("Item at index " + index + " is already equipped");
         inventory.items[index].equipped = true;
+        let alredyEquipped = -1;
         switch (item.type) {
             case "armor":
+                alredyEquipped = inventory.equipped.armor[item.slot] || -1;
                 inventory.equipped.armor[item.slot] = index;
                 break;
             case "weapon":
+                alredyEquipped = inventory.equipped.weapon || -1;
                 inventory.equipped.weapon = index;
                 break;
             default:
                 throw new Error("Invalid item type: " + item.type);
         }
+        if (alredyEquipped >= 0) inventory.items[alredyEquipped].equipped = false;
+
         await set(moi, target, inventory);
         return inventory;
     }
