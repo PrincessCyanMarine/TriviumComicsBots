@@ -1,5 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 import { database } from "..";
+import { getMana, setMana } from "../common/functions";
+import { type } from "os";
+import { TIME } from "../common/variables";
 
 export namespace Inventory {
     export type ItemType = "weapon" | "armor" | "consumable" | "misc";
@@ -8,13 +11,31 @@ export namespace Inventory {
     export type ConsumableType = "potion" | "food" | "scroll";
     export type MiscType = "material" | "other" | "valuable" | "quest" | "key";
     export type ItemRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+    export const ItemEffects = ["buff", "debuff", "damage", "heal", "other"] as const;
+    export const ItemEffectTypes = [
+        "attack",
+        // "defense",
+        // "health",
+        "mana",
+        // "speed",
+        "luck",
+        // "accuracy",
+        // "evasion",
+        "manaRegen",
+        // "healthRegen",
+    ] as const;
+    export const ItemEffectTargets = ["self", "enemy", "allies", "enemies"] as const;
+    export type ItemEffectType = (typeof ItemEffectTypes)[number];
+    export type ItemEffectTarget = (typeof ItemEffectTargets)[number];
+    export type ItemEffectEffect = (typeof ItemEffects)[number];
 
     export type ItemEffect = {
-        type: "attack" | "defense" | "health" | "mana" | "speed" | "luck" | "accuracy" | "evasion" | "manaRegen" | "healthRegen";
+        type: ItemEffectType;
         amount: number;
-        target: "self";
-        effect: "buff" | "debuff" | "heal" | "damage";
+        target: ItemEffectTarget;
+        effect: ItemEffectEffect;
         item?: Item;
+        duration?: number;
     };
 
     export type Item = {
@@ -23,10 +44,13 @@ export namespace Inventory {
         description: string;
         effects: ItemEffect[];
         equippable?: boolean;
+        consumable?: boolean;
         equipped?: boolean;
         id: number;
         maxCount?: number;
         count?: number;
+        unstackable?: boolean;
+        equippedAt?: number | null;
     } & (
         | {
               type: "weapon";
@@ -118,10 +142,18 @@ export namespace Inventory {
                 inventory.items = await Promise.all(
                     inventory.items
                         .map((item) => {
-                            return { ...item, ...getItemById(item.id) };
+                            let i = { ...getItemById(item.id), ...item };
+                            if (!i.unstackable) return i;
+                            return cloneItem(i);
                         })
                         .filter((item) => item != null)
-                        .filter((item, i, a) => a.findIndex((i2) => i2.id == item.id) == i)
+                        .filter((item, i, a) => item.unstackable || a.findIndex((i2) => i2.id == item.id) == i)
+                        .filter((item) => {
+                            if (!item.equippedAt) return true;
+                            let hasDuration = item.effects.some((e) => e.duration);
+                            if (!hasDuration) return true;
+                            return item.equippedAt + item.effects.reduce((a, b) => Math.max(a, b.duration || 0), 0) * TIME.MINUTES > Date.now();
+                        })
                         .map(async (item) => {
                             return { ...item, count: await itemCount(moi, item, target, inventory) };
                         })
@@ -130,14 +162,41 @@ export namespace Inventory {
         return inventory;
     }
 
-    export async function set(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user, inventory: Inventory) {
+    export function cloneItem(item: Item) {
+        let _act = <T>(obj: T): T => {
+            if (typeof obj == "object") {
+                if (Array.isArray(obj)) return obj.map((i) => _act(i)) as T;
+                else {
+                    for (let [key, value] of Object.entries(obj as Object)) (obj as any)[key] = _act(value) as any;
+                    return { ...obj };
+                }
+            }
+            return obj;
+        };
+        return _act(item);
+    }
+
+    export async function set(
+        moi: Message | CommandInteraction,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory: Inventory | null
+    ) {
+        if (!inventory) {
+            database.child(`inventory/` + moi.guild?.id + "/" + target.id).remove();
+            return;
+        }
         inventory.items = inventory.items
             .filter((item) => {
                 if (item.count && item.count <= 0) return false;
                 return true;
             })
             .map((item) => {
+                let i = cloneItem(item);
+                let baseItem = getItemById(item.id);
+                for (let [key, value] of Object.entries(baseItem)) if ((i as any)[key] == (baseItem as any)[key]) delete (i as any)[key];
+
                 return {
+                    ...i,
                     id: item.id,
                     count: item.count || 1,
                     equipped: item.equipped || false,
@@ -185,6 +244,7 @@ export namespace Inventory {
         if (!(await canEquip(item))) throw new Error("Can't equip item " + item.name);
         if (item.equipped) throw new Error("Item at index " + index + " is already equipped");
         inventory.items[index].equipped = true;
+        inventory.items[index].equippedAt = Date.now();
         let alredyEquipped: number | null = null;
         if (!inventory.equipped) inventory.equipped = {};
         switch (item.type) {
@@ -198,11 +258,12 @@ export namespace Inventory {
                 inventory.equipped.weapon = item.id;
                 break;
         }
-        console.log("alredyEquipped", alredyEquipped);
+        // console.log("alredyEquipped", alredyEquipped);
 
         if (alredyEquipped != null) {
             let aeIndex = inventory.items.findIndex((i) => i.id == alredyEquipped!);
             inventory.items[aeIndex].equipped = false;
+            inventory.items[aeIndex].equippedAt = null;
         }
         await set(moi, target, inventory);
         return inventory;
@@ -219,7 +280,7 @@ export namespace Inventory {
         if (!inventory) inventory = await get(moi, target);
         if (count < 0) return give(moi, item, -count, target, inventory);
         if (count == 0) return inventory;
-        let index = inventory.items.findIndex((i) => i.id == (item as Item).id);
+        let index = inventory.items.findIndex((i) => (i.unstackable ? equals(i, item as Item) : i.id == (item as Item).id));
         if (index < 0) throw new Error("Can't take item " + item.name + " from " + target.username + " because they don't have it");
         let iCount = await itemCount(moi, item, target, inventory);
         if (iCount < count) count = iCount;
@@ -233,6 +294,11 @@ export namespace Inventory {
         return inventory;
     }
 
+    export function equals(a: Item, b: Item): boolean {
+        for (let [key, value] of Object.entries(a)) if (value != (b as any)[key]) return false;
+        return true;
+    }
+
     export async function give(
         moi: Message | CommandInteraction,
         item: Item | number,
@@ -240,7 +306,7 @@ export namespace Inventory {
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
     ): Promise<Inventory> {
-        console.log(item);
+        // console.log(item);
         if (typeof item == "number") item = getItemById(item);
         if (!item) throw new Error("Invalid item id " + item);
         if (!inventory) inventory = await get(moi, target);
@@ -251,7 +317,7 @@ export namespace Inventory {
             if (hasCount + count > item.maxCount) throw new Error("Can't have more than " + item.maxCount + " of item " + item.name);
         }
         if (count != 1) item.count = count;
-        let index = await hasItem(moi, item, target, inventory);
+        let index = item.unstackable ? -1 : await hasItem(moi, item, target, inventory);
         if (index >= 0) {
             inventory.items[index].count = (inventory.items[index].count || 1) + count;
         } else {
@@ -278,9 +344,10 @@ export namespace Inventory {
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
     ) {
-        if (typeof item != "number") item = item.id;
+        if (typeof item == "number") item = getItemById(item);
+        if (item.unstackable) return item.count ?? 1;
         if (!inventory) inventory = await get(moi, target);
-        let match = inventory.items.filter((i) => i.id == (item as number));
+        let match = inventory.items.filter((i) => i.id == (item as Item).id);
         let num = match.reduce((a, b) => a + (b.count || 1), 0);
         return num;
     }
@@ -290,7 +357,11 @@ export namespace Inventory {
         let effects: ItemEffect[] = [];
         for (let item of inventory.items) {
             if (item.equipped) {
-                effects.push(...item.effects.map((e) => ({ ...e, item })));
+                effects.push(
+                    ...item.effects
+                        .filter((e) => !e.duration || e.duration * TIME.MINUTES + (item.equippedAt || 0) > Date.now())
+                        .map((e) => ({ ...e, item }))
+                );
             }
         }
         return effects;
@@ -300,7 +371,60 @@ export namespace Inventory {
         if (typeof item == "number") item = getItemById(item);
         if (item.equippable) return true;
         if (["armor", "weapon"].includes(item.type) && !(item.equippable == false)) return true;
+        if (item.effects.some((e) => e.duration && e.target == "self")) return true;
         return false;
+    }
+
+    export function canUse(item: Item | number) {
+        if (typeof item == "number") item = getItemById(item);
+        if (item.consumable) return true;
+        if (item.type == "consumable") return true;
+        return false;
+    }
+
+    export async function use(
+        moi: Message | CommandInteraction,
+        index: number,
+        target = moi instanceof Message ? moi.author : moi.user,
+        inventory?: Inventory
+    ) {
+        if (!inventory) inventory = await get(moi, target);
+        let item = inventory.items[index];
+        if (!item) throw new Error("No item at index " + index);
+        if (!canUse(item)) throw new Error("Can't use item " + item.name);
+        if (item.count && item.count <= 0) throw new Error("Item at index " + index + " has no uses left");
+        let hasDuration = item.effects.some((e) => e.duration);
+        if (hasDuration) {
+            if (item.equipped) {
+                throw new Error('Item "' + item.name + '" is already active');
+            }
+            equip(moi, index, target, inventory);
+        }
+        console.log(item.type, hasDuration);
+        if (item.type == "consumable" && !hasDuration) {
+            // console.log(item.type, hasDuration);
+            // if (item.count) item.count--;
+            // console.log(item.count);
+            // await set(moi, target, inventory);
+            await take(moi, item, 1, target, inventory);
+        }
+        for (let effect of item.effects) {
+            switch (effect.target) {
+                case "self":
+                    if (effect.effect == "heal" || effect.effect == "damage") {
+                        if (effect.type == "mana") {
+                            let mana = await getMana(moi, target);
+                            let newMana = mana.value;
+                            if (effect.effect == "heal") newMana += effect.amount;
+                            else newMana -= effect.amount;
+                            await setMana(moi, newMana, target);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return item;
     }
 
     export enum ITEM_DICT {
@@ -311,6 +435,7 @@ export namespace Inventory {
         "Rings of destruction" = 4,
         "The test stick" = -1,
         "Shiny rock" = 5,
+        "Potion" = 6,
         "D20 of perfect rolls" = 20,
     }
 
@@ -419,6 +544,16 @@ export namespace Inventory {
             effects: [],
             miscType: "valuable",
             maxCount: 999,
+        },
+        [ITEM_DICT["Potion"]]: {
+            name: "Potion",
+            description: "A potion that does nothing",
+            id: ITEM_DICT["Potion"],
+            rarity: "common",
+            type: "consumable",
+            unstackable: true,
+            effects: [],
+            consumableType: "potion",
         },
         20: {
             name: "D20 of perfect rolls",

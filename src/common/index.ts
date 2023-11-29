@@ -368,6 +368,44 @@ d20.on("messageCreate", async (msg) => {
                 msg.reply(`You consumed ${cost} mana (${Math.floor(mana.value)}/${mana.max}) to roll a d${num} and got a ${roll}\n${text}`);
                 break;
             }
+            case "clear": {
+                if (!msg.member.permissions.has("MANAGE_MESSAGES")) {
+                    msg.reply("You don't have the permission to use that command");
+                    return;
+                }
+                let target = msg.mentions.users?.first() || msg.author;
+                await Inventory.set(msg, target, null);
+                break;
+            }
+            case "use": {
+                let index = parseInt(options[1]);
+                let inventory = await Inventory.get(msg);
+                if (isNaN(index) || index < 0 || index > inventory.items.length - 1) {
+                    msg.reply("Invalid index");
+                    return;
+                }
+                let item = inventory.items[index];
+                if (!item) {
+                    msg.reply("Invalid index");
+                    return;
+                }
+                if (!Inventory.canUse(item)) {
+                    msg.reply("That item can't be used");
+                    return;
+                }
+                if (item.count == 0) {
+                    msg.reply("You don't have that item");
+                    return;
+                }
+                try {
+                    await Inventory.use(msg, index);
+                    msg.reply(`Used ${item.name}`);
+                } catch (err: any) {
+                    console.error(err);
+                    msg.reply(err?.message || "Something went wrong");
+                }
+                break;
+            }
             case "money": {
                 let target = msg.mentions.users?.first() || msg.author;
                 let gold = await Inventory.getGold(msg, target);
@@ -415,7 +453,7 @@ d20.on("messageCreate", async (msg) => {
                     msg.reply("Invalid index");
                     return;
                 }
-                if (!Inventory.canEquip(item)) {
+                if (!Inventory.canEquip(item) || Inventory.canUse(item)) {
                     msg.reply("That item can't be equipped");
                     return;
                 }
@@ -439,7 +477,8 @@ d20.on("messageCreate", async (msg) => {
                 try {
                     let target = msg.mentions.users?.first() || msg.author;
                     let itemId = parseInt(options[1]);
-                    console.log(options[1], itemId);
+                    if (options[1] == "potion") itemId = Inventory.ITEM_DICT["Potion"];
+                    // console.log(options[1], itemId);
                     if ((!itemId && itemId != 0) || isNaN(itemId)) {
                         msg.reply("Invalid item id");
                         return;
@@ -452,10 +491,45 @@ d20.on("messageCreate", async (msg) => {
                         return;
                     }
                     let item = Inventory.getItemById(itemId);
-                    console.log(item);
+                    // console.log(item);
                     if (!item) {
                         msg.reply("Invalid item id");
                         return;
+                    }
+                    if (options[1] == "potion") {
+                        item = { ...item };
+                        let effect = options[2] as Inventory.ItemEffect["effect"];
+                        if (!effect || !Inventory.ItemEffects.includes(effect)) {
+                            msg.reply("Invalid effect\nAvailable effects:\n" + Inventory.ItemEffects.map((e) => `- ${e}`).join("\n"));
+                            return;
+                        }
+                        let type = options[3] as Inventory.ItemEffect["type"];
+                        if (!type || !Inventory.ItemEffectTypes.includes(type)) {
+                            msg.reply("Invalid type\nAvailable types:\n" + Inventory.ItemEffectTypes.map((e) => `- ${e}`).join("\n"));
+                            return;
+                        }
+                        let amount = parseInt(options[4]);
+                        if (!amount || isNaN(amount)) {
+                            msg.reply("Invalid amount");
+                            return;
+                        }
+                        let duration = parseInt(options[5]) || undefined;
+                        if (duration && isNaN(duration)) {
+                            duration = undefined;
+                        }
+                        item.name = `${capitalize(effect)} ${type} potion (${amount})`;
+                        item.effects = [
+                            {
+                                effect,
+                                type,
+                                amount,
+                                target: "self",
+                            },
+                        ];
+                        if (duration) {
+                            item.name += ` (${duration}m)`;
+                            item.effects[0].duration = duration;
+                        }
                     }
                     let inventory = await Inventory.give(msg, item, amount, target);
                     msg.reply(amount > 0 ? `Gave ${amount} ${item.name} to ${target}` : `Took ${-amount} ${item.name} from ${target}`);
