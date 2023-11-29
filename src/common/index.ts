@@ -375,6 +375,7 @@ d20.on("messageCreate", async (msg) => {
                 }
                 let target = msg.mentions.users?.first() || msg.author;
                 await Inventory.set(msg, target, null);
+                msg.reply(`Cleared ${target}'s inventory`);
                 break;
             }
             case "use": {
