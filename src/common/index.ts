@@ -338,9 +338,9 @@ d20.on("messageCreate", async (msg) => {
                     return;
                 }
                 let cost = {
-                    6: 30,
-                    20: 35,
-                    100: 40,
+                    6: 60,
+                    20: 75,
+                    100: 100,
                 }[num];
                 let payout = {
                     6: 10,
