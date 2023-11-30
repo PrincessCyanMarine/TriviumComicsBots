@@ -337,11 +337,13 @@ d20.on("messageCreate", async (msg) => {
                     msg.reply("Select a valid die (6, 20 or 100)");
                     return;
                 }
-                let cost = {
-                    6: 60,
-                    20: 75,
-                    100: 100,
-                }[num];
+                let ext = !!options[2];
+                let cost =
+                    {
+                        6: 60,
+                        20: 75,
+                        100: 100,
+                    }[num] + (ext ? 25 : 0);
                 let payout = {
                     6: 10,
                     20: 50,
@@ -352,7 +354,7 @@ d20.on("messageCreate", async (msg) => {
                     msg.reply(`Not enough mana\nCost: ${cost}`);
                     return;
                 }
-                let roll = Math.ceil(Math.random() * num);
+                let roll = Math.min(num, Math.ceil(Math.random() * num + (ext ? 1 : 0)));
                 let result = ({
                     1: [`Critical fail! You lost ${payout / 2} gold!`, -payout / 2],
                     69: [`Nice! You won 69 gold!`, 69],
@@ -365,7 +367,11 @@ d20.on("messageCreate", async (msg) => {
                 if (result[2]) await result[2]();
                 if (pay != 0) await Inventory.addGold(msg, pay);
                 let mana = await getMana(msg);
-                msg.reply(`You consumed ${cost} mana (${Math.floor(mana.value)}/${mana.max}) to roll a d${num} and got a ${roll}\n${text}`);
+                msg.reply(
+                    `You consumed ${cost} mana (${Math.floor(mana.value)}/${mana.max}) to roll a d${num} and got a ${roll - (ext ? 1 : 0)}${
+                        ext ? " +1" : ""
+                    }\n${text}`
+                );
                 break;
             }
             case "clear": {
