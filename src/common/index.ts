@@ -338,29 +338,37 @@ d20.on("messageCreate", async (msg) => {
                     return;
                 }
                 let ext = !!options[2];
+                let roll = Math.min(num, Math.ceil(Math.random() * num + (ext ? 1 : 0)));
+                if (msg.author.id == marineId && testing) {
+                    if (options[2]) roll = parseInt(options[2]);
+                    ext = !!options[3];
+                }
                 let cost =
                     {
                         6: 60,
                         20: 75,
                         100: 100,
                     }[num] + (ext ? 25 : 0);
-                let payout = {
+                let payouts = {
                     6: 10,
                     20: 50,
                     100: 300,
-                }[num];
+                };
                 let [canUse] = await useMana(msg, cost);
                 if (!canUse) {
                     msg.reply(`Not enough mana\nCost: ${cost}`);
                     return;
                 }
-                let roll = Math.min(num, Math.ceil(Math.random() * num + (ext ? 1 : 0)));
                 let result = ({
-                    1: [`Critical fail! You lost ${payout / 2} gold!`, -payout / 2],
-                    69: [`Nice! You won 69 gold!`, 69],
-                    [num - 1]: [`Almost! You won ${payout / 2} gold!`, payout / 2],
-                    [num]: [`Critical success! You won ${payout} gold!`, payout],
+                    1: [`Critical fail! You lost ${payouts[num] / 2} gold!`, -payouts[num] / 2],
+                    5: [`You won ${payouts[6] / 2} gold!`, payouts[6] / 2],
+                    6: [`You won ${payouts[6]} gold!`, payouts[6]],
                     15: [`You found a Shiny Rock`, 0, () => Inventory.give(msg, Inventory.ITEM_DICT["Shiny rock"], 1)],
+                    19: [`You won ${payouts[20] / 2} gold!`, payouts[20] / 2],
+                    20: [`You won ${payouts[20]} gold!`, payouts[20]],
+                    69: [`Nice! You won 69 gold!`, 69],
+                    [num - 1]: [`Almost! You won ${payouts[num] / 2} gold!`, payouts[num] / 2],
+                    [num]: [`Critical success! You won ${payouts[num]} gold!`, payouts[num]],
                 }[roll] || [`You won nothing`, 0]) as [string, number, undefined | (() => Promise<void | any>)];
                 let text = result[0];
                 let pay = result[1];
