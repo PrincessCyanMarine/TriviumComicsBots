@@ -248,8 +248,6 @@ export namespace Inventory {
             case "weapon":
                 inventory.equipped.weapon = null;
                 break;
-            default:
-                throw new Error("Invalid item type: " + item.type);
         }
 
         await set(moi, target, inventory);
