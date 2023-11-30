@@ -347,7 +347,7 @@ d20.on("messageCreate", async (msg) => {
                     20: 50,
                     100: 300,
                 }[num];
-                let canUse = useMana(msg, cost);
+                let [canUse] = await useMana(msg, cost);
                 if (!canUse) {
                     msg.reply(`Not enough mana\nCost: ${cost}`);
                     return;
