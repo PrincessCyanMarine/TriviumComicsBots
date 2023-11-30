@@ -176,6 +176,30 @@ export namespace Inventory {
         return _act(item);
     }
 
+    function clearItem(item: Item) {
+        let _act = <T extends Object>(obj: T, bObj: T): T => {
+            for (let [key] of Object.entries(bObj)) {
+                if ((obj as any)[key] == (bObj as any)[key]) delete (obj as any)[key];
+                else if (typeof (obj as any)[key] == "object") {
+                    if (Array.isArray((obj as any)[key])) {
+                        for (let index = 0; index < (obj as any)[key].length; index++) {
+                            let value = (obj as any)[key][index];
+                            let bValue = (bObj as any)[key][index];
+                            if (value == bValue) {
+                                (obj as any)[key].splice(index, 1);
+                                index--;
+                            } else if (typeof value == "object") (obj as any)[key][index] = _act(value, bValue);
+                        }
+                    } else {
+                        (obj as any)[key] = _act((obj as any)[key], (bObj as any)[key]);
+                    }
+                }
+            }
+            return obj;
+        };
+        return _act(cloneItem(item), cloneItem(getItemById(item.id)));
+    }
+
     export async function set(
         moi: Message | CommandInteraction,
         target = moi instanceof Message ? moi.author : moi.user,
@@ -191,30 +215,8 @@ export namespace Inventory {
                 return true;
             })
             .map((item) => {
-                let i = cloneItem(item);
-                let baseItem = getItemById(item.id);
-                for (let [key] of Object.entries(baseItem)) {
-                    if ((i as any)[key] == (baseItem as any)[key]) delete (i as any)[key];
-                    else {
-                        if (typeof (i as any)[key] == "object") {
-                            if (Array.isArray((i as any)[key])) {
-                                for (let index = 0; index < (i as any)[key].length; index++) {
-                                    let value = (i as any)[key][index];
-                                    let bValue = (baseItem as any)[key][index];
-                                    for (let [key, value] of Object.entries(bValue)) {
-                                        if ((value as any)[key] == (bValue as any)[key]) delete (value as any)[key];
-                                    }
-                                    if (!Object.keys(value).length) {
-                                        (i as any)[key].splice(index, 1);
-                                        index--;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                i = {
-                    ...i,
+                let i = {
+                    ...clearItem(item),
                     id: item.id,
                     count: item.count || 1,
                     equipped: item.equipped || false,
