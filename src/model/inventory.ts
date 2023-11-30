@@ -194,13 +194,18 @@ export namespace Inventory {
                 let i = cloneItem(item);
                 let baseItem = getItemById(item.id);
                 for (let [key, value] of Object.entries(baseItem)) if ((i as any)[key] == (baseItem as any)[key]) delete (i as any)[key];
-
-                return {
+                i = {
                     ...i,
                     id: item.id,
                     count: item.count || 1,
                     equipped: item.equipped || false,
                 } as Item;
+                if (!i.equipped) {
+                    i.equipped = null as any;
+                    i.equippedAt = null;
+                }
+
+                return i;
             });
         return database.child(`inventory/` + moi.guild?.id + "/" + target.id).set(inventory);
     }

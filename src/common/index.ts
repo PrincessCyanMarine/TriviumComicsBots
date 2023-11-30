@@ -477,21 +477,21 @@ d20.on("messageCreate", async (msg) => {
                 }
                 try {
                     let target = msg.mentions.users?.first() || msg.author;
-                    let itemId = parseInt(options[1]);
-                    if (options[1] == "potion") itemId = Inventory.ITEM_DICT["Potion"];
+                    let itemIdOrIndex = parseInt(options[1]);
+                    if (options[1] == "potion") itemIdOrIndex = Inventory.ITEM_DICT["Potion"];
                     // console.log(options[1], itemId);
-                    if ((!itemId && itemId != 0) || isNaN(itemId)) {
+                    if ((!itemIdOrIndex && itemIdOrIndex != 0) || isNaN(itemIdOrIndex)) {
                         msg.reply("Invalid item id");
                         return;
                     }
                     let amount = parseInt(options[2] || "1") || 1;
                     if (isNaN(amount)) new Error("Invalid amount");
                     if (command == "take") amount = -amount;
-                    if (amount >= 1 && [0, 1].includes(itemId) && target.id != "852639258690191370") {
+                    if (amount >= 1 && [0, 1].includes(itemIdOrIndex) && target.id != "852639258690191370") {
                         msg.reply("That item is exclusive to AC");
                         return;
                     }
-                    let item = Inventory.getItemById(itemId);
+                    let item = command == "take" ? (await Inventory.get(msg, target)).items[itemIdOrIndex] : Inventory.getItemById(itemIdOrIndex);
                     // console.log(item);
                     if (!item) {
                         msg.reply("Invalid item id");
@@ -533,7 +533,7 @@ d20.on("messageCreate", async (msg) => {
                             item.effects[0].duration = duration;
                         }
                     }
-                    let inventory = await Inventory.give(msg, item, amount, target);
+                     let inventory = await Inventory.give(msg, item, amount, target);
                     msg.reply(amount > 0 ? `Gave ${amount} ${item.name} to ${target}` : `Took ${-amount} ${item.name} from ${target}`);
                 } catch (err: any) {
                     console.error(err);
