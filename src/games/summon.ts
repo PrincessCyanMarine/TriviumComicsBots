@@ -52,7 +52,7 @@ export async function summon(msg: Message, options: string[]) {
         } else {
             let [canUse, mana] = await useMana(msg, 30);
             if (!canUse) {
-                say(sadie, msg.channel, `Not enough mana to summon!\nSummoning cost: 30\nCurrent mana: ${mana.value}`);
+                say(sadie, msg.channel, `Not enough mana to summon!\nSummoning cost: 30\nCurrent mana: ${Math.floor(mana.value)}`);
                 return;
             }
             let text = random_from_array([
