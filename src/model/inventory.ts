@@ -178,7 +178,7 @@ export namespace Inventory {
 
     function clearItem(item: Item) {
         let _act = <T extends Object>(obj: T, bObj: T): T => {
-            if (typeof obj != "object") return obj;
+            if (typeof obj != "object" || typeof bObj != "object") return obj;
             for (let [key] of Object.entries(bObj)) {
                 if ((obj as any)[key] == (bObj as any)[key]) delete (obj as any)[key];
                 else if (typeof (obj as any)[key] == "object") {
