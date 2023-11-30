@@ -193,7 +193,26 @@ export namespace Inventory {
             .map((item) => {
                 let i = cloneItem(item);
                 let baseItem = getItemById(item.id);
-                for (let [key, value] of Object.entries(baseItem)) if ((i as any)[key] == (baseItem as any)[key]) delete (i as any)[key];
+                for (let [key] of Object.entries(baseItem)) {
+                    if ((i as any)[key] == (baseItem as any)[key]) delete (i as any)[key];
+                    else {
+                        if (typeof (i as any)[key] == "object") {
+                            if (Array.isArray((i as any)[key])) {
+                                for (let index = 0; index < (i as any)[key].length; index++) {
+                                    let value = (i as any)[key][index];
+                                    let bValue = (baseItem as any)[key][index];
+                                    for (let [key, value] of Object.entries(bValue)) {
+                                        if ((value as any)[key] == (bValue as any)[key]) delete (value as any)[key];
+                                    }
+                                    if (!Object.keys(value).length) {
+                                        (i as any)[key].splice(index, 1);
+                                        index--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 i = {
                     ...i,
                     id: item.id,
