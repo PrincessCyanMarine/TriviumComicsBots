@@ -532,8 +532,9 @@ d20.on("messageCreate", async (msg) => {
                             item.name += ` (${duration}m)`;
                             item.effects[0].duration = duration;
                         }
+                        item.description = `A potion that ${effect}s ${type} by ${amount} ${duration ? `for ${duration} minutes` : ""}`;
                     }
-                     let inventory = await Inventory.give(msg, item, amount, target);
+                    let inventory = await Inventory.give(msg, item, amount, target);
                     msg.reply(amount > 0 ? `Gave ${amount} ${item.name} to ${target}` : `Took ${-amount} ${item.name} from ${target}`);
                 } catch (err: any) {
                     console.error(err);
