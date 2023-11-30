@@ -312,7 +312,7 @@ d20.on("messageCreate", async (msg) => {
                     let inventoryStr = [];
                     let i = 0;
                     if (inventory.items.length == 0) {
-                        msg.reply(`${target}'s inventory is empty`);
+                        msg.reply(`${target}'s inventory is empty (${await Inventory.getGold(msg, target, inventory)} gold)`);
                         return;
                     }
                     for (let item of inventory.items) {
