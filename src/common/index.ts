@@ -413,6 +413,7 @@ d20.on("messageCreate", async (msg) => {
                 }
                 break;
             }
+            case "gold":
             case "money": {
                 let target = msg.mentions.users?.first() || msg.author;
                 let gold = await Inventory.getGold(msg, target);
