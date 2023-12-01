@@ -26,6 +26,7 @@ import {
     GuildEmoji,
     GuildMember,
     HexColorString,
+    Interaction,
     InteractionReplyOptions,
     InteractionUpdateOptions,
     Message,
@@ -2038,7 +2039,7 @@ export const createCharacterCard = async (
     return canvas.toBuffer();
 };
 
-export async function getMana(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user, update = false) {
+export async function getMana(moi: Message | Interaction, target = moi instanceof Message ? moi.author : moi.user, update = false) {
     let time = Date.now();
     let level = (await database.child(`level/${moi.guild?.id}/${target.id}`).once("value")).val() || 1;
     let prestige = (await database.child(`prestige/${moi.guild?.id}/${target.id}`).once("value")).val() || 0;
@@ -2105,7 +2106,7 @@ export async function getMana(moi: Message | CommandInteraction, target = moi in
     };
 }
 
-export async function useMana(moi: Message | CommandInteraction, amount: number) {
+export async function useMana(moi: Message | Interaction, amount: number) {
     let mana = await getMana(moi);
     let target = moi instanceof Message ? moi.author : moi.user;
     if (mana.value < amount) return [false, mana] as const;
@@ -2117,7 +2118,7 @@ export async function useMana(moi: Message | CommandInteraction, amount: number)
     return [true, mana] as const;
 }
 
-export async function setMana(moi: Message | CommandInteraction, amount: number, target = moi instanceof Message ? moi.author : moi.user) {
+export async function setMana(moi: Message | Interaction, amount: number, target = moi instanceof Message ? moi.author : moi.user) {
     await database.child(`mana/${moi.guild?.id}/${target.id}`).set({
         value: amount,
         timestamp: Date.now(),
@@ -2125,7 +2126,7 @@ export async function setMana(moi: Message | CommandInteraction, amount: number,
     return amount;
 }
 
-export async function addMana(moi: Message | CommandInteraction, amount: number, target = moi instanceof Message ? moi.author : moi.user) {
+export async function addMana(moi: Message | Interaction, amount: number, target = moi instanceof Message ? moi.author : moi.user) {
     let mana = await getMana(moi, target);
     return setMana(moi, mana.value + amount, target);
 }

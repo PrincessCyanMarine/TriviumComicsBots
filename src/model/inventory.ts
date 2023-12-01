@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { Interaction, Message } from "discord.js";
 import { database } from "..";
 import { getMana, setMana } from "../common/functions";
 import { type } from "os";
@@ -95,14 +95,14 @@ export namespace Inventory {
         return item;
     }
 
-    export async function getGold(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user, inventory?: Inventory) {
+    export async function getGold(moi: Message | Interaction, target = moi instanceof Message ? moi.author : moi.user, inventory?: Inventory) {
         let gold;
         if (!inventory) gold = (await database.child(`inventory/` + moi.guild?.id + "/" + target.id + "/gold").once("value")).val();
         else gold = inventory.gold;
         return (gold || 0) as number;
     }
     export async function addGold(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         amount: number,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
@@ -111,7 +111,7 @@ export namespace Inventory {
         await setGold(moi, gold + amount, target, inventory);
     }
     export async function setGold(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         amount: number,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
@@ -124,7 +124,7 @@ export namespace Inventory {
         await set(moi, target, inventory);
     }
 
-    export async function get(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
+    export async function get(moi: Message | Interaction, target = moi instanceof Message ? moi.author : moi.user) {
         let inventory: Inventory = (await database.child(`inventory/` + moi.guild?.id + "/" + target.id).once("value")).val();
         if (!inventory) {
             inventory = {
@@ -201,11 +201,7 @@ export namespace Inventory {
         return _act(cloneItem(item), cloneItem(getItemById(item.id)));
     }
 
-    export async function set(
-        moi: Message | CommandInteraction,
-        target = moi instanceof Message ? moi.author : moi.user,
-        inventory: Inventory | null
-    ) {
+    export async function set(moi: Message | Interaction, target = moi instanceof Message ? moi.author : moi.user, inventory: Inventory | null) {
         if (!inventory) {
             database.child(`inventory/` + moi.guild?.id + "/" + target.id).remove();
             return;
@@ -233,7 +229,7 @@ export namespace Inventory {
     }
 
     export async function unequip(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         index: number,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
@@ -258,7 +254,7 @@ export namespace Inventory {
     }
 
     export async function equip(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         index: number,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
@@ -295,7 +291,7 @@ export namespace Inventory {
     }
 
     export async function take(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         item: Item | number,
         count = 1,
         target = moi instanceof Message ? moi.author : moi.user,
@@ -325,7 +321,7 @@ export namespace Inventory {
     }
 
     export async function give(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         item: Item | number,
         count = 1,
         target = moi instanceof Message ? moi.author : moi.user,
@@ -353,7 +349,7 @@ export namespace Inventory {
     }
 
     export async function hasItem(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         item: Item | number,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
@@ -364,7 +360,7 @@ export namespace Inventory {
     }
 
     export async function itemCount(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         item: Item | number,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
@@ -377,7 +373,7 @@ export namespace Inventory {
         return num;
     }
 
-    export async function activeEffects(moi: Message | CommandInteraction, target = moi instanceof Message ? moi.author : moi.user) {
+    export async function activeEffects(moi: Message | Interaction, target = moi instanceof Message ? moi.author : moi.user) {
         let inventory = await get(moi, target);
         let effects: ItemEffect[] = [];
         for (let item of inventory.items) {
@@ -408,7 +404,7 @@ export namespace Inventory {
     }
 
     export async function use(
-        moi: Message | CommandInteraction,
+        moi: Message | Interaction,
         index: number,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
