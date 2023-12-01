@@ -51,7 +51,7 @@ let advMessage = async (moi: Message | Interaction, options: string[], plusOne =
     };
 };
 
-let _advStart = async (moi: Message | Interaction, num: 6 | 20 | 100, plusOne = false): Promise<[boolean, string]> => {
+let doAdventure = async (moi: Message | Interaction, num: 6 | 20 | 100, plusOne = false): Promise<[boolean, string]> => {
     let roll = Math.min(num, Math.ceil(Math.random() * num + (plusOne ? 1 : 0)));
     let cost =
         {
@@ -104,7 +104,7 @@ let roll = async (interaction: ButtonInteraction, num: 6 | 20 | 100) => {
         return;
     }
     let plusOne = getPlusOne(interaction.customId);
-    let [success, text] = await _advStart(interaction, num, plusOne);
+    let [success, text] = await doAdventure(interaction, num, plusOne);
     let msg = await advMessage(interaction, interaction.customId.split("?")[1].split("&"), plusOne);
     msg.content = text;
     await interaction.update(msg);
@@ -114,7 +114,7 @@ addExclamationCommand(["adv", "adventure"], async (msg, options) => {
     let num = options[1];
     if (num == "6" || num == "20" || num == "100") {
         let plusOne = !!options[2];
-        let [success, text] = await _advStart(msg, parseInt(num) as 6 | 20 | 100, plusOne);
+        let [success, text] = await doAdventure(msg, parseInt(num) as 6 | 20 | 100, plusOne);
         let components = getButtons(msg, options, plusOne);
         msg.reply({ content: text, components });
         return;
