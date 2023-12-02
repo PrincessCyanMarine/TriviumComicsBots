@@ -407,9 +407,11 @@ d20.on("messageCreate", async (msg) => {
                     msg.reply(`\`\`\`\n${items.join("\n")}\n\`\`\``);
                 } else {
                     msg.reply(
-                        `# ${item.name}\n## ${item.description}\nType: ${item.type == "armor" ? item.slot : item.type}\nRarity: ${
-                            item.rarity
-                        }\nMax count: ${item.maxCount || "∞"}${Inventory.canEquip(item) ? `\nEquippable` : ""}${
+                        `# ${item.name}\n## ${item.description}\nType: ${item.type == "armor" ? item.slot : item.type}\nRarity: ${item.rarity}${
+                            item.buyPrice < 0 ? "" : `\nBuy price: ${item.buyPrice} gold`
+                        }${item.sellPrice < 0 ? "" : `\nSell price: ${item.sellPrice} gold`}\nMax count: ${item.maxCount || "∞"}${
+                            Inventory.canEquip(item) ? `\nEquippable` : ""
+                        }${
                             item.effects.length > 0
                                 ? `\n## Effects:\n${item.effects
                                       .map((e) => `- ${capitalize(e.effect)} ${e.type} by ${e.amount} on ${e.target}`)
