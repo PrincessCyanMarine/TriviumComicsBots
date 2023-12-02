@@ -53,12 +53,7 @@ let advMessage = async (moi: Message | Interaction, options: string[], plusOne =
 
 let doAdventure = async (moi: Message | Interaction, num: 6 | 20 | 100, plusOne = false): Promise<[boolean, string]> => {
     let roll = Math.min(num, Math.ceil(Math.random() * num + (plusOne ? 1 : 0)));
-    let cost =
-        {
-            6: 60,
-            20: 75,
-            100: 100,
-        }[num] + (plusOne ? 25 : 0);
+    let cost = getCost(num, plusOne);
     let payouts = {
         6: 10,
         20: 50,

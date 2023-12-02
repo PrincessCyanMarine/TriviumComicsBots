@@ -1,6 +1,6 @@
 import { Interaction, Message } from "discord.js";
 import { database } from "..";
-import { getMana, setMana } from "../common/functions";
+import { capitalize, getMana, setMana } from "../common/functions";
 import { type } from "os";
 import { TIME } from "../common/variables";
 
@@ -51,6 +51,8 @@ export namespace Inventory {
         count?: number;
         unstackable?: boolean;
         equippedAt?: number | null;
+        buyPrice: number;
+        sellPrice: number;
     } & (
         | {
               type: "weapon";
@@ -92,6 +94,8 @@ export namespace Inventory {
         if (!id && id != 0) return null as R;
         let item = ITEMS[id!] as R;
         if (!item) throw new Error("No item with id " + id);
+        if (!item.buyPrice && item.buyPrice != 0) item.buyPrice = -1;
+        if (!item.sellPrice && item.sellPrice != 0) item.sellPrice = -1;
         return item;
     }
 
@@ -316,8 +320,25 @@ export namespace Inventory {
     }
 
     export function equals(a: Item, b: Item): boolean {
-        for (let [key, value] of Object.entries(a)) if (value != (b as any)[key]) return false;
-        return true;
+        let compare = (a: any, b: any) => {
+            if ((!b && !!a) || (!a && !!b)) return false;
+            if (typeof a != typeof b) return false;
+            if (typeof a == "object") {
+                if (Array.isArray(a)) {
+                    if (!Array.isArray(b)) return false;
+                    if (a.length != b.length) return false;
+                    for (let i = 0; i < a.length; i++) if (!compare(a[i], b[i])) return false;
+                    return true;
+                } else {
+                    if (Array.isArray(b)) return false;
+                    if (Object.keys(a).length != Object.keys(b).length) return false;
+                    for (let [key, value] of Object.entries(a)) if (!compare(value, (b as any)[key])) return false;
+                    return true;
+                }
+            }
+            return a == b;
+        };
+        return compare(a, b);
     }
 
     export async function give(
@@ -448,6 +469,27 @@ export namespace Inventory {
         return item;
     }
 
+    export function makePotion(effects: ItemEffect | ItemEffect[], name?: string, description?: string, buyPrice = -1, sellPrice = -1) {
+        if (!Array.isArray(effects)) effects = [effects];
+        let item = {
+            id: Inventory.ITEM_DICT["Potion"],
+            buyPrice,
+            sellPrice,
+            effects,
+        } as Partial<Potion>;
+        if (effects.length == 1) {
+            let { effect, type, amount, duration } = effects[0];
+            if (!name) {
+                name = `${capitalize(effect)} ${type} potion (${amount})`;
+                if (duration && duration > 0) name += ` (${duration}m)`;
+            }
+            if (!description) item.description = `A potion that ${effect}s ${type} by ${amount} ${duration ? `for ${duration} minutes` : ""}`;
+        }
+        if (name) item.name = name;
+        if (description) item.description = description;
+        return item as Potion;
+    }
+
     export enum ITEM_DICT {
         "AC's Helpful Ring" = 0,
         "AC's Unhelpful Ring" = 1,
@@ -459,6 +501,13 @@ export namespace Inventory {
         "Potion" = 6,
         "D20 of perfect rolls" = 20,
     }
+
+    export type Potion = Item & {
+        id: 6;
+        type: "consumable";
+        unstackable: true;
+        consumableType: "potion";
+    };
 
     export const ITEMS: Record<number, Item> = {
         0: {
@@ -477,6 +526,8 @@ export namespace Inventory {
             type: "armor",
             id: 0,
             maxCount: 1,
+            buyPrice: -1,
+            sellPrice: -1,
         },
         1: {
             description: "A ring specially forged for Razraz. It decreases his mana by 20",
@@ -494,6 +545,8 @@ export namespace Inventory {
             type: "armor",
             id: 1,
             maxCount: 1,
+            buyPrice: -1,
+            sellPrice: -1,
         },
         2: {
             description: "A ring of promise that signifies a strong bond between two people (+10 mana to the happy couple)",
@@ -511,6 +564,8 @@ export namespace Inventory {
             type: "armor",
             id: 2,
             maxCount: 1,
+            buyPrice: 100,
+            sellPrice: 50,
         },
         3: {
             description: "Papers that signify a past bond between two people (-10 mana to the ex couple)",
@@ -528,6 +583,8 @@ export namespace Inventory {
             type: "misc",
             equippable: true,
             id: 3,
+            buyPrice: 50,
+            sellPrice: 10,
         },
         4: {
             name: "Rings of destruction",
@@ -538,6 +595,8 @@ export namespace Inventory {
             effects: [],
             slot: "ring",
             maxCount: 1,
+            buyPrice: 1000000,
+            sellPrice: 1,
         },
         "-1": {
             name: "The test stick",
@@ -555,6 +614,8 @@ export namespace Inventory {
             ],
             weaponType: "sword",
             maxCount: 64,
+            buyPrice: -1,
+            sellPrice: -1,
         },
         5: {
             name: "Shiny rock",
@@ -565,6 +626,8 @@ export namespace Inventory {
             effects: [],
             miscType: "valuable",
             maxCount: 999,
+            buyPrice: 100,
+            sellPrice: 20,
         },
         [ITEM_DICT["Potion"]]: {
             name: "Potion",
@@ -575,6 +638,8 @@ export namespace Inventory {
             unstackable: true,
             effects: [],
             consumableType: "potion",
+            buyPrice: -1,
+            sellPrice: -1,
         },
         20: {
             name: "D20 of perfect rolls",
@@ -594,6 +659,8 @@ export namespace Inventory {
             ],
             miscType: "other",
             maxCount: 1,
+            buyPrice: -1,
+            sellPrice: -1,
         },
     };
 }

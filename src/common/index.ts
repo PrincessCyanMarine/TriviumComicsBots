@@ -378,6 +378,18 @@ d20.on("messageCreate", async (msg) => {
             case "money": {
                 let target = msg.mentions.users?.first() || msg.author;
                 let gold = await Inventory.getGold(msg, target);
+                if (msg.member.permissions.has("KICK_MEMBERS") && ["set", "add"].includes(options[1]) && options[2]) {
+                    let mode = options[1] as "set" | "add";
+                    let amount = parseInt(options[2]);
+                    if (isNaN(amount)) {
+                        msg.reply("Invalid amount");
+                        return;
+                    }
+                    if (mode == "set") await Inventory.setGold(msg, amount, target);
+                    else await Inventory.addGold(msg, amount, target);
+                    msg.reply(`${target} now has ${await Inventory.getGold(msg, target)} gold`);
+                    return;
+                }
                 msg.reply(`${target} has ${gold} gold`);
                 break;
             }
@@ -465,7 +477,7 @@ d20.on("messageCreate", async (msg) => {
                         msg.reply("Invalid item id");
                         return;
                     }
-                    if (options[1] == "potion") {
+                    if (options[0] == "give" && options[1] == "potion") {
                         item = { ...item };
                         let effect = options[2] as Inventory.ItemEffect["effect"];
                         if (!effect || !Inventory.ItemEffects.map((b) => b.toLowerCase()).includes(effect)) {
