@@ -111,14 +111,14 @@ let getWelcomeMessage = async (moi: Message | Interaction) => {
         ),
     ];
     return {
-        content: `Welcome to the shop!`,
+        content: `Welcome to the shop! You have ${await Inventory.getGold(moi)} gold`,
         components: buttons,
     };
 };
 
 let isSameUser = (interaction: ButtonInteraction) => interaction.user.id == interaction.customId.match(/id=([^&]+?)(&|$)/)?.[1];
 
-let getShopBuy = (interaction: ButtonInteraction, page = 0) => {
+let getShopBuy = async (interaction: ButtonInteraction, page = 0) => {
     if (!isSameUser(interaction)) {
         return {
             ephemeral: true,
@@ -170,9 +170,9 @@ let getShopBuy = (interaction: ButtonInteraction, page = 0) => {
     pageButtons.push(new MessageButton().setCustomId(`sell?id=${interaction.user.id}&page=0`).setLabel(`SELL`).setStyle(MessageButtonStyles.DANGER));
 
     if (pageButtons.length > 0) components.push(new MessageActionRow().addComponents(...pageButtons));
-    let content = `Welcome to the shop!\nPage ${page + 1}/${Math.ceil(ShopItems.length / 5)}\n\`\`\`\n${items
-        .map(([i, a]) => `${a}x ${i.name}: ${i.buyPrice < 0 ? "SOLD OUT" : i.buyPrice}\n- ${i.description}`)
-        .join("\n\n")}\n\`\`\``;
+    let content = `Welcome to the shop! You have ${await Inventory.getGold(interaction)} gold\nPage ${page + 1}/${Math.ceil(
+        ShopItems.length / 5
+    )}\n\`\`\`\n${items.map(([i, a]) => `${a}x ${i.name}: ${i.buyPrice < 0 ? "SOLD OUT" : i.buyPrice}\n- ${i.description}`).join("\n\n")}\n\`\`\``;
 
     return { content, components };
 };
@@ -218,7 +218,9 @@ let getShopSell = async (interaction: ButtonInteraction, page = 0) => {
         );
     pageButtons.push(new MessageButton().setCustomId(`buy?id=${interaction.user.id}&page=0`).setLabel(`BUY`).setStyle(MessageButtonStyles.SUCCESS));
     if (pageButtons.length > 0) components.push(new MessageActionRow().addComponents(...pageButtons));
-    let content = `Welcome to the shop!\nPage ${page + 1}/${Math.ceil(inventory.items.length / 5)}\n\`\`\`\n${items
+    let content = `Welcome to the shop!You have ${await Inventory.getGold(interaction)} gold\nPage ${page + 1}/${Math.ceil(
+        inventory.items.length / 5
+    )}\n\`\`\`\n${items
         .map((i) => `${i.count}x ${i.name}: ${i.sellPrice < 0 ? "UNTRADABLE" : i.sellPrice}\n- ${i.description}`)
         .join("\n\n")}\n\`\`\``;
     return { content, components };
@@ -272,8 +274,7 @@ let buyItem = async (interaction: ButtonInteraction, itemIndex: number) => {
         await Inventory.give(interaction, item, amount);
         await Inventory.addGold(interaction, -item.buyPrice);
         let msg = await getShopBuy(interaction, Math.floor(itemIndex / 5));
-        msg.content =
-            `${interaction.user} bought ${item.name} for ${item.buyPrice} gold!\nThey now have ${gold - item.buyPrice} gold\n` + msg.content;
+        msg.content = `${item.name} bought for ${item.buyPrice} gold!\n` + msg.content;
         interaction.update(msg);
     } catch (e: any) {
         interaction.reply({
@@ -305,9 +306,7 @@ let sellItem = async (interaction: ButtonInteraction, itemIndex: number) => {
         await Inventory.take(interaction, item, 1);
         await Inventory.addGold(interaction, item.sellPrice);
         let msg = await getShopSell(interaction, Math.floor(itemIndex / 5));
-        msg.content =
-            `${interaction.user} sold ${item.name} for ${item.buyPrice} gold!\nThey now have ${await Inventory.getGold(interaction)} gold\n` +
-            msg.content;
+        msg.content = `${item.name} sold for ${item.sellPrice} gold!\n` + msg.content;
         interaction.update(msg);
     } catch (e: any) {
         interaction.reply({
