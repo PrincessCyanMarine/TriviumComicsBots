@@ -218,7 +218,7 @@ let getShopSell = async (interaction: ButtonInteraction, page = 0) => {
         );
     pageButtons.push(new MessageButton().setCustomId(`buy?id=${interaction.user.id}&page=0`).setLabel(`BUY`).setStyle(MessageButtonStyles.SUCCESS));
     if (pageButtons.length > 0) components.push(new MessageActionRow().addComponents(...pageButtons));
-    let content = `Welcome to the shop!You have ${await Inventory.getGold(interaction)} gold\nPage ${page + 1}/${Math.ceil(
+    let content = `Welcome to the shop! You have ${await Inventory.getGold(interaction)} gold\nPage ${page + 1}/${Math.ceil(
         inventory.items.length / 5
     )}\n\`\`\`\n${items
         .map((i) => `${i.count}x ${i.name}: ${i.sellPrice < 0 ? "UNTRADABLE" : i.sellPrice}\n- ${i.description}`)
