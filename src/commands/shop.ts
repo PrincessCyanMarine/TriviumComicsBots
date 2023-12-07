@@ -190,17 +190,19 @@ let getShopSell = async (interaction: ButtonInteraction, page = 0) => {
     let items = inventory.items.slice(page * 5, page * 5 + 5).map((i) => {
         return { ...Inventory.getItemById(i.id), ...i };
     }) as Inventory.Item[];
-    let components = [
-        new MessageActionRow().addComponents(
-            ...items.map((item, i) =>
-                new MessageButton()
-                    .setCustomId(`sellItem?id=${interaction.user.id}&item=${page * 5 + i}`)
-                    .setLabel(`${item.sellPrice < 0 ? "UNTRADABLE" : `${item.name}`}`)
-                    .setDisabled(item.sellPrice < 0)
-                    .setStyle(MessageButtonStyles.PRIMARY)
+    let components: MessageActionRow[] | undefined = [];
+    if (items.length > 0)
+        components.push(
+            new MessageActionRow().addComponents(
+                ...items.map((item, i) =>
+                    new MessageButton()
+                        .setCustomId(`sellItem?id=${interaction.user.id}&item=${page * 5 + i}`)
+                        .setLabel(`${item.sellPrice < 0 ? "UNTRADABLE" : `${item.name}`}`)
+                        .setDisabled(item.sellPrice < 0)
+                        .setStyle(MessageButtonStyles.PRIMARY)
+                )
             )
-        ),
-    ];
+        );
     let pageButtons = [];
     if (page > 0)
         pageButtons.push(
@@ -218,11 +220,14 @@ let getShopSell = async (interaction: ButtonInteraction, page = 0) => {
         );
     pageButtons.push(new MessageButton().setCustomId(`buy?id=${interaction.user.id}&page=0`).setLabel(`BUY`).setStyle(MessageButtonStyles.SUCCESS));
     if (pageButtons.length > 0) components.push(new MessageActionRow().addComponents(...pageButtons));
-    let content = `Welcome to the shop! You have ${await Inventory.getGold(interaction)} gold\nPage ${page + 1}/${Math.ceil(
-        inventory.items.length / 5
-    )}\n\`\`\`\n${items
-        .map((i) => `${i.count}x ${i.name}: ${i.sellPrice < 0 ? "UNTRADABLE" : i.sellPrice}\n- ${i.description}`)
-        .join("\n\n")}\n\`\`\``;
+    let content = `Welcome to the shop! You have ${await Inventory.getGold(interaction)} gold\n${
+        items.length > 0
+            ? `Page ${page + 1}/${Math.ceil(inventory.items.length / 5)}\n\`\`\`\n${items
+                  .map((i) => `${i.count}x ${i.name}: ${i.sellPrice < 0 ? "UNTRADABLE" : i.sellPrice}\n- ${i.description}`)
+                  .join("\n\n")}\n\`\`\``
+            : "You have nothing to sell!"
+    }`;
+    if (components.length == 0) components = undefined;
     return { content, components };
 };
 

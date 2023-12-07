@@ -386,7 +386,8 @@ export function readAllBotData() {
                 command: {
                     type: "function",
                     function: async (moi: CommandInteraction, thiscommand, startTime) => {
-                        if (moi.user.id != marineId) return `Sorry, in its current state, this command is only available for {mention:${marineId}}`;
+                        if (moi.user.id != marineId)
+                            return `Sorry, in its current state, this command is only available for {mention:user:${marineId}}`;
                         // console.log(moi.options.getString("command", false));
                         let command = moi.options.getString("command", false);
                         if (!command) {
