@@ -376,6 +376,24 @@ d20.on("messageCreate", async (msg) => {
             }
             case "gold":
             case "money": {
+                if (options[1] == "rank") {
+                    let inventories: { [id: string]: Inventory.Inventory } = (await database.child(`inventory/` + msg.guild?.id).once("value")).val();
+                    if (!inventories) {
+                        msg.reply("No one has any gold");
+                        return;
+                    }
+                    let inventoriesArray = Object.entries(inventories);
+                    let inventoriesSorted = inventoriesArray.sort((a, b) => b[1].gold - a[1].gold);
+                    let text = "";
+                    let i = 0;
+                    for (let [id, inventory] of inventoriesSorted) {
+                        let member = await msg.guild?.members.fetch(id);
+                        if (!member) continue;
+                        text += `${++i}: ${member.displayName} (${inventory.gold} gold)\n`;
+                    }
+                    msg.reply(`\`\`\`\n${text}\n\`\`\``);
+                    return;
+                }
                 let target = msg.mentions.users?.first() || msg.author;
                 let gold = await Inventory.getGold(msg, target);
                 if (msg.member.permissions.has("KICK_MEMBERS") && ["set", "add"].includes(options[1]) && options[2]) {

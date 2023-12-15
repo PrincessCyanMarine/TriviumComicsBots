@@ -18,8 +18,8 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
         },
         "Weak mana restore potion",
         "Restores 50 mana",
-        100,
-        50
+        50,
+        25
     ),
     Inventory.makePotion(
         {
@@ -30,8 +30,8 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
         },
         "Mana restore potion",
         "Restores 100 mana",
-        250,
-        125
+        85,
+        50
     ),
     Inventory.makePotion(
         {
@@ -42,8 +42,8 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
         },
         "Stong mana restore potion",
         "Restores 200 mana",
-        500,
-        250
+        125,
+        75
     ),
     Inventory.makePotion(
         {
@@ -55,8 +55,8 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
         },
         "Weak max mana potion",
         "Raises max mana by 50 for 5 minutes",
-        150,
-        75
+        50,
+        25
     ),
     Inventory.makePotion(
         {
@@ -68,21 +68,21 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
         },
         "Max mana potion",
         "Raises max mana by 100 for 5 minutes",
-        300,
-        150
+        85,
+        50
     ),
     Inventory.makePotion(
         {
-            amount: 150,
+            amount: 200,
             duration: 5,
             effect: "buff",
             type: "mana",
             target: "self",
         },
         "Strong max mana potion",
-        "Raises max mana by 150 for 5 minutes",
-        800,
-        400
+        "Raises max mana by 200 for 5 minutes",
+        125,
+        75
     ),
     { id: 0 },
     { id: 1 },
