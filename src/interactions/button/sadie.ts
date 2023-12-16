@@ -30,3 +30,4 @@ sadie.on("interactionCreate", async (interaction) => {
             break;
     }
 });
+console.log("sadie button commands loaded");

@@ -168,6 +168,7 @@ export namespace Inventory {
 
     export function cloneItem(item: Item) {
         let _act = <T>(obj: T): T => {
+            if (!obj) return obj;
             if (typeof obj == "object") {
                 if (Array.isArray(obj)) return obj.map((i) => _act(i)) as T;
                 else {
@@ -442,7 +443,7 @@ export namespace Inventory {
             }
             equip(moi, index, target, inventory);
         }
-        console.log(item.type, hasDuration);
+        // console.log(item.type, hasDuration);
         if (item.type == "consumable" && !hasDuration) {
             // console.log(item.type, hasDuration);
             // if (item.count) item.count--;

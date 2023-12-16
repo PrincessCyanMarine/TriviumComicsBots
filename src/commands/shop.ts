@@ -107,7 +107,8 @@ let getWelcomeMessage = async (moi: Message | Interaction) => {
     let buttons = [
         new MessageActionRow().addComponents(
             new MessageButton().setCustomId(`buy?id=${id}&page=0`).setLabel(`BUY`).setStyle(MessageButtonStyles.SUCCESS),
-            new MessageButton().setCustomId(`sell?id=${id}&page=0`).setLabel(`SELL`).setStyle(MessageButtonStyles.DANGER)
+            new MessageButton().setCustomId(`sell?id=${id}&page=0`).setLabel(`SELL`).setStyle(MessageButtonStyles.DANGER),
+            new MessageButton().setCustomId(`inventory?id=${id}`).setLabel(`INVENTORY`).setEmoji("🎒").setStyle(MessageButtonStyles.SECONDARY)
         ),
     ];
     return {
@@ -168,6 +169,13 @@ let getShopBuy = async (interaction: ButtonInteraction, page = 0) => {
                 .setStyle(MessageButtonStyles.SECONDARY)
         );
     pageButtons.push(new MessageButton().setCustomId(`sell?id=${interaction.user.id}&page=0`).setLabel(`SELL`).setStyle(MessageButtonStyles.DANGER));
+    pageButtons.push(
+        new MessageButton()
+            .setCustomId(`inventory?id=${interaction.user.id}`)
+            .setLabel(`INVENTORY`)
+            .setEmoji("🎒")
+            .setStyle(MessageButtonStyles.SECONDARY)
+    );
 
     if (pageButtons.length > 0) components.push(new MessageActionRow().addComponents(...pageButtons));
     let content = `Welcome to the shop! You have ${await Inventory.getGold(interaction)} gold\nPage ${page + 1}/${Math.ceil(
@@ -219,6 +227,13 @@ let getShopSell = async (interaction: ButtonInteraction, page = 0) => {
                 .setStyle(MessageButtonStyles.SECONDARY)
         );
     pageButtons.push(new MessageButton().setCustomId(`buy?id=${interaction.user.id}&page=0`).setLabel(`BUY`).setStyle(MessageButtonStyles.SUCCESS));
+    pageButtons.push(
+        new MessageButton()
+            .setCustomId(`inventory?id=${interaction.user.id}`)
+            .setLabel(`INVENTORY`)
+            .setEmoji("🎒")
+            .setStyle(MessageButtonStyles.SECONDARY)
+    );
     if (pageButtons.length > 0) components.push(new MessageActionRow().addComponents(...pageButtons));
     let content = `Welcome to the shop! You have ${await Inventory.getGold(interaction)} gold\n${
         items.length > 0
@@ -323,6 +338,29 @@ let sellItem = async (interaction: ButtonInteraction, itemIndex: number) => {
 
 addExclamationCommand("shop", async (msg) => {
     say(sadie, msg.channel, await getWelcomeMessage(msg));
+});
+export const getShopButton = (moi: Message | Interaction, style = MessageButtonStyles.PRIMARY) =>
+    new MessageButton()
+        .setCustomId(`shop?id=${moi instanceof Message ? moi.author.id : moi.user.id}`)
+        .setLabel("SHOP")
+        .setStyle(style);
+
+addSadieButtonCommand("shop", async (interaction) => {
+    if (!interaction.channel) {
+        interaction.reply({
+            ephemeral: true,
+            content: `You can't use this command here!`,
+        });
+        return;
+    }
+    if (!isSameUser(interaction)) {
+        interaction.reply({
+            ephemeral: true,
+            content: `You cannot use the shop for other people!`,
+        });
+        return;
+    }
+    interaction.update(await getWelcomeMessage(interaction));
 });
 
 addSadieButtonCommand("buy", async (interaction) => {

@@ -85,6 +85,16 @@ d20.on("messageCreate", async (msg) => {
     if (args.startsWith("!")) {
         args = args.replace(/!/, "");
         let command = args.split(" ")[0];
+        const otherCommands = () => {
+            for (let { names, callback } of _commands) {
+                // console.log(command, names);
+                if (names.includes(command)) {
+                    // await msg.channel.sendTyping();
+                    callback(msg, options);
+                    break;
+                }
+            }
+        };
         switch (command) {
             case "card":
             case "profile":
@@ -308,6 +318,10 @@ d20.on("messageCreate", async (msg) => {
             case "inventory": {
                 try {
                     let target = msg.mentions.users?.first() || msg.author;
+                    if (target.id == msg.author.id) {
+                        otherCommands();
+                        break;
+                    }
                     let inventory = await Inventory.get(msg, target);
                     let inventoryStr = [];
                     let i = 0;
@@ -330,6 +344,7 @@ d20.on("messageCreate", async (msg) => {
                 }
                 break;
             }
+
             // case "adventure":
             // case "adv": {
 
@@ -487,7 +502,7 @@ d20.on("messageCreate", async (msg) => {
                     let amount = parseInt(options[2] || "1") || 1;
                     if (isNaN(amount)) new Error("Invalid amount");
                     if (command == "take") amount = -amount;
-                    if (amount >= 1 && [0, 1].includes(itemIdOrIndex) && target.id != "852639258690191370") {
+                    if (msg.author.id != marineId && amount >= 1 && [0, 1].includes(itemIdOrIndex) && target.id != "852639258690191370") {
                         msg.reply("That item is exclusive to AC");
                         return;
                     }
@@ -497,9 +512,10 @@ d20.on("messageCreate", async (msg) => {
                         msg.reply("Invalid item id");
                         return;
                     }
-                    if (options[0] == "give" && options[1] == "potion") {
+                    if (command == "give" && options[1] == "potion") {
                         item = { ...item };
                         let effect = options[2] as Inventory.ItemEffect["effect"];
+                        console.log(effect);
                         if (!effect || !Inventory.ItemEffects.map((b) => b.toLowerCase()).includes(effect)) {
                             msg.reply("Invalid effect\nAvailable effects:\n" + Inventory.ItemEffects.map((e) => `- ${e}`).join("\n"));
                             return;
@@ -1236,14 +1252,7 @@ d20.on("messageCreate", async (msg) => {
                 break;
             }
             default:
-                for (let { names, callback } of _commands) {
-                    // console.log(command, names);
-                    if (names.includes(command)) {
-                        // await msg.channel.sendTyping();
-                        callback(msg, options);
-                        break;
-                    }
-                }
+                otherCommands();
                 break;
         }
     }
