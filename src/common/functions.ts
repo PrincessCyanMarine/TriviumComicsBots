@@ -2059,7 +2059,7 @@ export async function getMana(moi: Message | Interaction, target = moi instanceo
     };
 
     for (let effect of effects) {
-        if (!["mana", "manaRegen"].includes(effect.type)) continue;
+        if (!["mana", "manaregen"].includes(effect.type.toLowerCase())) continue;
         switch (effect.effect) {
             case "buff":
                 if (effect.type == "mana") {

@@ -514,18 +514,20 @@ d20.on("messageCreate", async (msg) => {
                     }
                     if (command == "give" && options[1] == "potion") {
                         item = { ...item };
-                        let effect = options[2] as Inventory.ItemEffect["effect"];
+                        let effect = options[2].toLowerCase() as Inventory.ItemEffect["effect"];
                         console.log(effect);
                         if (!effect || !Inventory.ItemEffects.map((b) => b.toLowerCase()).includes(effect)) {
                             msg.reply("Invalid effect\nAvailable effects:\n" + Inventory.ItemEffects.map((e) => `- ${e}`).join("\n"));
                             return;
                         }
-                        let type = options[3] as Inventory.ItemEffect["type"];
+                        effect = Inventory.ItemEffects.find((e) => e.toLowerCase() == effect) as Inventory.ItemEffect["effect"];
+                        let type = options[3].toLowerCase() as Inventory.ItemEffect["type"];
                         console.log(type);
                         if (!type || !Inventory.ItemEffectTypes.map((b) => b.toLowerCase()).includes(type)) {
                             msg.reply("Invalid type\nAvailable types:\n" + Inventory.ItemEffectTypes.map((e) => `- ${e}`).join("\n"));
                             return;
                         }
+                        type = Inventory.ItemEffectTypes.find((e) => e.toLowerCase() == type) as Inventory.ItemEffect["type"];
                         let amount = parseInt(options[4]);
                         if (!amount || isNaN(amount)) {
                             msg.reply("Invalid amount");

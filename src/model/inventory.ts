@@ -21,7 +21,7 @@ export namespace Inventory {
         "luck",
         // "accuracy",
         // "evasion",
-        "manaRegen",
+        "manaregen",
         // "healthRegen",
     ] as const;
     export const ItemEffectTargets = ["self", "enemy", "allies", "enemies"] as const;
