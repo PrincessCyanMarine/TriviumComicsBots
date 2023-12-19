@@ -92,7 +92,7 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
             amount: 50,
             duration: 20,
             effect: "buff",
-            type: "manaRegen",
+            type: "manaregen",
             target: "self",
         },
         "REALLY STRONG max regen potion",
