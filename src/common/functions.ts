@@ -11,18 +11,16 @@ import {
     SlashCommandUserOption,
     channelMention,
     formatEmoji,
-    hyperlink,
     roleMention,
     userMention,
 } from "@discordjs/builders";
-import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage, registerFont } from "canvas";
+import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage } from "canvas";
 import {
     ActivityType,
     AllowedImageSize,
     ButtonInteraction,
     Client,
     CommandInteraction,
-    Guild,
     GuildEmoji,
     GuildMember,
     HexColorString,
@@ -33,41 +31,25 @@ import {
     MessageActionRow,
     MessageAttachment,
     MessageButton,
-    MessageComponent,
     MessageEditOptions,
     MessageEmbed,
     MessageOptions,
     MessageSelectMenu,
     ModalSubmitInteraction,
     PartialMessage,
-    PresenceStatusData,
     ReplyOptions,
     SelectMenuInteraction,
     TextBasedChannel,
     TextChannel,
     User,
 } from "discord.js";
-import {
-    existsSync,
-    lstatSync,
-    mkdir,
-    mkdirSync,
-    readFileSync,
-    readdir,
-    readdirSync,
-    rmSync,
-    rmdirSync,
-    unlink,
-    unlinkSync,
-    writeFileSync,
-} from "fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, unlinkSync, writeFileSync } from "fs";
 import GIFEncoder from "gifencoder";
 import { Readable } from "stream";
 import { database, testing } from "..";
 import assets from "../assetsIndexes";
 import {
     botData,
-    BotTypeNameToType,
     cerby,
     clients,
     CustomActivity,
@@ -83,33 +65,19 @@ import {
     setBotData,
     sieg,
 } from "../clients";
-import {
-    ActivatorType,
-    BotDataTypes,
-    BotNames,
-    botNames,
-    CommandCondition,
-    CommandType,
-    DataType,
-    ImageType,
-    isDataTypeKey,
-    VariableType,
-} from "../model/botData";
+import { ActivatorType, BotNames, botNames, CommandCondition, CommandType, DataType, ImageType, isDataTypeKey } from "../model/botData";
 import { eli_activities } from "../eli/activities";
 import { krystal_activities } from "../krystal/activities";
-import { greet } from "../krystal/functions";
 import { ray_activities } from "../ray/activities";
 import { sadie_activities } from "../sadie/activities";
-import { Harem } from "./harem";
 import { TIME, disturb_channels, ignore_channels, isRestarting, marineId, setRestarting, testChannelId, triviumGuildId } from "./variables";
 import { spawn } from "child_process";
 import { CardStyle, createXpBar, defaultstyle, generatecard } from "../d20/functions";
 import simpleGit from "simple-git";
 import path, { parse } from "path";
 import { addSlashCommand, slash_commands } from "../interactions/slash/common";
-import { writeFile } from "fs/promises";
-import { timeStamp } from "console";
 import { Inventory } from "../model/inventory";
+import { cycledPath, permanentPath, removeExtension } from "./emojiRotationHelper";
 
 export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");
@@ -349,15 +317,19 @@ export function readAllBotData() {
             }
         }
         clearAllData();
-        let choices: { name: string; value: string }[] = [];
+        let helpChoices: { name: string; value: string }[] = [];
         for (let bot of botNames) {
-            choices.push(
+            helpChoices.push(
                 ...Object.keys(botData[bot].activator)
                     .filter((s) => !botData[bot].activator[s].hideFromHelp)
                     .map((s) => ({ value: `[${s}](${bot})`, name: `${s} (${bot})` }))
             );
-            if (bot == "d20") choices.push({ value: `[help](d20)`, name: `help (d20)` });
+            if (bot == "d20") helpChoices.push({ value: `[help](d20)`, name: `help (d20)` });
         }
+        let emojiChoices: { name: string; value: string }[] = readdirSync(permanentPath)
+            .map((e) => removeExtension(e))
+            .concat(readdirSync(cycledPath).map((e) => removeExtension(e)))
+            .map((e) => ({ name: e, value: e }));
 
         // console.log(choices);
 
@@ -372,7 +344,7 @@ export function readAllBotData() {
                     description: "What command do you want more info about?",
                     type: "string",
                     required: false,
-                    choices,
+                    choices: helpChoices,
                 },
             ],
             description: "See a list of bot commands and their descriptions (only for commands using the new system)",
@@ -412,6 +384,77 @@ export function readAllBotData() {
                         // return makeCommandsMD();
                     },
                 },
+            },
+        });
+        console.log("emojiChoices", emojiChoices.length);
+        botData["d20"]["activator"]["emoji"] = clearActivator({
+            dataType: "activator",
+            name: "emoji",
+            method: "exclamation",
+            activator: "emoji",
+            // args: [
+            //     {
+            //         name: "command",
+            //         description: "What emoji do you want to send?",
+            //         type: "number",
+            //         required: false,
+            //     },
+            // ],
+            description: "Send an emoji as an image",
+            bot: "d20",
+            version: "1.0.0",
+            type: "command",
+            hideFromHelp: false,
+            command: {
+                type: "sequence",
+                commands: [
+                    {
+                        type: "function",
+                        function: async (moi: Message, thiscommand, startTime) => {
+                            let emoji = moi.content.split(" ")[1]; // moi.options.getNumber("command", false);
+                            if (!emoji) {
+                                let canvas = createCanvas(Math.min(emojiChoices.length, 5) * 72 + 16, (emojiChoices.length / 5 + 1) * 72);
+                                let ctx = canvas.getContext("2d");
+                                ctx.fillStyle = "black";
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                ctx.fillStyle = "white";
+                                for (let i = 0; i < emojiChoices.length; i++) {
+                                    let e = emojiChoices[i];
+                                    let path = `${permanentPath}/${e.name}.png`;
+                                    if (!existsSync(path)) path = `${cycledPath}/${e.name}.png`;
+                                    if (!existsSync(path)) continue;
+                                    let img = await loadImage(path);
+                                    ctx.drawImage(img, (i % 5) * 72 + 8, Math.floor(i / 5) * 72 + 16, 64, 64);
+                                    ctx.fillText(`${i}`, (i % 5) * 72 + 8, Math.floor(i / 5) * 72 + 72 + 16);
+                                }
+
+                                moi.reply({ files: [new MessageAttachment(canvas.toBuffer(), "emojis.png")] });
+                                return;
+                            }
+                            let getPath = (emoji: string) => {
+                                let path = `${permanentPath}/${emoji}.png`;
+                                if (!existsSync(path)) path = `${cycledPath}/${emoji}.png`;
+                                if (!existsSync(path)) return null;
+                                return path;
+                            };
+                            let path = getPath(emoji);
+                            if (!path) {
+                                let num = parseInt(emoji);
+                                if (isNaN(num) || num < 0 || num > emojiChoices.length) return moi.reply("Emoji not found");
+                                emoji = emojiChoices[num].value;
+                            }
+                            path = getPath(emoji);
+                            if (!path) return moi.reply("Emoji not found");
+                            return moi.reply({ files: [path] });
+
+                            // return makeCommandsMD();
+                        },
+                    },
+                    {
+                        type: "boolean",
+                        value: true,
+                    },
+                ],
             },
         });
         // writeFileSync("output.json", JSON.stringify(botData, null, 4));
@@ -1917,6 +1960,7 @@ export async function testMessageCommand(botName: BotNames, msg: Message, startT
 }
 
 export function testExclamationCommand(botName: BotNames, msg: Message, startTime: number) {
+    // console.log(botName);
     if (testing && msg.channelId != testChannelId) return;
     if (!testing && msg.channelId == testChannelId) return;
     let bot = clients[botName];
@@ -1924,7 +1968,8 @@ export function testExclamationCommand(botName: BotNames, msg: Message, startTim
     if (!content.startsWith("!")) return;
     let activators = exclamationCommands[botName];
     if (!activators) return;
-    // console.log(msg.content);
+    // console.log(content);
+    // console.log(activators);
     let words = content.split(" ");
     let activator = words[0].slice(1);
     let command = activators.find((a) => a.activators.includes(activator));

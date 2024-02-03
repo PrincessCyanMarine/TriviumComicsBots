@@ -272,7 +272,7 @@ export var botData: Record<
     },
 };
 
-export var client_list = [krystal, sadie, ray, eli, cerby, sieg];
+export var client_list = [krystal, sadie, ray, eli, cerby, sieg, d20];
 client_list.forEach((client) => {
     client.on("ready", () => {
         // client.guilds.fetch(triviumGuildId).then(async (guild) => {

@@ -34,6 +34,7 @@ import { TextInputStyles } from "discord.js/typings/enums";
 import { addD20ModalCommand } from "../interactions/modal/d20";
 import { addD20SlashCommand } from "../interactions/slash/d20";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { cycledPath, permanentPath, removeExtension } from "../common/emojiRotationHelper";
 
 const emptyMessage = {
     content: null,
@@ -42,9 +43,6 @@ const emptyMessage = {
     files: [],
 };
 
-export const permanentPath = "./assets/emojis/permanent";
-export const cycledPath = "./assets/emojis/cycled";
-
 export interface EmojiRotationData {
     toBeAdded: string[];
     timer: number;
@@ -52,8 +50,6 @@ export interface EmojiRotationData {
     added?: string[];
     brandNew?: string[];
 }
-
-export const removeExtension = (name: string) => name.replace(/^(.*)\..*$/, (_, $1) => $1);
 
 const getDuplicates = (guildEmojis: GuildEmoji[]) => {
     if (!Array.isArray(guildEmojis)) guildEmojis = Object.values(guildEmojis);
