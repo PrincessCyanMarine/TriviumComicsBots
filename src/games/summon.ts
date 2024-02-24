@@ -141,11 +141,11 @@ export async function summon(msg: Message, options: string[]) {
                             250
                         );
                     else await say(sadie, msg.channel, "A wild " + userMention(mentioned) + " appears!", 250);
-                    if (mentioned == SUMMON_TARGETS.SWITCH)
-                        await say(krystal, msg.channel, {
-                            files: [await killing(undefined, msg.author, undefined, undefined)],
-                            content: "We don't have permission to use Merry's art",
-                        });
+                    // if (mentioned == SUMMON_TARGETS.SWITCH)
+                    //     await say(krystal, msg.channel, {
+                    //         files: [await killing(undefined, msg.author, undefined, undefined)],
+                    //         content: "We don't have permission to use Merry's art",
+                    //     });
                     if (mentioned == "297531251081084941") summoned_name = SUMMON_NAMES.DODO;
                     else if ((await msg.guild?.members.fetch(mentioned))?.permissions.has("KICK_MEMBERS")) summoned_name = "mod/" + mentioned;
                     else summoned_name = "player/" + mentioned;
