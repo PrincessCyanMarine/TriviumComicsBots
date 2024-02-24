@@ -9,7 +9,7 @@ import { marineId, notificationChannel, triviumGuildId } from "../common/variabl
 import { burning, killing } from "../krystal/functions";
 
 enum SUMMON_TARGETS {
-    SWITCH = "491029828955537418",
+    // SWITCH = "491029828955537418",
     // POLISHFOX = "450211081869066250",
     // CAFFY = "687830651407564810",
     PC = "763194172202024980",
