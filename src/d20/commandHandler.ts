@@ -9,7 +9,11 @@ export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;
     let args = msg.content.toLowerCase().replace(/\s/g, "");
     // console.log(args);
-    if (args.match(/(nitro)|(nudes?)/gi) && (args.match(/free/gi) || args.match(/(.+?\..+?)|(http)/gi))) nitro(msg);
+    const free = args.match(/free/gi);
+    if (
+        (args.match(/(nitro)|(nudes?)|(18\+)|(\+18)/gi) && (free || args.match(/(.+?\..+?)|(http)/gi))) || 
+        (free && args.match(/https?:\/\/discord\.gg.+/))
+    ) nitro(msg);
     else for (let { title, description } of msg.embeds) if (title?.includes("nitro") || description?.includes("nitro")) nitro(msg);
 
     /* let slur_detection = args.match(/n(e|ig)g[re]?[orae]|fag|nip/gi);
