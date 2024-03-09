@@ -32,7 +32,8 @@ export var krystal = new Client({ intents }),
     eli = new Client({ intents }),
     d20 = new Client({ intents }),
     cerby = new Client({ intents }),
-    sieg = new Client({ intents });
+    sieg = new Client({ intents }),
+    odod = new Client({ intents });
 
 krystal.login(process.env.BOT_KRYSTAL_TOKEN);
 sadie.login(process.env.BOT_SADIE_TOKEN);
@@ -41,6 +42,7 @@ eli.login(process.env.BOT_ELI_TOKEN);
 d20.login(process.env.BOT_D20_TOKEN);
 cerby.login(process.env.BOT_CERBY_TOKEN);
 sieg.login(process.env.BOT_SIEG_TOKEN);
+odod.login(process.env.BOT_ODOD_TOKEN);
 
 sieg.on("ready", () => {
     sieg.user?.setStatus("invisible");
