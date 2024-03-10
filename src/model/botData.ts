@@ -3,7 +3,7 @@ export type BotDataTypes = (typeof botDataTypes)[number];
 export function isDataTypeKey(key: string): key is BotDataTypes {
     return botDataTypes.includes(key as any);
 }
-export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus", "siegfried", "d20"] as const;
+export const botNames = ["sadie", "common", "krystal", "ray", "eli", "cerberus", "siegfried", "d20", "odod"] as const;
 export type BotNames = (typeof botNames)[number];
 
 export type ImageType = {

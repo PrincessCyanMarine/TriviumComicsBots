@@ -272,6 +272,11 @@ export var botData: Record<
         command: {},
         variable: {},
     },
+    odod: {
+        activator: {},
+        command: {},
+        variable: {},
+    },
 };
 
 export var client_list = [krystal, sadie, ray, eli, cerby, sieg, d20];
@@ -358,13 +363,14 @@ export const logwebhook = (testing: boolean) =>
           });
 
 export const clients: { [bot: string]: Client } = {
-    d20: d20,
-    sadie: sadie,
-    krystal: krystal,
-    eli: eli,
-    ray: ray,
+    d20,
+    sadie,
+    krystal,
+    eli,
+    ray,
     cerberus: cerby,
     siegfried: sieg,
+    odod,
 };
 
 // IDs are already public
@@ -376,6 +382,7 @@ export const id2bot: { [bot: string]: BotNames } = {
     "666795899879424020": "ray",
     "711241945149734914": "cerberus",
     "723938416139567154": "siegfried",
+    "1215840037795532920": "odod",
 };
 
 export type CustomActivity = [string, Exclude<ActivityType, "CUSTOM"> | undefined, string | undefined, (string | Buffer)?, string?, string?];
