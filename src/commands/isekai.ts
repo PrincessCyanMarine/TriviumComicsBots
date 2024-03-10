@@ -77,15 +77,11 @@ addD20SlashCommand(command, async (interaction) => {
             }
         }
         const addCharacter = async (character: string) => {
-            if (!botNames.includes(character as any)) {
-                await interaction.editReply({ content: `Character ${character} not found` });
-                return;
-            }
+            if (!botNames.includes(character as any))
+                throw `Character ${character} not found`;
             const bot = clients[character as keyof typeof clients];
-            if (!bot) {
-                await interaction.editReply({ content: `Character ${character} not found` });
-                return;
-            }
+            if (!bot)
+                throw `Character ${character} not found`;
             characters.push(bot);
             return bot;
         }
