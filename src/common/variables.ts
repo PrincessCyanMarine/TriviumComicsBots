@@ -68,6 +68,7 @@ export const notificationChannel = "620635349173010474";
 
 export const marineId = "305883924310261760";
 export const dodoId = "297531251081084941";
+export const dumbassId = "601943025253482496";
 export const marinaId = "334997744265723905";
 
 export enum TIME {
