@@ -67,6 +67,7 @@ export const slash_commands: Record<
     krystal: [],
     ray: [],
     siegfried: [],
+    odod: [],
 };
 
 export const addSlashCommand = async (
