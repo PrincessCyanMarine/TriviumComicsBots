@@ -128,7 +128,7 @@ addD20SlashCommand(command, async (interaction) => {
                                 if (!emoji) throw `Emoji ${currentLine.content} not found`;
                                 currentLine.content = emoji.id;
                             } else {
-                                if (!currentLine.content.match(/^[0-9]+$/)) {
+                                if (currentLine.content.match(/^[a-z]+$/i)) {
                                     throw `Invalid emoji ${currentLine.content}`;
                                 }
                             }
