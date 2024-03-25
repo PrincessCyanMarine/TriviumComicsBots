@@ -6,10 +6,15 @@ import { testing } from "..";
 export const triviumGuildId: string = "562429293364248587";
 // export const testGuildId: string = triviumGuildId;
 // export var testChannelId: string = "690361467475984605"; //Discord-team
-export const testGuildId: string = "620635349173010465";
-export var testChannelId: string = "892800588469911663"; // Actual Test Channel
 // export var testChannelId: string = "1164622025969639565"; // Console logger
 // export var testChannelId: string = "999917475342843924";
+
+// Actual Test Channel
+// export const testGuildId: string = "620635349173010465";
+// export var testChannelId: string = "892800588469911663"; 
+
+export const testGuildId: string = "620088019868844042";
+export var testChannelId: string = "620088019868844044"; 
 
 export const setTestChannelId = (id: string) => (testChannelId = id);
 

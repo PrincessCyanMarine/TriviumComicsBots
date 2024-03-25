@@ -53,7 +53,6 @@ import {
 import { ActionRowBuilder, channelMention, userMention } from "@discordjs/builders";
 import { lamp, sleep } from "../attachments";
 import { playrps, rps_bots, rps_bots_emojis } from "../games/rockpaperscissors";
-import { summon, SUMMON_NAMES } from "../games/summon";
 import { krystal_activities } from "../krystal/activities";
 import { sadie_activities } from "../sadie/activities";
 import { eli_activities } from "../eli/activities";
@@ -559,9 +558,6 @@ d20.on("messageCreate", async (msg) => {
                     msg.reply(err.message || "Something went wrong");
                 }
                 break;
-            case "summon":
-                summon(msg, options);
-                break;
             case "activity":
                 if (msg.author.id != marineId) return;
                 let acts: { [bot: string]: CustomActivity[] } = {
@@ -576,50 +572,6 @@ d20.on("messageCreate", async (msg) => {
                         ? acts[options[1]][parseInt(options[2])]
                         : random_from_array(acts[options[1]]);
                 changeActivity(...act);
-                break;
-
-            case "summoned":
-            case "summons":
-                {
-                    let target = msg.mentions.members?.first() || msg.member;
-                    let text = "";
-                    let summoned = (await database.child("summons/" + msg.guild?.id + "/" + target.id).once("value")).val() || {};
-                    let summoned_birds: { bird_id: number } =
-                        (await database.child("birdpedia/" + msg.guild?.id + "/" + target.id).once("value")).val() || {};
-                    let summoned_players: number[] = summoned && "player" in summoned ? Object.values(summoned["player"]) || [] : [];
-                    let summoned_mods: number[] = summoned && "mod" in summoned ? Object.values(summoned["mod"]) || [] : [];
-                    let birds = 0;
-                    let players = 0;
-                    let mods = 0;
-                    Object.values(summoned_birds).forEach((bird) => (birds += bird));
-                    summoned_players.forEach((player) => (players += player));
-                    summoned_mods.forEach((mod) => (mods += mod));
-                    text += get_summon_message("Was denied", summoned[SUMMON_NAMES.NO], "time");
-                    text += get_summon_message("Was reached to talk about their car's extended warranty", summoned[SUMMON_NAMES.WARRANTY], "time");
-                    text += get_summon_message("Performed", summoned[SUMMON_NAMES.CALL_THAT_A_RITUAL], "shitty ritual");
-                    text += get_summon_message("Failed miserably", summoned[SUMMON_NAMES.FAIL_MISERABLY], "time");
-                    text += get_summon_message("Was denied", summoned[SUMMON_NAMES.DENIED], "time");
-                    text += get_summon_message("Summoned", summoned[SUMMON_NAMES.CHAIR], "chair");
-                    text += get_summon_message("Heard", summoned[SUMMON_NAMES.CRICKETS], "cricket");
-                    text += get_summon_message("Wasn't heard", summoned[SUMMON_NAMES.UNHEARD], "time");
-                    text += get_summon_message("Summoned", summoned[SUMMON_NAMES.VOIDFISH], "voidfish", "voidfish");
-                    text += get_summon_message("Summoned", summoned[SUMMON_NAMES.PLANE], "plane");
-                    text += get_summon_message("Summoned", (summoned[SUMMON_NAMES.NOT_A_DODO] || 0) + birds, "regular bird");
-                    text += get_summon_message("Summoned", summoned[SUMMON_NAMES.LITERAL_DODO], "dodo");
-                    text += get_summon_message("Stepped on", summoned[SUMMON_NAMES.LEGO], "poisoned lego");
-                    text += get_summon_message("Summoned Ray", summoned[SUMMON_NAMES.RAY], "time");
-                    text += get_summon_message("Summoned Krystal", summoned[SUMMON_NAMES.KRYSTAL], "time");
-                    text += get_summon_message("Summoned Sadie", summoned[SUMMON_NAMES.SADIE], "time");
-                    text += get_summon_message("Summoned Eli", summoned[SUMMON_NAMES.ELI], "time");
-                    text += get_summon_message("Summoned Dodo", summoned[SUMMON_NAMES.DODO], "time");
-                    text += get_summon_message("Summoned", players, "player");
-                    text += get_summon_message("Summoned", mods, "moderator");
-                    say(
-                        ray,
-                        msg.channel,
-                        text == "" ? `${target.displayName} hasn't summoned anything yet` : `${target.displayName}\n\`\`\`\n` + text + "```"
-                    );
-                }
                 break;
             case "claim":
                 {
@@ -1259,9 +1211,6 @@ d20.on("messageCreate", async (msg) => {
         }
     }
 });
-
-const get_summon_message = (action: string, times: number = 0, result?: string, plural?: string) =>
-    times == 0 ? "" : action + " " + times + " " + (plural ? (times == 1 ? result : plural) : result + (result && times == 1 ? "" : "s")) + "\n";
 
 krystal.on("guildMemberAdd", async (member: GuildMember) => {
     if (testing && member.guild.id != testGuildId) return;

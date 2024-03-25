@@ -1,9 +1,13 @@
+const EDITABLE = ["message"];
+const ACCEPTS_ATTACHMENTS = ["message", "edit"];
+const ACCEPTS_TEXT = [...ACCEPTS_ATTACHMENTS];
+
 import { SlashCommandAttachmentOption, SlashCommandBuilder, SlashCommandChannelOption } from "@discordjs/builders";
 import { addD20SlashCommand } from "../interactions/slash/d20";
 import axios from "axios";
 import { botNames } from "../model/botData";
 import { clients } from "../clients";
-import { Client, MessageOptions, MessagePayload, TextChannel } from "discord.js";
+import { Client, MessageEditOptions, MessageOptions, MessagePayload, TextChannel } from "discord.js";
 import { wait } from "../common/functions";
 import { dodoId, dumbassId, marineId } from "../common/variables";
 
@@ -19,7 +23,8 @@ type Line = {
     character: Client;
     delay: number;
     typingTime: number;
-} & ( { type: "message", content: string | MessageOptions; } | { type: "reaction", content: string; } );
+    content: string | MessageOptions | MessageEditOptions;
+} & ( { type: "delete" } | { type: "message", content: string | MessageOptions; } | { type: "edit", content: string | MessageEditOptions; } | { type: "reaction", content: string; } );
 
 const createLine = (character: Client, delay: number, typingTime: number, type: Line["type"]): Line => ({
     character,
@@ -59,20 +64,20 @@ addD20SlashCommand(command, async (interaction) => {
         let lines = content.data.split("\n").map((line) => line.replace(/[\r\n]/g, ""));
         const episode: Line[] = [];
         const characters: Client[] = [];
-    
         let currentLine: Line | null = null;
         const addLine = () => {
             if (!!currentLine) {
-                if (typeof currentLine.content == "string"){
-                    currentLine.content = currentLine.content.trim();
-                    if (!currentLine.content) {
-                        throw `Cannot have empty messages`;
+                if ("content" in currentLine)
+                    if (typeof currentLine.content == "string") {
+                        currentLine.content = currentLine.content.trim();
+                        if (!currentLine.content) {
+                            throw `Cannot have empty messages`;
+                        }
+                    } else if (typeof currentLine.content.content == "string"){
+                        let content = currentLine.content.content.trim();
+                        if (content) currentLine.content.content = content;
+                        else delete currentLine.content.content;
                     }
-                } else if (typeof currentLine.content.content == "string"){
-                    let content = currentLine.content.content.trim();
-                    if (content) currentLine.content.content = content;
-                    else delete currentLine.content.content;
-                }
                 episode.push(currentLine);
             }
         }
@@ -82,7 +87,7 @@ addD20SlashCommand(command, async (interaction) => {
             const bot = clients[character as keyof typeof clients];
             if (!bot)
                 throw `Character ${character} not found`;
-            characters.push(bot);
+            if (!characters.includes(bot)) characters.push(bot);
             return bot;
         }
         const parseNum = (str: string) =>  {
@@ -92,9 +97,15 @@ addD20SlashCommand(command, async (interaction) => {
         }
         let end = false;
         let i = 0;
+        let ignore = null;
         try {
             for (let line of lines) {
                 i++;
+                if (line.startsWith("!ignore")) {
+                    ignore = ignore === null ? i : null;
+                    continue;
+                }
+                if (ignore !== null) continue;
                 if (line.startsWith("--")) continue;
                 const args = line.replace(/^[#!]\s?/, "").replace(/[\r\n]/g, "").split(" ");
                 if (line.startsWith("#")) {
@@ -111,7 +122,7 @@ addD20SlashCommand(command, async (interaction) => {
                 if (line.startsWith("!")) {
                     let type = args.shift()?.toLowerCase();
                     switch (type) {
-                        case "react":
+                        case "react": {
                             addLine();
                             let [character, emoji, _delay] = args;
                             const bot = await addCharacter(character);
@@ -130,11 +141,25 @@ addD20SlashCommand(command, async (interaction) => {
                             } else if (currentLine.content.match(/^[a-z]+$/i)) 
                                 throw `Invalid emoji ${currentLine.content}`;
                             break;
+                        }
+                        case "edit": {
+                            if (!currentLine) throw `No message found`;
+                            if (!EDITABLE.includes(currentLine.type)) throw `Cannot edit ${currentLine.type}`;
+                            let previousLine = currentLine;
+                            addLine();
+                            const [character, _delay] = args;
+                            const delay = parseNum(_delay);
+                            const bot = await addCharacter(character);
+                            if (!bot) return;
+                            if (previousLine.character != bot) throw `Cannot edit message from different character`;
+                            currentLine = createLine(bot, delay, 0, "edit");
+                            break;
+                        }
                         case "image":
                             let [url] = args;
                             if (!url) throw `No url found`;
                             if (!currentLine) throw `No message found`;
-                            if (currentLine.type != "message") throw `Cannot add image to non-message line`;
+                            if (!ACCEPTS_ATTACHMENTS.includes(currentLine.type)) throw `Cannot add image to ${currentLine.type}`;
                             if (typeof currentLine.content == "string"){
                                 currentLine.content = { content: currentLine.content };
                             }
@@ -151,13 +176,14 @@ addD20SlashCommand(command, async (interaction) => {
                     if (end) break;
                     continue;
                 }
-                if (currentLine && currentLine.type == "message") {
+                if (currentLine && ACCEPTS_TEXT.includes(currentLine.type)) {
                     let content = line.replace(/^\\#/, "#").replace(/^\\!/, "!").replace(/^\\--/, "--") + "\n";
                     if (!content) content = "\n";
                     if (typeof currentLine.content == "string") currentLine.content += content;
                     else currentLine.content.content += content;
                 }
             }
+            if (ignore !== null) throw `!ignore not closed on line ${ignore}`;
         } catch(e) {
                 console.error(e);
                 await interaction.editReply({ content: `Error parsing script on line ${i}\n${e}` });
@@ -215,6 +241,16 @@ addD20SlashCommand(command, async (interaction) => {
                         return;
                     }
                     break;
+                case "edit": {
+                    if (!currentMessage) {
+                        await interaction.editReply({ content: `No message to edit` });
+                        return;
+                    }
+                    if (line.character != previousCharacter)
+                        throw `Cannot edit message from different character`;
+                    await wait(line.delay);
+                    await currentMessage.edit(line.content);
+                }
                 default:
                     await interaction.editReply({ content: `Unknown line type ${(line as any).type}` });
                     return;
