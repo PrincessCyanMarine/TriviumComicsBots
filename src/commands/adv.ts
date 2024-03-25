@@ -1,11 +1,8 @@
 import { ButtonInteraction, Interaction, Message, MessageActionRow, MessageButton } from "discord.js";
 import { addExclamationCommand } from "../common";
-import { marineId } from "../common/variables";
-import { testing } from "..";
 import { getMana, useMana } from "../common/functions";
 import { Inventory } from "../model/inventory";
 import { addD20ButtonCommand } from "../interactions/button/d20";
-import { ActionRowBuilder, ButtonBuilder } from "@discordjs/builders";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 
 let getCost = (num: 6 | 20 | 100, ext: boolean) => {

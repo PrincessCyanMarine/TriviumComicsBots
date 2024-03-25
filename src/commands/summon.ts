@@ -1,12 +1,12 @@
-import { hyperlink, userMention } from "@discordjs/builders";
-import { ButtonInteraction, Client, DMChannel, GuildMember, Interaction, Message, MessageActionRow, MessageAttachment, MessageButton, MessageEditOptions, MessageOptions, ReplyOptions, Role, TextBasedChannel, TextChannel } from "discord.js";
-import { readFileSync, writeFileSync } from "fs";
+import { userMention } from "@discordjs/builders";
+import { ButtonInteraction, Client, Message, MessageActionRow, MessageAttachment, MessageButton, MessageEditOptions, MessageOptions, ReplyOptions, TextBasedChannel } from "discord.js";
+import { readFileSync } from "fs";
 import { database } from "..";
 import { glitch } from "../attachments";
 import { d20, krystal, ray, sadie } from "../clients";
 import { random_from_array, say, useMana, wait } from "../common/functions";
 import { marineId, notificationChannel, sadieId, triviumGuildId } from "../common/variables";
-import { burning, killing } from "../krystal/functions";
+import { burning } from "../krystal/functions";
 import { addExclamationCommand } from "../common";
 import { addSadieButtonCommand } from "../interactions/button/sadie";
 
@@ -45,6 +45,10 @@ export enum SUMMON_NAMES {
 
 export async function summon(moi: Message | ButtonInteraction, options: string[] = []) {
     try {
+        if (moi instanceof ButtonInteraction && moi.id.match(/id=(.+)(&|$)?/)?.[1] != moi.user.id) {
+            moi.reply({ content: "You can't summon for someone else", ephemeral: true })
+            return;
+        }
         const channel = moi.channel;
         if (!channel) throw "Channel not found";
         const author = moi instanceof Message ? moi.author : moi.user;
