@@ -72,7 +72,10 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
             );
             content.components = components;
             if (!content.files) content.files = [];
-            if (previousMessage && bot.user!.id != previousMessage.author.id) await previousMessage.delete();
+            if (previousMessage && bot.user!.id != previousMessage.author.id) {
+                await previousMessage.delete();
+                previousMessage = null;
+            }
             if (moi instanceof Message) {
                 if (!previousMessage) previousMessage = await say(bot, channel, content, delay, reply);
                 else await previousMessage.edit(content as MessageEditOptions);
