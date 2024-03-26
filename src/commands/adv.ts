@@ -64,13 +64,13 @@ let doAdventure = async (moi: Message | Interaction, num: 6 | 20 | 100, plusOne 
     }
     const results = {
         1: [true, `Critical fail! You lost ${payouts[num] / 2} gold!`, -payouts[num] / 2],
-        5: [false, `You won ${payouts[6] / 4} gold!`, payouts[6] / 4],
+        5: [false, `You won ${payouts[6] / 8} gold!`, payouts[6] / 8],
         6: [true, `You won ${payouts[6]} gold!`, payouts[6]],
         15: [false, `You found a Shiny Rock`, 0, () => Inventory.give(moi, Inventory.ITEM_DICT["Shiny rock"], 1)],
-        19: [false, `You won ${payouts[20] / 4} gold!`, payouts[20] / 4],
+        19: [false, `You won ${payouts[20] / 8} gold!`, payouts[20] / 8],
         20: [true, `You won ${payouts[20]} gold!`, payouts[20]],
         69: [true, `Nice! You won 69 gold!`, 69],
-        [num - 1]: [false, `Almost! You won ${payouts[num] / 4} gold!`, payouts[num] / 4],
+        [num - 1]: [false, `Almost! You won ${payouts[num] / 8} gold!`, payouts[num] / 8],
         [num]: [true, `Critical success! You won ${payouts[num]} gold!`, payouts[num]],
     };
     let result: ResultType = [`You won nothing`, 0, undefined];
