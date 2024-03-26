@@ -2104,7 +2104,7 @@ export async function getStamina(moi: Message | Interaction, target = moi instan
     };
     const regen = (prestige + 1) / 30;
     const oldStamina = stamina.value;
-    stamina.value = Math.max(Math.min(oldStamina + ((time - stamina.timestamp) / 1000) * regen, maxStamina), 0);
+    stamina.value = Math.max(Math.min(oldStamina + ((time - stamina.timestamp) / 60000) * regen, maxStamina), 0);
 
     let oldTimestamp = stamina.timestamp;
     stamina.timestamp = time;
