@@ -11,9 +11,9 @@ let getCost = (num: 6 | 20 | 100, ext: boolean) => {
     return (
         {
             6: 1,
-            20: 2,
-            100: 3,
-        }[num] + (ext ? 1 : 0)
+            20: 3,
+            100: 5,
+        }[num] * (ext ? 2 : 1)
     );
 };
 
