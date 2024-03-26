@@ -2094,7 +2094,7 @@ export async function getStamina(moi: Message | Interaction, target = moi instan
     const time = Date.now();
     const level = await getLevel(moi, target);
     const prestige = await getPrestige(moi, target);
-    const maxStamina = 5 + (level - 1);
+    const maxStamina = 5 + (level);
     const stamina: {
         value: number;
         timestamp: number;
