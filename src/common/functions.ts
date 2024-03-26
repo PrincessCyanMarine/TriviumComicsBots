@@ -2085,10 +2085,46 @@ export const createCharacterCard = async (
     return canvas.toBuffer();
 };
 
+const getLevel = async (moi: Message | Interaction, target: User) =>
+    (await database.child(`level/${moi.guild?.id}/${target.id}`).once("value")).val() || 1;
+const getPrestige = async (moi: Message | Interaction, target: User) =>
+    (await database.child(`prestige/${moi.guild?.id}/${target.id}`).once("value")).val() || 0;
+
+export async function getStamina(moi: Message | Interaction, target = moi instanceof Message ? moi.author : moi.user, update = false) {
+    const time = Date.now();
+    const level = await getLevel(moi, target);
+    const prestige = await getPrestige(moi, target);
+    const maxStamina = 5 + (level - 1);
+    const stamina: {
+        value: number;
+        timestamp: number;
+    } = (await database.child(`stamina/${moi.guild?.id}/${target.id}`).once("value")).val() || {
+        timestamp: time,
+        value: maxStamina,
+    };
+    const regen = (prestige + 1) / 30;
+    const oldStamina = stamina.value;
+    stamina.value = Math.max(Math.min(oldStamina + ((time - stamina.timestamp) / 1000) * regen, maxStamina), 0);
+
+    let oldTimestamp = stamina.timestamp;
+    stamina.timestamp = time;
+    if (update) await database.child(`stamina/${moi.guild?.id}/${target.id}`).set(stamina);
+
+    return {
+        ...stamina,
+        oldStamina,
+        regen,
+        max: maxStamina,
+        level,
+        prestige,
+        oldTimestamp,
+    };
+}
+
 export async function getMana(moi: Message | Interaction, target = moi instanceof Message ? moi.author : moi.user, update = false) {
     let time = Date.now();
-    let level = (await database.child(`level/${moi.guild?.id}/${target.id}`).once("value")).val() || 1;
-    let prestige = (await database.child(`prestige/${moi.guild?.id}/${target.id}`).once("value")).val() || 0;
+    const level = await getLevel(moi, target);
+    let prestige = await getPrestige(moi, target);
     let mana: {
         value: number;
         timestamp: number;
@@ -2150,6 +2186,18 @@ export async function getMana(moi: Message | Interaction, target = moi instanceo
         oldTimestamp,
         effectsText,
     };
+}
+
+export async function useStamina(moi: Message | Interaction, amount: number) {
+    let stamina = await getStamina(moi);
+    let target = moi instanceof Message ? moi.author : moi.user;
+    if (stamina.value < amount) return [false, stamina] as const;
+    stamina.value -= amount;
+    await database.child(`stamina/${moi.guild?.id}/${target.id}`).set({
+        value: stamina.value,
+        timestamp: stamina.timestamp,
+    });
+    return [true, stamina] as const;
 }
 
 export async function useMana(moi: Message | Interaction, amount: number) {

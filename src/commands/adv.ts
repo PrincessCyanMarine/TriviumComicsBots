@@ -1,17 +1,19 @@
 import { ButtonInteraction, Interaction, Message, MessageActionRow, MessageButton } from "discord.js";
 import { addExclamationCommand } from "../common";
-import { getMana, useMana } from "../common/functions";
+import { getStamina, useStamina } from "../common/functions";
 import { Inventory } from "../model/inventory";
 import { addD20ButtonCommand } from "../interactions/button/d20";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 
+type ResultType = [string, number, undefined | (() => Promise<void | any>)];
+
 let getCost = (num: 6 | 20 | 100, ext: boolean) => {
     return (
         {
-            6: 60,
-            20: 75,
-            100: 100,
-        }[num] + (ext ? 25 : 0)
+            6: 1,
+            20: 2,
+            100: 3,
+        }[num] + (ext ? 1 : 0)
     );
 };
 
@@ -21,15 +23,15 @@ let getButtons = (moi: Message | Interaction, options: string[], plusOne = false
         new MessageActionRow().addComponents(
             new MessageButton()
                 .setCustomId(`adv6?id=${id}&plusOne=${plusOne}`)
-                .setLabel(`6 (${getCost(6, plusOne)} mana)`)
+                .setLabel(`6 (${getCost(6, plusOne)} stamina)`)
                 .setStyle(MessageButtonStyles.PRIMARY),
             new MessageButton()
                 .setCustomId(`adv20?id=${id}&plusOne=${plusOne}`)
-                .setLabel(`20 (${getCost(20, plusOne)} mana)`)
+                .setLabel(`20 (${getCost(20, plusOne)} stamina)`)
                 .setStyle(MessageButtonStyles.PRIMARY),
             new MessageButton()
                 .setCustomId(`adv100?id=${id}&plusOne=${plusOne}`)
-                .setLabel(`100 (${getCost(100, plusOne)} mana)`)
+                .setLabel(`100 (${getCost(100, plusOne)} stamina)`)
                 .setStyle(MessageButtonStyles.PRIMARY),
             new MessageButton()
                 .setCustomId(`advPlusOne?id=${id}&plusOne=${plusOne}`)
@@ -41,9 +43,9 @@ let getButtons = (moi: Message | Interaction, options: string[], plusOne = false
 
 let advMessage = async (moi: Message | Interaction, options: string[], plusOne = false) => {
     let buttons = getButtons(moi, options, plusOne);
-    let mana = await getMana(moi);
+    let stamina = await getStamina(moi);
     return {
-        content: `You have ${Math.floor(mana.value)}/${mana.max} mana\nChoose a die to roll${plusOne ? " (Adding +1)" : ""}`,
+        content: `You have ${Math.floor(stamina.value)}/${stamina.max} stamina\nChoose a die to roll${plusOne ? " (Adding +1)" : ""}`,
         components: buttons,
     };
 };
@@ -56,29 +58,37 @@ let doAdventure = async (moi: Message | Interaction, num: 6 | 20 | 100, plusOne 
         20: 50,
         100: 300,
     };
-    let [canUse] = await useMana(moi, cost);
+    let [canUse] = await useStamina(moi, cost);
     if (!canUse) {
-        return [false, `Not enough mana\nCost: ${cost}`];
+        return [false, `Not enough stamina\nCost: ${cost}`];
     }
-    let result = ({
-        1: [`Critical fail! You lost ${payouts[num] / 2} gold!`, -payouts[num] / 2],
-        5: [`You won ${payouts[6] / 2} gold!`, payouts[6] / 2],
-        6: [`You won ${payouts[6]} gold!`, payouts[6]],
-        15: [`You found a Shiny Rock`, 0, () => Inventory.give(moi, Inventory.ITEM_DICT["Shiny rock"], 1)],
-        19: [`You won ${payouts[20] / 2} gold!`, payouts[20] / 2],
-        20: [`You won ${payouts[20]} gold!`, payouts[20]],
-        69: [`Nice! You won 69 gold!`, 69],
-        [num - 1]: [`Almost! You won ${payouts[num] / 2} gold!`, payouts[num] / 2],
-        [num]: [`Critical success! You won ${payouts[num]} gold!`, payouts[num]],
-    }[roll] || [`You won nothing`, 0]) as [string, number, undefined | (() => Promise<void | any>)];
-    let text = result[0];
-    let pay = result[1];
-    if (result[2]) await result[2]();
+    const results = {
+        1: [true, `Critical fail! You lost ${payouts[num] / 2} gold!`, -payouts[num] / 2],
+        5: [false, `You won ${payouts[6] / 4} gold!`, payouts[6] / 4],
+        6: [true, `You won ${payouts[6]} gold!`, payouts[6]],
+        15: [false, `You found a Shiny Rock`, 0, () => Inventory.give(moi, Inventory.ITEM_DICT["Shiny rock"], 1)],
+        19: [false, `You won ${payouts[20] / 4} gold!`, payouts[20] / 4],
+        20: [true, `You won ${payouts[20]} gold!`, payouts[20]],
+        69: [true, `Nice! You won 69 gold!`, 69],
+        [num - 1]: [false, `Almost! You won ${payouts[num] / 4} gold!`, payouts[num] / 4],
+        [num]: [true, `Critical success! You won ${payouts[num]} gold!`, payouts[num]],
+    };
+    let result: ResultType = [`You won nothing`, 0, undefined];
+    for (const [key, value] of Object.entries(results).sort(([a], [b]) => parseInt(b) - parseInt(a))) {
+        const num = parseInt(key);
+        if (num == roll || (num < roll && !value[0])) {
+            value.shift();
+            result = value as ResultType;
+            break;
+        }
+    }
+    let [text, pay, callback] = result;
+    if (callback) await callback();
     if (pay != 0) await Inventory.addGold(moi, pay);
-    let mana = await getMana(moi);
+    let stamina = await getStamina(moi);
     return [
         true,
-        `You consumed ${cost} mana (${Math.floor(mana.value)}/${mana.max}) to roll a d${num} and got a ${roll - (plusOne ? 1 : 0)}${
+        `You consumed ${cost} stamina (${Math.floor(stamina.value)}/${stamina.max}) to roll a d${num} and got a ${roll - (plusOne ? 1 : 0)}${
             plusOne ? " +1" : ""
         }\n${text}`,
     ];

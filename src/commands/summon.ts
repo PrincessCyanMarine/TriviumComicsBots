@@ -1,5 +1,16 @@
 import { userMention } from "@discordjs/builders";
-import { ButtonInteraction, Client, Message, MessageActionRow, MessageAttachment, MessageButton, MessageEditOptions, MessageOptions, ReplyOptions, TextBasedChannel } from "discord.js";
+import {
+    ButtonInteraction,
+    Client,
+    Message,
+    MessageActionRow,
+    MessageAttachment,
+    MessageButton,
+    MessageEditOptions,
+    MessageOptions,
+    ReplyOptions,
+    TextBasedChannel,
+} from "discord.js";
 import { readFileSync } from "fs";
 import { database } from "..";
 import { glitch } from "../attachments";
@@ -45,17 +56,15 @@ export enum SUMMON_NAMES {
 
 export async function summon(moi: Message | ButtonInteraction, options: string[] = []) {
     try {
-        if (moi instanceof ButtonInteraction && moi.id.match(/id=(.+)(&|$)?/)?.[1] != moi.user.id) {
-            moi.reply({ content: "You can't summon for someone else", ephemeral: true })
+        if (moi instanceof ButtonInteraction && moi.customId.match(/id=(.+?)(&|$)/)?.[1] != moi.user.id) {
+            moi.reply({ content: "You can't summon for someone else", ephemeral: true });
             return;
         }
         const channel = moi.channel;
         if (!channel) throw "Channel not found";
         const author = moi instanceof Message ? moi.author : moi.user;
-        let mentioned = moi instanceof Message ? moi.mentions.members?.first()?.id : moi.id.match(/mentioned=(.+)(&|$)?/)?.[1];
-        console.log(mentioned);
-        
-        let previousMessage: Message | null = null;
+        let mentioned = moi instanceof Message ? moi.mentions.members?.first()?.id : moi.customId.match(/mentioned=(.+?)(&|$)/)?.[1];
+        let previousMessage: Message  | null = moi instanceof ButtonInteraction ? moi.message as Message : null;
         const send = async (
             bot: Client,
             channel: TextBasedChannel | string,
@@ -66,14 +75,15 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
         ) => {
             if (typeof content === "string") content = { content: content } as MessageOptions;
             let components = content.components || [];
-            if (button && bot.user!.id === sadieId) components.push(
-                new MessageActionRow().addComponents(
-                    new MessageButton()
-                    .setCustomId("summon?id=" + author.id + (mentioned ? "&mentioned=" + mentioned : ""))
-                    .setLabel("SUMMON")
-                    .setStyle("PRIMARY")
-                )
-            );
+            if (button && bot.user!.id === sadieId)
+                components.push(
+                    new MessageActionRow().addComponents(
+                        new MessageButton()
+                            .setCustomId("summon?id=" + author.id + (mentioned ? "&mentioned=" + mentioned : ""))
+                            .setLabel("SUMMON")
+                            .setStyle("PRIMARY")
+                    )
+                );
             content.components = components;
             if (!content.files) content.files = [];
             if (previousMessage && bot.user!.id != previousMessage.author.id) {
@@ -88,7 +98,7 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                 else await moi.update(content as MessageEditOptions);
             }
             await wait(1500);
-        }
+        };
 
         // console.log(SUMMON_NAMES);
         let summoned_creature = Math.floor(Math.random() * 21);
@@ -128,56 +138,56 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                     await send(
                         sadie,
                         channel,
-                        'A telephone appears! It starts ringing…\nYou answer the phone. "We\'ve been trying to reach you about your vehicle’s extended warranty. Press one—"\nYou hang up the phone.',
+                        `[${summoned_creature}] A telephone appears! It starts ringing…\nYou answer the phone. "We\'ve been trying to reach you about your vehicle’s extended warranty. Press one—"\nYou hang up the phone.`,
                         450
                     );
                     summoned_name = SUMMON_NAMES.WARRANTY;
                     break;
                 case 2:
-                    await send(sadie, channel, "You call that a ritual?", 250);
+                    await send(sadie, channel, `[${summoned_creature}] You call that a ritual?`, 250);
                     summoned_name = SUMMON_NAMES.CALL_THAT_A_RITUAL;
                     break;
                 case 3:
-                    await send(sadie, channel, "Your circle glows...\nAnd you fail miserably", 250);
+                    await send(sadie, channel, `[${summoned_creature}] Your circle glows...\nAnd you fail miserably`, 250);
                     summoned_name = SUMMON_NAMES.FAIL_MISERABLY;
                     break;
                 case 4:
-                    await send(sadie, channel, "Denied.", 250);
+                    await send(sadie, channel, `[${summoned_creature}] Denied.`, 250);
                     summoned_name = SUMMON_NAMES.DENIED;
                     break;
                 case 5:
                     // TODO readd
                     await send(sadie, channel, "🪑\nYou summoned... A chair?", 250, undefined, false);
                     await send(krystal, channel, { files: [await burning(undefined)] }, 250, undefined, false);
-                    await send(sadie, channel, "And there it goes...", 250);
+                    await send(sadie, channel, `And there it goes...\n[${summoned_creature}]`, 250);
                     summoned_name = SUMMON_NAMES.CHAIR;
                     break;
                 case 6:
                 case 7:
-                    await send(sadie, channel, "You fail!", 250);
+                    await send(sadie, channel, `[${summoned_creature}] You fail!`, 250);
                     summoned_name = SUMMON_NAMES.FAIL;
                     break;
                 case 8:
                 case 9:
-                    await send(sadie, channel, "*Crickets.*", 250);
+                    await send(sadie, channel, `[${summoned_creature}] *Crickets.*`, 250);
                     summoned_name = SUMMON_NAMES.CRICKETS;
                     break;
                 case 10:
                 case 11:
-                    await send(sadie, channel, "Your cryptic chanting echoes unheard.", 250);
+                    await send(sadie, channel, `[${summoned_creature}] Your cryptic chanting echoes unheard.`, 250);
                     summoned_name = SUMMON_NAMES.UNHEARD;
                     break;
                 case 12:
                     await send(
                         sadie,
                         channel,
-                        "The fabric of the universe peels away for just a brief moment, summoning...\n\nA voidfish.\n\nIt hisses angrily at you, before blinking out of existence.",
+                        `[${summoned_creature}] The fabric of the universe peels away for just a brief moment, summoning...\n\nA voidfish.\n\nIt hisses angrily at you, before blinking out of existence.`,
                         250
                     );
                     summoned_name = SUMMON_NAMES.VOIDFISH;
                     break;
                 case 13:
-                    await send(sadie, channel, "It's a bird! It's a plane! It's—no it's just a plane.", 250);
+                    await send(sadie, channel, `[${summoned_creature}] It's a bird! It's a plane! It's—no it's just a plane.`, 250);
                     summoned_name = SUMMON_NAMES.PLANE;
                     break;
                 case 14:
@@ -188,10 +198,13 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                         await send(
                             sadie,
                             channel,
-                            "A wild " + userMention(mentioned) + " appears!\n\nWait did you just summon yourself? Is that even possible?",
+                            `[${summoned_creature}] ` +
+                                "A wild " +
+                                userMention(mentioned) +
+                                " appears!\n\nWait did you just summon yourself? Is that even possible?",
                             250
                         );
-                    else await send(sadie, channel, "A wild " + userMention(mentioned) + " appears!", 250);
+                    else await send(sadie, channel, `[${summoned_creature}] ` + "A wild " + userMention(mentioned) + " appears!", 250);
                     // if (mentioned == SUMMON_TARGETS.SWITCH)
                     //     await send(krystal, channel, {
                     //         files: [await killing(undefined, msg.author, undefined, undefined)],
@@ -202,7 +215,7 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                     else summoned_name = "player/" + mentioned;
                     break;
                 case 15:
-                    await send(sadie, channel, "You summoned a bird. It's not a dodo", 300);
+                    await send(sadie, channel, `[${summoned_creature}] ` + "You summoned a bird. It's not a dodo", 300);
                     summoned_name = SUMMON_NAMES.NOT_A_DODO;
                     break;
                 case 16:
@@ -216,7 +229,12 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                         sadie,
                         channel,
                         {
-                            content: "You summoned " + (bird.groups.bird.match(/^[aeiou]/i) ? "an " : "a ") + bird.groups.bird + "!",
+                            content:
+                                `[${summoned_creature}] ` +
+                                "You summoned " +
+                                (bird.groups.bird.match(/^[aeiou]/i) ? "an " : "a ") +
+                                bird.groups.bird +
+                                "!",
                             components: [
                                 new MessageActionRow().addComponents(
                                     new MessageButton().setLabel(bird.groups.bird).setStyle("LINK").setURL(bird.groups.url).setEmoji("🐦")
@@ -230,7 +248,7 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                     birdpedia.set(bd + 1);
                     break;
                 case 18:
-                    await send(sadie, channel, "You summoned a literal dodo. Aren’t they extinct?", 300);
+                    await send(sadie, channel, `[${summoned_creature}] ` + "You summoned a literal dodo. Aren’t they extinct?", 300);
                     summoned_name = SUMMON_NAMES.LITERAL_DODO;
                     break;
                 case 19:
@@ -245,36 +263,45 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                         summoned_name = "mod/" + mod;
                         mod = userMention(mod);
                     } else mod = "[INSERT QUEENSBLADE]";
-                    await send(sadie, channel, "You summoned a servant of Dodo!\nA wild " + mod + " appears!");
+                    await send(sadie, channel, `[${summoned_creature}] ` + "You summoned a servant of Dodo!\nA wild " + mod + " appears!");
                     break;
                 case 20:
                     await random_from_array([
                         async () => {
-                            await send(sadie, channel, "You step on a poisoned lego and die before seeing what you summoned! :GMSadieTheSadist:");
+                            await send(
+                                sadie,
+                                channel,
+                                `[${summoned_creature}] ` + "You step on a poisoned lego and die before seeing what you summoned! :GMSadieTheSadist:"
+                            );
                             summoned_name = SUMMON_NAMES.LEGO;
                         },
                         async () => {
-                            await send(sadie, channel, "A wild Ray appears!");
+                            await send(sadie, channel, `[${summoned_creature}] ` + "A wild Ray appears!");
                             summoned_name = SUMMON_NAMES.RAY;
                         },
                         // TODO readd
                         async () => {
                             await send(sadie, channel, "A wild Krystal appears!", undefined, undefined, false);
-                            await send(krystal, channel, { content: "W̸̡̡̺̠̝̎̆ě̶̲́̒͒l̴̮̰̝͑́͛c̶̼̔́̿̆o̷̜̠̙̭͛͗̀͗ͅm̶̭͚̌e̵̤͕͗̒ ̸͉̺̻̔͐̉̂͐̉t̸̹͖̘̻̞́o̴̗̽͆ ̵̢̛͓̻̩̩̮̅t̴̬̯̲̍̏͗h̷̝̎͛é̷̯̤̤͗̑ ̷̡͉̙̱̲̿̓g̴͕͍͔̣̊́̀̾͝a̴̱̭͒͝m̷̢͕̜͗ȩ̶̹̈́̾̈͌ ̵̤̩̹̍͝o̷̺̎f̵̯̌͑̈́̚ ̸̡͓̞̯̩̃̏̿̚l̵̰̮̱̿́i̷͙̫̩͙̔́̀̄̕f̵̖͔̜́̾͋͘͝e̵͉͓̾̕͜!̵̛̥̓̀́͐̈́", files: [glitch] }, 250);
+                            await send(
+                                krystal,
+                                channel,
+                                { content: "W̸̡̡̺̠̝̎̆ě̶̲́̒͒l̴̮̰̝͑́͛c̶̼̔́̿̆o̷̜̠̙̭͛͗̀͗ͅm̶̭͚̌e̵̤͕͗̒ ̸͉̺̻̔͐̉̂͐̉t̸̹͖̘̻̞́o̴̗̽͆ ̵̢̛͓̻̩̩̮̅t̴̬̯̲̍̏͗h̷̝̎͛é̷̯̤̤͗̑ ̷̡͉̙̱̲̿̓g̴͕͍͔̣̊́̀̾͝a̴̱̭͒͝m̷̢͕̜͗ȩ̶̹̈́̾̈͌ ̵̤̩̹̍͝o̷̺̎f̵̯̌͑̈́̚ ̸̡͓̞̯̩̃̏̿̚l̵̰̮̱̿́i̷͙̫̩͙̔́̀̄̕f̵̖͔̜́̾͋͘͝e̵͉͓̾̕͜!̵̛̥̓̀́͐̈́" + `\n[${summoned_creature}]`, files: [glitch] },
+                                250
+                            );
                             summoned_name = SUMMON_NAMES.KRYSTAL;
                         },
                         async () => {
-                            await send(sadie, channel, "A wild Sadie appears!\n\nWait that's me");
+                            await send(sadie, channel, `[${summoned_creature}] ` + "A wild Sadie appears!\n\nWait that's me");
                             summoned_name = SUMMON_NAMES.SADIE;
                             // summoned_name = "sadie";
                         },
                         async () => {
-                            await send(sadie, channel, "A wild Eli appears!");
+                            await send(sadie, channel, `[${summoned_creature}] ` + "A wild Eli appears!");
                             summoned_name = SUMMON_NAMES.ELI;
                             // summoned_name = "eli";
                         },
                         async () => {
-                            await send(sadie, channel, "You summoned " + userMention("297531251081084941") + "!");
+                            await send(sadie, channel, `[${summoned_creature}] ` + "You summoned " + userMention("297531251081084941") + "!");
                             summoned_name = SUMMON_NAMES.DODO;
                             // summoned_name = "DODO!!!";
                         },
@@ -307,8 +334,7 @@ export async function summonHistory(msg: Message) {
     }
     let text = "";
     let summoned = (await database.child("summons/" + msg.guild?.id + "/" + target.id).once("value")).val() || {};
-    let summoned_birds: { bird_id: number } =
-        (await database.child("birdpedia/" + msg.guild?.id + "/" + target.id).once("value")).val() || {};
+    let summoned_birds: { bird_id: number } = (await database.child("birdpedia/" + msg.guild?.id + "/" + target.id).once("value")).val() || {};
     let summoned_players: number[] = summoned && "player" in summoned ? Object.values(summoned["player"]) || [] : [];
     let summoned_mods: number[] = summoned && "mod" in summoned ? Object.values(summoned["mod"]) || [] : [];
     let birds = 0;
@@ -337,11 +363,7 @@ export async function summonHistory(msg: Message) {
     text += get_summon_message("Summoned Dodo", summoned[SUMMON_NAMES.DODO], "time");
     text += get_summon_message("Summoned", players, "player");
     text += get_summon_message("Summoned", mods, "moderator");
-    say(
-        ray,
-        msg.channel,
-        text == "" ? `${target.displayName} hasn't summoned anything yet` : `${target.displayName}\n\`\`\`\n` + text + "```"
-    );
+    say(ray, msg.channel, text == "" ? `${target.displayName} hasn't summoned anything yet` : `${target.displayName}\n\`\`\`\n` + text + "```");
 }
 
 addExclamationCommand("summon", summon);
