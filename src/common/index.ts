@@ -401,9 +401,15 @@ d20.on("messageCreate", async (msg) => {
                     let text = "";
                     let i = 0;
                     for (let [id, inventory] of inventoriesSorted) {
-                        let member = await msg.guild?.members.fetch(id);
-                        if (!member) continue;
-                        text += `${++i}: ${member.displayName} (${inventory.gold} gold)\n`;
+                        try {
+                            let member = await msg.guild?.members.fetch(id);
+                            if (!member) continue;
+                            text += `${++i}: ${member.displayName} (${inventory.gold} gold)\n`;
+                            if (i >= 10) break;
+                        } catch(err) {
+                            console.error(err);
+                        }
+                        
                     }
                     msg.reply(`\`\`\`\n${text}\n\`\`\``);
                     return;
