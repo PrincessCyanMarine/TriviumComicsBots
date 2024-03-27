@@ -1707,10 +1707,11 @@ export const update = async (msg?: Message) => {
     console.log("Updating...");
     if (msg) await say(d20, msg.channel, "Updating...", 0);
     try {
-        await spawnAsync("git", ["pull"]);
-        await spawnAsync("pnpm", ["install"]);
-        await spawnAsync("tsc");
-        await spawnAsync("pm2", ["restart", "all"]);
+        await spawnAsync("~/update");
+        // await spawnAsync("git", ["pull"]);
+        // await spawnAsync("pnpm", ["install"]);
+        // await spawnAsync("tsc");
+        // await spawnAsync("pm2", ["restart", "all"]);
         setRestarting(false);
     } catch (err) {
         setRestarting(false);
