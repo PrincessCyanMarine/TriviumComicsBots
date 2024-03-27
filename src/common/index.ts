@@ -407,7 +407,7 @@ d20.on("messageCreate", async (msg) => {
                             text += `${++i}: ${member.displayName} (${inventory.gold} gold)\n`;
                             if (i >= 10) break;
                         } catch(err) {
-                            console.error(err);
+                            console.error("Error on !gold rank: ", err);
                         }
                         
                     }
