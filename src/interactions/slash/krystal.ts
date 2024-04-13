@@ -2,7 +2,7 @@ import { CommandInteraction } from "discord.js";
 import { testing } from "../..";
 import { krystal, mod_alert_webhook, ray } from "../../clients";
 import { msg2embed, say } from "../../common/functions";
-import { ignore_channels } from "../../common/variables";
+import { alert_role_id, ignore_channels } from "../../common/variables";
 import { followup, reply } from "./common";
 
 krystal.on("interactionCreate", async (interaction) => {
@@ -29,8 +29,13 @@ async function whisper(interaction: CommandInteraction) {
         return;
     }
     let snitch = Math.floor(Math.random() * 2);
-    await reply(interaction, `All right, <@${interaction.user.id}>`, [0, 1].includes(snitch));
+    const banned = whisper.match(/(nigg?(er|a))|fag|tranny/);
+    if (banned) {
+        mod_alert_webhook(testing).send(`<@&${alert_role_id}> ${interaction.user.username} asked Krystal to say ${whisper}\nFlagged because of ${banned}`);
+        return;
+    }
     mod_alert_webhook(testing).send(`${interaction.user.username} asked Krystal to say ${whisper}`);
+    await reply(interaction, `All right, <@${interaction.user.id}>`, [0, 1].includes(snitch));
     () =>
         [
             async () => {
