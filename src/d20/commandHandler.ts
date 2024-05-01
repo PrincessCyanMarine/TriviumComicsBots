@@ -11,8 +11,8 @@ export function testCommands(msg: Message) {
     // console.log(args);
     const free = args.match(/free/gi);
     if (
-        (args.match(/(nitro)|(nudes?)|(18\+)|(\+18)/gi) && (free || args.match(/(.+?\..+?)|(http)/gi))) ||
-        (free && args.match(/https?:\/\/discord\.gg.+/))
+        (args.match(/(e-?girl)|(e-?boy)|(onlyfan)|(nitro)|(nudes?)|(18\+)|(\+18)/gi) && (free || args.match(/(.+?\..+?)|(http)/gi))) ||
+        (args.match(/https?:\/\/discord\.gg.+/))
     )
         nitro(msg);
     else for (let { title, description } of msg.embeds) if (title?.includes("nitro") || description?.includes("nitro")) nitro(msg);
