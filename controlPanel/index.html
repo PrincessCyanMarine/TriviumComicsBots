@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel</title>
+    <script src="/elementBuilder"></script>
+    <style>
+        html {
+            text-align: center;
+        }
+        .icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 100%;
+            background-color: #888;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            cursor: pointer;
+        }
+        .channel {
+            cursor: pointer;
+        }
+        .channel.selected {
+            font-weight: bold;
+        }
+        .icon.selected {
+            -webkit-box-shadow: 0px 0px 30px 1px rgb(44, 173, 190);
+            -moz-box-shadow: 0px 0px 30px 1px rgb(44, 173, 190);
+            box-shadow: 0px 0px 30px 1px rgb(44, 173, 190);
+        }
+        #guilds, #channels {
+            width: 128px;
+        }
+        #guilds > div, #channels > div {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        #channels > div {
+            gap: 8px;
+        }
+        #content {
+            display: flex;
+            gap: 32px;
+            flex-direction: row;
+        }
+        #messages, .messages {
+            display: flex;
+            flex-direction: column-reverse;
+            height: 80vh;
+            width: 60vw;
+            overflow-y: auto;
+        }
+        .message {
+            display: flex;
+            gap: 16px;
+            margin: 8px;
+            margin-top: 16px;
+            flex-direction: row;
+            text-align: left;
+        }
+        .message > .right {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .username {
+            font-weight: bold;
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+        }
+        .option {
+            cursor: pointer;
+            color: red;
+        }
+        .option:hover {
+            text-decoration: underline;
+        }
+        #logout {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            cursor: pointer;
+            padding: 16px;
+        }
+        #messageBoxParent {
+            width: 60vw;
+            margin-top: 16px;
+            padding: 8px;
+            justify-content: center;
+            align-items: center;
+            display: none;
+        }
+        #messageBox {
+            width: 90%;
+            height: 28px;
+            font-size: 16px;
+        }
+        #messageBoxParent > button {
+            height: 33px;
+            width: 8%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="loading">LOADING...</h1>
+    <div id="content">
+        <div id="guilds"></div>
+        <div id="channels"></div>
+        <div id="messagesParent"></div>
+        <div id="bots"></div>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+        <div id="messageBoxParent">
+            <input id="messageBox">
+            <button onclick="sendMessage()">
+                &gt;
+            </button>
+        </div>
+    </div>
+    <button id="logout" onclick="logout()">
+        LOGOUT
+    </button>
+    <script>
+        var token;
+        var selectedGuild = null;
+        var selectedChannel = null;
+        var selectedBot = null;
+        /** @type {WebSocket} */
+        var ws;
+
+        function connectWebsocket() {
+            ws = new WebSocket('ws://localhost:4000');
+
+            ws.addEventListener("open", (event) => {
+                console.log('websocket connected', event);
+            });
+
+            ws.addEventListener('close', (event) => {
+                console.warn('websocket disconnected', event);
+                alert('websocket disconnected');
+            })
+
+            ws.addEventListener('error', (event) => {
+                console.error('websocket error', event);
+                alert('websocket error');
+            })
+
+            ws.addEventListener("message", (event) => {
+                try {
+                    console.log("Message from server ", event.data);
+                    const parseData = JSON.parse(event.data);
+                    if (parseData?.type) {
+                        switch (parseData.type) {
+                            case 'MESSAGE':
+                                addMessage(parseData.message);
+                                break;
+                            case 'MESSAGE_DELETED':
+                                document.getElementById(`message-${parseData.messageId}`).remove();
+                                break;
+                            case 'MESSAGE_UPDATED':
+                                const message = document.getElementById(`message-content-${parseData.message.id}`);
+                                if (message) message.innerText = parseData.message.content;
+                                break;
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+
+        }
+
+        function selectChannel(channel) {
+            document.getElementById('messagesParent').innerHTML = '';
+            document.getElementById('bots').innerHTML = '';
+            if (channel && !channel.div) channel.div = document.getElementById(`channel-${channel.id}`)
+            if (selectedChannel?.div) selectedChannel.div.removeClass('selected');
+            selectedChannel = channel;
+            selectBot(null);
+            if (channel) {
+                channel.div.addClass('selected');
+                showChannel(channel);
+            }
+            console.log('ws?.OPEN', !!ws?.OPEN);
+            if (ws?.OPEN) ws.send(JSON.stringify({ type: 'SELECT_CHANNEL', channelId: channel?.id, token }));
+            sessionStorage.setItem('selectedChannel', JSON.stringify(channel));
+        }
+        async function selectGuild(guild) {
+            if (selectedGuild?.icon) selectedGuild.icon.removeClass('selected');
+            guild.icon.addClass('selected');
+            selectedGuild = guild;
+            selectChannel(null);
+            document.getElementById('channels').innerHTML = 'LOADING...';
+            let sessionChannels = JSON.parse(sessionStorage.getItem('channels'));
+            console.log('sessionChannels', sessionChannels);
+            if (sessionChannels?.[guild.id]) showChannels(sessionChannels[guild.id]);
+            else sessionChannels = {};
+            getChannels().then(({ channels, guildId }) => {
+                if (guildId !== selectedGuild.id) return false;
+                console.log(channels);
+                sessionChannels[guildId] = channels
+                sessionStorage.setItem('channels', JSON.stringify(sessionChannels));
+                showChannels(channels);
+                return true;
+            });
+            sessionStorage.setItem('selectedGuild', JSON.stringify(guild));
+        }
+        function selectBot(bot) {
+            if (bot && !bot.div) bot.div = document.getElementById(`bot-${bot.id}`);
+            if (selectedBot) selectedBot.div.removeClass('selected');
+            selectedBot = bot;
+            const textBox = document.getElementById('messageBoxParent');
+            if (bot) {
+                bot.div.addClass('selected');
+                textBox.style.display = 'flex';
+            } else {
+                textBox.style.display = 'none';
+            }
+            sessionStorage.setItem('selectedBot', JSON.stringify(bot));
+        }
+
+        function sendMessage() {
+            const content = document.getElementById('messageBox').value.trim();
+            if (!content) return;
+            document.getElementById('messageBox').value = '';
+            fetch('http://localhost:4000/message/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token, channelId: selectedChannel.id, content, botName: selectedBot.key })
+            }).then(res => res.json()).then((message) => {
+                // console.log(message);
+                // addMessage(message);
+            })
+        }
+
+        function getMessages() {
+            return fetch('http://localhost:4000/messages/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token, channelId: selectedChannel.id })
+            }).then(res => res.json());
+        }
+
+        function editMessage(content, botName, channelId, messageId) {
+            return fetch('http://localhost:4000/message/edit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token, channelId, messageId, content, botName })
+            }).then(res => res.json());
+        }
+
+        function deleteMessage(botName, channelId, messageId) {
+            return fetch('http://localhost:4000/message/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token, channelId, messageId, botName })
+            }).then(res => res.json());
+        }
+
+        function getMessageElement(message) {
+            const messageDiv = new ElementBuilder('div').addClass('message').setId(`message-${message.id}`);
+            messageDiv.appendChildren(
+                new ElementBuilder('img').setAttribute('src', message.author.avatar).addClass('icon'),
+            );
+            const username = new ElementBuilder('div').setText(message.author.username).addClass('username');
+            if (message.author.bot) {
+                username.setText(`${message.author.username} [BOT]`);
+                console.log('selectedChannel ', selectedChannel)
+                const bot = selectedChannel.bots[message.author.id];
+                if (bot) {
+                    username.appendChildren(
+                        new ElementBuilder('a').setText('[EDIT]').addClass('option').addEventListener('click', () => {
+                            const content = prompt('Enter new content', message.content);
+                            if (content === null) return;
+                            editMessage(content, bot, selectedChannel.id, message.id).then((newMessage) => {
+                                console.log(newMessage);
+                                message.content = newMessage.content;
+                                document.getElementById(`message-content-${message.id}`).innerText = newMessage.content;
+                            })
+                        }),
+                        new ElementBuilder('a').setText('[DELETE]').addClass('option').addEventListener('click', () => {
+                            if (!confirm('Are you sure you want to delete this message?')) return;
+                            deleteMessage(bot, selectedChannel.id, message.id).then((newMessage) => {
+                                console.log(newMessage);
+                                // message.content = newMessage.content;
+                                document.getElementById(`message-${message.id}`).remove();
+                            })
+                        }),
+                    )
+                }
+            }
+            const rightSideDiv = new ElementBuilder('div').appendChildren(username).addClass('right');
+            if (message.content) rightSideDiv.appendChildren(new ElementBuilder('div').setText(message.content).setId(`message-content-${message.id}`))
+            if (message.attachments?.length > 0) rightSideDiv.appendChildren(message.attachments.map((attachment) => {
+                if (attachment.type.startsWith("image")) return new ElementBuilder('img').setAttribute('src', attachment.url).setAttribute('width', `${attachment.width}px`).setAttribute('height', `${attachment.height}px`);
+                if (attachment.type.startsWith("video")) return new ElementBuilder('video').setAttribute('src', attachment.url).setAttribute('width', `${attachment.width}px`).setAttribute('height', `${attachment.height}px`).setAttribute('controls', '');
+                return new ElementBuilder('a').setAttribute('href', attachment.url).setText(attachment.name).setAttribute('download', attachment.name);
+            }));
+            
+            return messageDiv.appendChildren(rightSideDiv);
+        }
+
+        function addMessage(message) {
+            console.log('addMessage', message)
+            const element = getMessageElement(message);
+            console.log('element', element)
+            document.getElementById('messages').prepend(element.build());
+        }
+
+        function showChannels(channels) {
+            const channelsDiv = new ElementBuilder('div');
+            channelsDiv.appendChildren(Object.values(channels).map((channel) => {
+                const res = new ElementBuilder('div').setText(channel.name).addClass('channel').setId(`channel-${channel.id}`);
+                res.addEventListener('click', () => {
+                    channel.div = res;
+                    selectChannel(channel);
+                });
+                return res;
+            }));
+            const prevDiv = document.getElementById('channels');
+            prevDiv.innerHTML = '';	
+            prevDiv.appendChild(channelsDiv.build());
+        }
+
+        function showChannel(channel) {
+            const botsDiv = new ElementBuilder('div');
+            for (const botId of Object.keys(channel.bots)) {
+                console.log(botId, selectedGuild.bots)
+                const bot = selectedGuild.bots.find((_bot) => _bot.id === botId);
+                console.log(bot);
+                const botIcon = new ElementBuilder('img').setAttribute('src', bot.avatar).addClass('icon').setId(`bot-${bot.id}`);
+                botIcon.addEventListener('click', () => {
+                    bot.div = botIcon;
+                    selectBot(bot);
+                });
+                botsDiv.appendChildren(botIcon);
+            }
+            const prevDiv = document.getElementById('bots');
+            prevDiv.innerHTML = '';
+            prevDiv.appendChild(botsDiv.build());
+
+            getMessages().then(({ messages, channelId }) => {
+                if (channelId !== selectedChannel.id) return;
+                console.log(messages);
+                const messagesDiv = new ElementBuilder('div');
+                messagesDiv.appendChildren(messages.map((message) => getMessageElement(message))).setId('messages');
+                const prevDiv = document.getElementById('messagesParent');
+                prevDiv.innerHTML = '';
+                prevDiv.appendChild(messagesDiv.build());
+            
+            });
+        }
+
+        function showGuilds(guilds) {
+            document.getElementById('loading')?.remove();
+            console.log(guilds);
+            const guildsDiv = new ElementBuilder('div');
+            for (const guild of Object.values(guilds)) {
+                let guildIcon; 
+                if (guild.iconURL) guildIcon = new ElementBuilder("img").setAttribute('src', guild.iconURL).addClass('icon').setId(`guild-${guild.id}`)
+                else guildIcon = new ElementBuilder("div").setText(guild.initials).addClass('icon').setId(`guild-${guild.id}`)
+                guild.icon = guildIcon;
+                guildIcon.addEventListener('click', () => {
+                    selectGuild(guild);
+                });
+                guildIcon.addEventListener('dragstart', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                })
+                guildsDiv.appendChildren(guildIcon);
+            }
+            const prevDiv = document.getElementById('guilds');
+            prevDiv.innerHTML = '';
+            prevDiv.appendChild(guildsDiv.build());
+        }
+
+        function getUser() {
+            return fetch('http://localhost:4000/user/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token })
+            }).then(res => res.json()).then(d => d.user);
+        }
+
+        function getGuilds() {
+            return fetch('http://localhost:4000/guilds/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token })
+            }).then(res => res.json());
+        }
+
+        function getChannels() {
+            console.log( selectedGuild.id )
+            return fetch('http://localhost:4000/channels/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token, guildId: selectedGuild.id })
+            }).then(res => res.json());
+        }
+
+        window.onload = () => {
+            connectWebsocket();
+            const inputBox = document.getElementById("messageBox");
+            inputBox.onkeydown = ({key}) => {
+                console.log()
+                switch (key) {
+                    case 'Enter':
+                        sendMessage()
+                        break;
+                }
+            }
+            
+            token = sessionStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'http://localhost:4000/auth';
+                return;
+            }
+            console.log(token);
+            getUser().then(console.log);
+            if (sessionStorage.getItem('guilds'))
+                showGuilds(JSON.parse(sessionStorage.getItem('guilds')));
+            getGuilds().then(guilds => {
+                sessionStorage.setItem('guilds', JSON.stringify(guilds));
+                showGuilds(guilds);
+            });
+            /*const sessionSelected = {
+                guild: JSON.parse(sessionStorage.getItem('selectedGuild')),
+                channel: JSON.parse(sessionStorage.getItem('selectedChannel')),
+                bot: JSON.parse(sessionStorage.getItem('selectedBot'))
+            }
+            console.log('sessionSelected', sessionSelected);
+            if (sessionSelected.guild) {
+                sessionSelected.guild.icon = document.getElementById(`guild-${sessionSelected.guild.id}`);
+                console.log('sessionSelected.guild.icon', sessionSelected.guild.icon);
+                console.log('selectGuild', selectGuild(sessionSelected.guild));
+                if (sessionSelected.channel) {
+                    sessionSelected.channel.div = document.getElementById(`channel-${sessionSelected.channel.id}`);
+                    selectChannel(sessionSelected.channel);
+                    if (sessionSelected.bot) {
+                        selectBot(sessionSelected.bot);
+                    }
+                }
+            }*/
+        };
+        function logout() {
+            sessionStorage.clear();
+            location.reload();
+        }
+    </script>
+</body>
+</html>

@@ -3,7 +3,6 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { createServer } from "http";
-import { get } from "https";
 import {
     accountForPrestige,
     CardStyle,
@@ -22,6 +21,7 @@ import { get_birds } from "./common/functions";
 import { readdirSync, readFileSync } from "fs";
 import { Harem } from "./common/harem";
 import { cycPath, permPath } from "./d20/EmojiCycler";
+import { getUser } from "./discordAuth";
 
 const express_app = express();
 const server = createServer(express_app);
@@ -37,80 +37,6 @@ express_app.use(
 express_app.use(bodyParser.json());
 
 express_app.use("/static", express.static("./public"));
-
-type User = {
-    id: string;
-    username: string;
-    discriminator: number | string;
-    public_flags: number;
-    flags: number;
-    banner: any;
-    banner_color: string;
-    accent_color: number;
-    locale: string;
-    mfa_enabled: boolean;
-    avatar: string;
-};
-
-type getUserStuff = {
-    statusCode: number | undefined;
-    statusMessage: string | undefined;
-    user: User;
-};
-
-function getGuilds(tokenType: string, accessToken: string): Promise<{ id: string }[]> {
-    return new Promise((resolve, reject) => {
-        get(
-            "https://discord.com/api/users/@me/guilds",
-            {
-                headers: {
-                    authorization: `${tokenType} ${accessToken}`,
-                },
-            },
-            (response) => {
-                response.setEncoding("utf8");
-                let rawData = "";
-                response.on("data", (chunk) => {
-                    rawData += chunk;
-                });
-                response.on("end", () => {
-                    let guilds: { id: string }[] = JSON.parse(rawData);
-                    resolve(guilds);
-                });
-            }
-        );
-    });
-}
-
-function getUser(tokenType: string, accessToken: string): Promise<getUserStuff> {
-    return new Promise(async (resolve, reject) => {
-        // let guilds: { id: string }[] = await getGuilds(tokenType, accessToken);
-        get(
-            "https://discord.com/api/users/@me",
-            {
-                headers: {
-                    authorization: `${tokenType} ${accessToken}`,
-                },
-            },
-            (response) => {
-                response.setEncoding("utf8");
-                let rawData = "";
-                response.on("data", (chunk) => {
-                    rawData += chunk;
-                });
-                response.on("end", () => {
-                    let user = JSON.parse(rawData);
-                    // user["guilds"] = guilds;
-                    resolve({
-                        user: user,
-                        statusCode: response.statusCode,
-                        statusMessage: response.statusMessage,
-                    });
-                });
-            }
-        );
-    });
-}
 
 express_app.get("/user/:tokentype/:token", async (req, res) => {
     let { user } = await getUser(req.params.tokentype, req.params.token);
