@@ -7,7 +7,7 @@ import { warn } from "./functions";
 
 export function testCommands(msg: Message) {
     if (!testing && msg.guildId != triviumGuildId) return;
-    let args = msg.content.toLowerCase().replace(/\s/g, "");
+    let args = msg.content.toLowerCase().replace(/\s/g, "").replace(/anime-?((boy)|(girl))/, "");
     // console.log(args);
     const free = args.match(/free/gi);
     if (
