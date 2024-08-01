@@ -9,6 +9,8 @@ This is the repository for the code of the bots from [Trivium comics' official d
 
 
 # Enviroment Variables
+Create a file called `.env` at the root of the project and fill the following values accordingly
+
 ## REQUIRED
 ```
 # [BOT TOKENS]
@@ -40,7 +42,7 @@ WEBHOOK_LOGS_CHANNEL
 TESTING (defaults to false if the value is not exactly equal to "true")
 ```
 
-### Values on the file "variables.ts" should be set accordingly
+### (Certain values on the `variables.ts` file also need to be redefined (big oversight on my part))
 
 
 # Commands
