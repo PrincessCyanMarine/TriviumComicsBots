@@ -11,10 +11,13 @@ This is the repository for the code of the bots from [Trivium comics' official d
 Assuming you are on Windows because if you are on Linux you don't need this tutorial
 ## Step 1: Download and install VSCode (you can use other text editors, but I'm going to assume you are using VSCode for this "tutorial")
 [VS Code](https://code.visualstudio.com/)
+
 ## Step 2: Download and install GIT
 [https://git-scm.com/downloads](https://git-scm.com/downloads)
+
 ## Step 3: Download and install Node.JS
 [https://nodejs.org/en](https://nodejs.org/en)
+
 ## Step 4: Clone the repository using GIT
 - Using windows explorer, open the folder where you want the bots' folder to go (try to avoid spaces on the file path)
 - Click on the empty space on the file path, something like this ↓ should happen
@@ -30,9 +33,14 @@ touch .env
 ```
 - Wait
 - Open the folder `TriviumComicBots`
-## Step 5: Create a folder called .env
+- 
+## Step 5: create 1-8 discord bots (yes 8 (you can have just 1 do the functions for all of the bots no problem, just use the same token for all of the bots on the .env))
+[https://discordjs.guide/preparations/setting-up-a-bot-application.html](https://discordjs.guide/preparations/setting-up-a-bot-application.html)
+Then paste their TOKENS on the `.env` file using the names shown under `# [BOT TOKENS]` on the [`required enviroment variables` section of this page](https://github.com/PrincessCyanMarine/TriviumComicsBots/tree/master?tab=readme-ov-file#required) like `BOT_NAME_TOKEN=TOKEN_YOU_GOT_FROM_THE_DISCORD_JS_GUIDE`
 
-
+# (to be completed)
+## Step 6: Create a firebase account and fill the values on the .env file
+## Step 7: Create 1-4 Discord webhooks and fill the values on the .env file
 
 # Enviroment Variables
 ## REQUIRED
