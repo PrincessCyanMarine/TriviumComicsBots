@@ -10,7 +10,7 @@ This is the repository for the code of the bots from [Trivium comics' official d
 # How to run the bots
 Assuming you are on Windows because if you are on Linux you don't need this tutorial
 ## Step 1: Download and install VSCode (you can use other text editors, but I'm going to assume you are using VSCode for this "tutorial")
-[VS Code](https://code.visualstudio.com/)
+[https://code.visualstudio.com/](https://code.visualstudio.com/)
 
 ## Step 2: Download and install GIT
 [https://git-scm.com/downloads](https://git-scm.com/downloads)
