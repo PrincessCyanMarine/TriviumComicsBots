@@ -8,6 +8,41 @@ This is the repository for the code of the bots from [Trivium comics' official d
 > In that case, I just ask that you at least link to this repository and use the same license (what also means making it open source so be careful with tokens and stuff).
 
 
+# Enviroment Variables
+## REQUIRED
+```
+# [BOT TOKENS]
+BOT_CERBY_TOKEN
+BOT_D20_TOKEN
+BOT_ELI_TOKEN
+BOT_KRYSTAL_TOKEN
+BOT_RAY_TOKEN
+BOT_SADIE_TOKEN
+BOT_SIEG_TOKEN
+BOT_ODOD_TOKEN
+
+# [FIREBASE]
+DATABASE_URL
+FIREBASE_CLIENT_EMAIL
+FIREBASE_PRIVATE_KEY
+FIREBASE_PROJECT_ID
+
+
+# [WEBHOOKS] (You can set just WEBHOOK_TESTING_CHANNEL and WEBHOOK_LOGS_CHANNEL as long as TESTING is "true" but its easier to just do all 4 even if they are all the same value)
+WEBHOOK_ALERT_CHANNEL
+WEBHOOK_TESTING_CHANNEL
+WEBHOOK_LOGGING_CHANNEL
+WEBHOOK_LOGS_CHANNEL
+```
+
+## Optional
+```
+TESTING (defaults to false if the value is not exactly equal to "true")
+```
+
+### Values on the file "variables.ts" should be set accordingly
+
+
 # Commands
 The command system is currently being rewritten, for commands implemented under the new system, check [this list](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
 
