@@ -7,10 +7,34 @@ This is the repository for the code of the bots from [Trivium comics' official d
 > 
 > In that case, I just ask that you at least link to this repository and use the same license (what also means making it open source so be careful with tokens and stuff).
 
+# How to run the bots
+Assuming you are on Windows because if you are on Linux you don't need this tutorial
+## Step 1: Download and install VSCode (you can use other text editors, but I'm going to assume you are using VSCode for this "tutorial")
+[VS Code](https://code.visualstudio.com/)
+## Step 2: Download and install GIT
+[https://git-scm.com/downloads](https://git-scm.com/downloads)
+## Step 3: Download and install Node.JS
+[https://nodejs.org/en](https://nodejs.org/en)
+## Step 4: Clone the repository using GIT
+- Using windows explorer, open the folder where you want the bots' folder to go (try to avoid spaces on the file path)
+- Click on the empty space on the file path, something like this ↓ should happen
+  - ![image](https://github.com/user-attachments/assets/642f63b0-dfa0-4df7-ac1a-c05f5a7dbf8c)
+- Type "cmd" and press enter
+- Copy and paste the commands bellow on the command prompt that has appeared (you may need to press enter for the last one to run)
+```bash
+git clone https://github.com/PrincessCyanMarine/TriviumComicsBots.git
+cd TriviumComicsBots
+npm i
+touch .env
+
+```
+- Wait
+- Open the folder `TriviumComicBots`
+## Step 5: Create a folder called .env
+
+
 
 # Enviroment Variables
-Create a file called `.env` at the root of the project and fill the following values accordingly
-
 ## REQUIRED
 ```
 # [BOT TOKENS]
@@ -44,6 +68,7 @@ TESTING (defaults to false if the value is not exactly equal to "true")
 
 ### (Certain values on the `variables.ts` file also need to be redefined (big oversight on my part))
 
+# How to use the (incomplete) `New Command System™`
 
 # Commands
 The command system is currently being rewritten, for commands implemented under the new system, check [this list](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
