@@ -162,7 +162,7 @@ export class Calculator {
                 return;
             } else {
                 let e = content.match(/e\+([0-9]+)/);
-                if (e?.[1])
+                if (e?.[1] && randomchance(30))
                     this.joke(
                         interaction,
                         ray,

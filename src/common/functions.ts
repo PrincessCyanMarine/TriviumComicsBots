@@ -1030,6 +1030,7 @@ var imageCache: Record<
 
 let MAX_CACHE_TIME = TIME.WEEKS;
 
+if (!existsSync(".cache")) mkdirSync(".cache");
 if (existsSync(".cache/data.json")) imageCache = JSON.parse(readFileSync(".cache/data.json", { encoding: "utf-8" }));
 
 function clearExpiredCache() {
