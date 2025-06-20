@@ -79,7 +79,7 @@ import { addSlashCommand, slash_commands } from "../interactions/slash/common";
 import { Inventory } from "../model/inventory";
 import { cycledPath, permanentPath, removeExtension } from "./emojiRotationHelper";
 
-export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’/g, "");
+export const argClean = (args: string): string => args.replace(/\,|\.|\?|\!|\;|\:|\{|\}|\[|\]|\"|\'|\~|\^|\`|\´|\*|\’|\_|\♡~/g, "");
 const createRegex = (test: string[]): RegExp => new RegExp(`(?<![A-Z0-9])(${test.join("|")})(?![A-Z0-9])`, "gi");
 
 const argMatch = (args: string, test: string[]): RegExpMatchArray | null => argClean(args).match(createRegex(test));
@@ -1170,6 +1170,17 @@ async function createImage(
     return canvas;
 }
 
+// export function increaseStat(target?: string, guildId?: string | null, stat?: string) {
+//     console.debug('increaseStat', target, guildId, stat);
+//     if (target && guildId && stat) {
+//         const child = database.child('stats').child(guildId).child(target).child(stat);
+//         child.once('value').then(data => {
+//             const val = data.val();
+//             child.set(val ? val + 1 : 1);
+//         });
+    // }
+// }
+
 function runDataCommand<T>(
     command: CommandType<T>,
     moi: Message | CommandInteraction,
@@ -1218,8 +1229,11 @@ function runDataCommand<T>(
 
             switch (command?.type) {
                 case "targeted":
-                    if (moi instanceof Message && getTargetMember(moi))
+                    const target = moi instanceof Message ? getTargetMember(moi) : undefined;
+                    if (target) {
+                        // increaseStat(target.id, moi.guildId, command.stat);
                         runDataCommand(command.hasTarget, moi, args, startTime, rootCommand).then(resolve).catch(reject);
+                    }
                     else if (command.noTarget) runDataCommand(command.noTarget, moi, args, startTime, rootCommand).then(resolve).catch(reject);
 
                     break;
@@ -1227,6 +1241,7 @@ function runDataCommand<T>(
                     try {
                         if (!moi) return reject("No message or interaction provided");
                         let bot;
+                        // increaseStat(moi.member?.user.id, moi.guildId, command.stat);
                         if (moi instanceof Message) {
                             if (command.messageSender) {
                                 let messageSender = await commandTextConverter(
