@@ -1,0 +1,268 @@
+{
+    "dataType": "activator",
+    "version": "1.0.0",
+    "method": "exclamation",
+    "activators": ["test", "teste", "tester", "testing"],
+    "type": "command",
+    "bot": "krystal",
+    "description": "A command made to test image generation.",
+    "command": {
+        "type": "message",
+        "text": "This is an image. Aren't you glad, {author:mention}?",
+        "image": {
+            "size": {
+                "width": 1600,
+                "height": 900
+            },
+            "color": "#00ffff",
+            "composite": [
+                {
+                    "url": "{author:displayAvatar}",
+                    "position": {
+                        "x": 0,
+                        "y": 500
+                    },
+                    "size": {
+                        "width": 400,
+                        "height": 400
+                    }
+                },
+                {
+                    "url": "{author:displayAvatar}",
+                    "position": {
+                        "x": 98,
+                        "y": 98
+                    },
+                    "size": {
+                        "width": 365,
+                        "height": 114
+                    }
+                },
+                {
+                    "url": "{author:displayAvatar}",
+                    "position": {
+                        "x": 750,
+                        "y": 200
+                    },
+                    "size": {
+                        "width": 100,
+                        "height": 300
+                    }
+                },
+                {
+                    "url": "./assets/krystal/glitch.png",
+                    "actions": [
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 50,
+                            "y": 50,
+                            "width": 883,
+                            "height": 559
+                        }
+                    ]
+                },
+                {
+                    "url": "./assets/krystal/glitch.png",
+                    "actions": [
+                        {
+                            "type": "crop",
+                            "style": "in",
+                            "x": 300,
+                            "y": 293,
+                            "width": 176,
+                            "height": 174
+                        }
+                    ]
+                },
+                {
+                    "color": "#00ff00",
+                    "size": {
+                        "width": 500,
+                        "height": 300
+                    },
+                    "position": {
+                        "x": 1100,
+                        "y": 600
+                    }
+                },
+                {
+                    "url": "{author:displayAvatar}",
+                    "position": {
+                        "x": 900,
+                        "y": 200
+                    },
+                    "size": {
+                        "width": 600,
+                        "height": 600
+                    },
+                    "actions": [
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 350,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 450,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 550,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "rotate",
+                            "angle": 45
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 50,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 150,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 250,
+                            "width": 600,
+                            "height": 50
+                        },
+                        {
+                            "type": "rotate",
+                            "angle": -45
+                        }
+                    ]
+                },
+                {
+                    "color": "#ffff00",
+                    "size": {
+                        "width": 200,
+                        "height": 500
+                    },
+                    "position": {
+                        "x": 500,
+                        "y": 300
+                    }
+                },
+                {
+                    "color": "#00ff0000",
+                    "size": {
+                        "width": 500,
+                        "height": 600
+                    },
+                    "position": {
+                        "x": 300,
+                        "y": 100
+                    },
+                    "composite": [
+                        {
+                            "color": "#ff0000",
+                            "size": {
+                                "width": 100,
+                                "height": 200
+                            },
+                            "position": {
+                                "x": 200,
+                                "y": 200
+                            }
+                        }
+                    ],
+                    "actions": [
+                        {
+                            "type": "rotate",
+                            "angle": 45
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 270,
+                            "width": 500,
+                            "height": 10
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 290,
+                            "width": 500,
+                            "height": 10
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 310,
+                            "width": 500,
+                            "height": 10
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 330,
+                            "width": 500,
+                            "height": 10
+                        },
+                        {
+                            "type": "crop",
+                            "style": "out",
+                            "x": 0,
+                            "y": 350,
+                            "width": 500,
+                            "height": 10
+                        },
+                        {
+                            "type": "rotate",
+                            "angle": -45
+                        }
+                    ]
+                },
+                {
+                    "url": "{author:displayAvatar}",
+                    "position": {
+                        "x": 1500,
+                        "y": 800
+                    },
+                    "size": {
+                        "width": 100,
+                        "height": 100
+                    }
+                },
+                {
+                    "url": "{author:displayAvatar}",
+                    "position": {
+                        "x": 1400,
+                        "y": 0
+                    },
+                    "size": {
+                        "width": 200,
+                        "height": 100
+                    }
+                }
+            ]
+        }
+    }
+}

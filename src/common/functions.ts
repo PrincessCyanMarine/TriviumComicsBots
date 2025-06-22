@@ -1170,16 +1170,16 @@ async function createImage(
     return canvas;
 }
 
-// export function increaseStat(target?: string, guildId?: string | null, stat?: string) {
-//     console.debug('increaseStat', target, guildId, stat);
-//     if (target && guildId && stat) {
-//         const child = database.child('stats').child(guildId).child(target).child(stat);
-//         child.once('value').then(data => {
-//             const val = data.val();
-//             child.set(val ? val + 1 : 1);
-//         });
-    // }
-// }
+export function increaseStat(target?: string, guildId?: string | null, stat?: string) {
+    console.debug('increaseStat', target, guildId, stat);
+    if (target && guildId && stat) {
+        const child = database.child('stats').child(guildId).child(target).child(stat);
+        child.once('value').then(data => {
+            const val = data.val();
+            child.set(val ? val + 1 : 1);
+        });
+    }
+}
 
 function runDataCommand<T>(
     command: CommandType<T>,
@@ -1231,7 +1231,7 @@ function runDataCommand<T>(
                 case "targeted":
                     const target = moi instanceof Message ? getTargetMember(moi) : undefined;
                     if (target) {
-                        // increaseStat(target.id, moi.guildId, command.stat);
+                        increaseStat(target.id, moi.guildId, command.stat);
                         runDataCommand(command.hasTarget, moi, args, startTime, rootCommand).then(resolve).catch(reject);
                     }
                     else if (command.noTarget) runDataCommand(command.noTarget, moi, args, startTime, rootCommand).then(resolve).catch(reject);
@@ -1926,6 +1926,8 @@ let messageCommands: Partial<
     >
 > = {};
 
+export const getActivators = () => ({ messageCommands, exclamationCommands });
+
 function addMessageCommand(bot: BotNames, activator: ActivatorType) {
     if (activator.method != "message") return;
     let matches = ("match" in activator ? [activator.match] : activator.matches) || [];
@@ -1947,7 +1949,7 @@ function addExclamationCommand(bot: BotNames, activator: ActivatorType) {
     exclamationCommands[bot]!.push({ activators, command: activator.command, name: activator.name });
 }
 
-export async function testMessageCommand(botName: BotNames, msg: Message, startTime: number) {
+export async function testMessageCommand(botName: BotNames, msg: Message, deactivatedGeneral: string[], deactivatedGuild: string[], startTime: number) {
     let bot = clients[botName];
     if (ignore_message(msg, bot)) return;
 
@@ -1962,6 +1964,7 @@ export async function testMessageCommand(botName: BotNames, msg: Message, startT
 
     for (let activator of activators) {
         if ((hasBot || !activator.botName) && (activator.matchType == "all" ? testAllWords : testWord)(content, ...activator.matches)) {
+            if (activator.name && (deactivatedGeneral.includes(activator.name) || deactivatedGuild.includes(activator.name))) continue;
             try {
                 if (await runDataCommand(activator.command, msg, [], startTime)) break;
             } catch (err) {
@@ -1976,7 +1979,7 @@ export async function testMessageCommand(botName: BotNames, msg: Message, startT
     }
 }
 
-export function testExclamationCommand(botName: BotNames, msg: Message, startTime: number) {
+export function testExclamationCommand(botName: BotNames, msg: Message, deactivatedGeneral: string[], deactivatedGuild: string[], startTime: number) {
     // console.log(botName);
     if (testing && msg.channelId != testChannelId) return;
     if (!testing && msg.channelId == testChannelId) return;
@@ -1989,7 +1992,7 @@ export function testExclamationCommand(botName: BotNames, msg: Message, startTim
     // console.log(activators);
     let words = content.split(" ");
     let activator = words[0].slice(1);
-    let command = activators.find((a) => a.activators.includes(activator));
+    let command = activators.find((a) => a.activators.includes(activator) && !(deactivatedGeneral.includes(`!${a.activators[0]}`) || deactivatedGuild.includes(`!${a.activators[0]}`)));
     if (!command) return;
     runDataCommand(command.command, msg, [], startTime);
 }

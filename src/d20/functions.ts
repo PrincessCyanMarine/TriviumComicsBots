@@ -435,7 +435,7 @@ export function generatecard(
 
         let prestige = await (await database.child("prestige/" + msg.guildId + "/" + target.id).once("value")).val();
         let style = (await (await database.child(`card/` + target.id).once("value")).val()) as CardStyle;
-        let stats = await (await database.child("stats/" + target.id).once("value")).val();
+        let stats = await (await database.child("stats/"  + msg.guildId + "/" + target.id).once("value")).val();
         let warnings_aux = await (await database.child("warnings/" + msg.guildId + "/" + target.id).once("value")).val();
         let guild = await (await database.child("guild/" + target.id).once("value")).val();
         let harem = await Harem.get(target.guild.id, target.id);
@@ -457,7 +457,7 @@ export function generatecard(
             if (!style["color2"]) style["color2"] = defaultstyle["color2"];
         }
 
-        if (!stats) stats = defaultstats;
+        stats = { ...defaultstats, ...stats };
 
         let date = target.joinedAt;
         let now = new Date(Date());

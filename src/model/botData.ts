@@ -71,6 +71,7 @@ export type CommandType<T = any, V extends any[] = any[]> = {
           type: "targeted";
           hasTarget: CommandType<T>;
           noTarget?: CommandType<T>;
+          stat?: string;
       }
     | {
           type: "message";
@@ -80,6 +81,7 @@ export type CommandType<T = any, V extends any[] = any[]> = {
           image?: ImageType;
           delay?: number;
           messageSender?: string | string[];
+          stat?: string;
       }
     | {
           type: "string";

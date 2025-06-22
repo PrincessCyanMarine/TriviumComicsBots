@@ -10,11 +10,13 @@ import { msg2embed } from "../common/functions";
 import { exec } from "child_process";
 
 d20.on("ready", () => {
+    require("../app/index");
     if (testing) return;
     mod_alert_webhook(testing).send("Bots have restarted");
     // new EmojiCycler("562429293364248587", "613507549085302796");
     d20TimedFunction();
     setInterval(d20TimedFunction, TIME.MINUTES * 30);
+
 });
 
 d20.on("messageCreate", async (msg) => {

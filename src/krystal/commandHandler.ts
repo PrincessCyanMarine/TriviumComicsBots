@@ -39,7 +39,7 @@ import {
 } from "./functions";
 
 export function testCommands(msg: Message) {
-    if (testing) return;
+    // if (testing) return;
     let args = msg.content;
 
     let tip = argClean(args).match(/(\S+?)s tip of the day/i);

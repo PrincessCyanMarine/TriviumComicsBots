@@ -303,8 +303,10 @@ client_list.forEach((client) => {
     try {
         client.on("messageCreate", async (msg) => {
             let startTime = Date.now();
-            testExclamationCommand(id2bot[client.user!.id!], msg, startTime);
-            testMessageCommand(id2bot[client.user!.id!], msg, startTime);
+            const deactivatedGeneral = (await database.child('deactivated-commands').child('general').once('value')).val() || [];
+            const deactivatedGuild = msg.guildId ? (await database.child('deactivated-commands').child(msg.guildId).once('value')).val() || []: [];
+            testExclamationCommand(id2bot[client.user!.id!], msg, deactivatedGeneral, deactivatedGuild, startTime);
+            testMessageCommand(id2bot[client.user!.id!], msg, deactivatedGeneral, deactivatedGuild, startTime);
             if (!msg.channel.isThread()) return;
             try {
                 await warReact(msg);

@@ -22,6 +22,7 @@
     "bot": "krystal",
     "command": {
         "type": "targeted",
+        "stat": "kill",
         "hasTarget": {
             "manaCost": 50,
             "type": "command",

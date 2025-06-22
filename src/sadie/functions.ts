@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from "canvas";
 import { Message, MessageAttachment, User } from "discord.js";
 import { sadie } from "../clients";
-import { createEncoder, getTarget, say, testWord } from "../common/functions";
+import { createEncoder, getTarget, increaseStat, say, testWord } from "../common/functions";
 import { greetings } from "./greetings";
 import { protectedFromKills } from "../common/variables";
 import assets from "../assetsIndexes";
@@ -90,6 +90,7 @@ export function punching(msg: Message, target: User | undefined = getTarget(msg)
             },
             1000 - new Date().valueOf() - startTime
         );
+        increaseStat(target?.id, msg?.guildId, 'punch');
     });
 
     loadImage(target.displayAvatarURL({ format: "png", size: 1024 })).then((avatar) => {
@@ -160,6 +161,13 @@ export async function kicking(msg: Message, avatars: string[] = []) {
 
     database.child("images/sadie/kick1").set(save_canvas1.toDataURL());
     database.child("images/sadie/kick2").set(save_canvas2.toDataURL());
+
+    const ids = msg.mentions.users.map((user, i) => user.id)
+    if (ids.length < 3 && testWord(msg.content, "me")) ids.push(msg.author.id);
+    
+    ids.slice(0, 3).forEach((id) => {
+        increaseStat(id, msg?.guildId, 'kick');
+    });
 }
 
 export function tsundere(msg: Message) {

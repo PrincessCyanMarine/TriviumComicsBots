@@ -13,6 +13,7 @@ export type User = {
     locale: string;
     mfa_enabled: boolean;
     avatar: string;
+    admin: boolean;
 };
 
 export type getUserStuff = {

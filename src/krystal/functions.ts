@@ -43,6 +43,7 @@ import {
     wait,
     createEncoder,
     getTargetMember,
+    increaseStat,
 } from "../common/functions";
 import { announcementChannelId, marinaId, patreon_roles, protectedFromKills } from "../common/variables";
 import { greetings } from "./greetings";
@@ -81,7 +82,10 @@ export async function yeeting(msg: Message, target: GuildMember | undefined = ge
     let { ctx, canvas, encoder } = createEncoder(
         width,
         height,
-        (buffer) => say(krystal, msg.channel, { files: [new MessageAttachment(buffer, "yeet.gif")] }, startTime - Date.now().valueOf()),
+        (buffer) => {
+            say(krystal, msg.channel, { files: [new MessageAttachment(buffer, "yeet.gif")] }, startTime - Date.now().valueOf())
+            increaseStat(target?.id, msg?.guildId, 'yeet');
+        },
         { delay: 1000 }
     );
 
@@ -201,6 +205,7 @@ export function killing(
                             1000 - (new Date().valueOf() - startTime)
                         );
                     else resolve(canvas.toBuffer());
+                    increaseStat(target?.id, msg?.guildId, 'kill');
                 });
         });
     });
@@ -254,7 +259,10 @@ export function sleeping(msg: Message | undefined, target: User | undefined = ms
             assets.krystal.sleep,
             sleep
         )
-            .then(resolve)
+            .then((...args) => {
+                increaseStat(target?.id, msg?.guildId, 'sleep');
+                resolve(...args)
+            })
             .catch(reject);
     });
 }
@@ -279,7 +287,10 @@ export function eating(msg?: Message, target: User | undefined = msg ? getTarget
             popcorn
         )
             .then(resolve)
-            .catch(reject);
+            .catch((...args) => {
+                increaseStat(target?.id, msg?.guildId, 'popcorn');
+                resolve(...args)
+            });
     });
 }
 
@@ -361,7 +372,10 @@ export function silencedbox(
             undefined,
             random_from_array(assets.krystal.boxlamp)
         )
-            .then(resolve)
+            .then((...args) => {
+                increaseStat(target?.id, msg?.guildId, 'boxlamp');
+                resolve(...args)
+            })
             .catch(reject);
     });
 }
@@ -390,13 +404,17 @@ export function silencing(
             assets.krystal.lamp,
             lamp
         )
-            .then(resolve)
+            .then((...args) => {
+                increaseStat(target?.id, msg?.guildId, 'lamp');
+                resolve(...args)
+            })
             .catch(reject);
     });
 }
 
 export function boxxing(msg?: Message, target: User | undefined = msg ? getTarget(msg) : undefined): Promise<Buffer | MessageAttachment> {
     return new Promise(async (resolve, reject) => {
+        console.debug('boxxing');
         imageCommand(
             krystal,
             msg,
@@ -413,7 +431,10 @@ export function boxxing(msg?: Message, target: User | undefined = msg ? getTarge
             assets.krystal.box,
             box
         )
-            .then(resolve)
+            .then((...args) => {
+                increaseStat(target?.id, msg?.guildId, 'box');
+                resolve(...args);
+            })
             .catch(reject);
     });
 }
@@ -446,6 +467,7 @@ export function sparing(msg: Message, target: User | undefined = getTarget(msg))
     if (!target) return say(krystal, msg.channel, "Which unattractive weeb should I spare?");
     say(krystal, msg.channel, "Understood, I will spare the unattractive weeb");
     database.child("dontattack").set(target.id);
+    increaseStat(target?.id, msg?.guildId, 'spare');
 }
 
 export async function testWebtoonEpisode() {

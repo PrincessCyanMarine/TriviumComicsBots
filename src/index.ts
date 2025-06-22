@@ -50,7 +50,7 @@ require("https").globalAgent.options.ca = require("fs").readFileSync(
     "node_modules/node_extra_ca_certs_mozilla_bundle/ca_bundle/ca_intermediate_root_bundle.pem"
 );
 
-import "./express";
+// import "./express";
 
 import admin from "firebase-admin";
 import { exit } from "process";

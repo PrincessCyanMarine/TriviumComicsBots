@@ -1,4 +1,3 @@
-console.log('Initializing controlPanel')
 import { config } from "dotenv";
 config();
 
@@ -55,83 +54,80 @@ const publicKeys = new Map<WebSocket, string>();
 
 var sockets = 0;
 
-wss.on('connection', async function connection(ws) {
-  console.log('connected');
-  ws.send(JSON.stringify((await krystal.guilds.fetch()).mapValues(guild => ({ name: guild.name, id: guild.id }))));
-
-  // const socketId = sockets++;
-  // // console.log("New connection", socketId);
-  // function removeWsListener() {
-  //   if (socketsListening.has(ws)) {
-  //     const oldChannel = socketsListening.get(ws)!;
-  //     if (channelsBeingListenedTo.has(oldChannel)) {
-  //       const oldChannelListeners = channelsBeingListenedTo.get(oldChannel)!;
-  //       channelsBeingListenedTo.set(oldChannel, oldChannelListeners.filter((listener) => listener !== ws));
-  //     }
-  //     socketsListening.delete(ws);
-  //   }
-  //   if (publicKeys.has(ws)) publicKeys.delete(ws);   
-  // }
+wss.on('connection', function connection(ws) {
+  const socketId = sockets++;
+  // console.log("New connection", socketId);
+  function removeWsListener() {
+    if (socketsListening.has(ws)) {
+      const oldChannel = socketsListening.get(ws)!;
+      if (channelsBeingListenedTo.has(oldChannel)) {
+        const oldChannelListeners = channelsBeingListenedTo.get(oldChannel)!;
+        channelsBeingListenedTo.set(oldChannel, oldChannelListeners.filter((listener) => listener !== ws));
+      }
+      socketsListening.delete(ws);
+    }
+    if (publicKeys.has(ws)) publicKeys.delete(ws);   
+  }
   
-  // ws.on('error', console.error);
+  ws.on('error', console.error);
 
-  // ws.on('close', async (data) => {
-  //   // console.log('closed', socketId);
-  //   try {
-  //     removeWsListener();
-  //   } catch (err) {
-  //     console.error(err);
-  //   };
-  // });
+  ws.on('close', async (data) => {
+    // console.log('closed', socketId);
+    try {
+      removeWsListener();
+    } catch (err) {
+      console.error(err);
+    };
+  });
 
-  // ws.on('message', async (data) => {
-  //   try {
-  //     console.log('received: %s', data);
-  //     const parsedData = JSON.parse(data.toString());
-  //     if (parsedData?.type) {
-  //       switch (parsedData.type) {
-  //         case 'SELECT_CHANNEL': {
-  //           const { token, channelId } = parsedData;
-  //           if (!token) throw new Error('No token provided');
-  //           const { user } = await getUser(...(token.split(' ') as [string, string]));
-  //           if (!user) throw new Error('User not found');
-  //           let channel;
-  //           if (channelId){
-  //             for (const bot of Object.values(bots)) {
-  //               try {
-  //                 channel = await bot.channels.fetch(channelId);
-  //                 if (channel) break;
-  //               } catch(err) {};
-  //             }
-  //             if (!channel) throw new Error('Channel not found');
-  //             if (!(channel instanceof TextChannel)) throw new Error('Channel is not a text channel');
-  //           }
-  //           const member = await channel?.guild.members.fetch(user.id);
-  //           if (channelId && channel && !member?.permissions.has("KICK_MEMBERS")) throw new Error('You do not have permission to view this channel');
-  //           removeWsListener();
-  //           if (channelId && channel) {
-  //             socketsListening.set(ws, channel);
-  //             console.log('socketsListening', socketsListening)
-  //             const listeners = channelsBeingListenedTo.get(channel) || [];
-  //             channelsBeingListenedTo.set(channel, [...listeners, ws]);
-  //           }
-  //           break;
-  //         }
-  //         case 'START_AUTH': {
-  //           ws.send(JSON.stringify({ type: 'AUTH_URL', url: `https://discord.com/oauth2/authorize?${toURL({ client_id: process.env.D20_CLIENT_ID!, redirect_uri: `http://192.168.18.5:${port}/auth/finish`, response_type: 'token', scope: 'identify guilds' })}` }));
-  //           break;
-  //         }
-  //         case 'KEY': {
-  //           const { key } = parsedData;
-  //           publicKeys.set(ws, key);
-  //           break;
-  //         }
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // });
+  ws.on('message', async (data) => {
+    try {
+      console.log('received: %s', data);
+      const parsedData = JSON.parse(data.toString());
+      if (parsedData?.type) {
+        switch (parsedData.type) {
+          case 'SELECT_CHANNEL': {
+            const { token, channelId } = parsedData;
+            if (!token) throw new Error('No token provided');
+            const { user } = await getUser(...(token.split(' ') as [string, string]));
+            if (!user) throw new Error('User not found');
+            let channel;
+            if (channelId){
+              for (const bot of Object.values(bots)) {
+                try {
+                  channel = await bot.channels.fetch(channelId);
+                  if (channel) break;
+                } catch(err) {};
+              }
+              if (!channel) throw new Error('Channel not found');
+              if (!(channel instanceof TextChannel)) throw new Error('Channel is not a text channel');
+            }
+            const member = await channel?.guild.members.fetch(user.id);
+            if (channelId && channel && !member?.permissions.has("KICK_MEMBERS")) throw new Error('You do not have permission to view this channel');
+            removeWsListener();
+            if (channelId && channel) {
+              socketsListening.set(ws, channel);
+              console.log('socketsListening', socketsListening)
+              const listeners = channelsBeingListenedTo.get(channel) || [];
+              channelsBeingListenedTo.set(channel, [...listeners, ws]);
+            }
+            break;
+          }
+          case 'START_AUTH': {
+            ws.send(JSON.stringify({ type: 'AUTH_URL', url: `https://discord.com/oauth2/authorize?${toURL({ client_id: process.env.D20_CLIENT_ID!, redirect_uri: `http://192.168.18.5:${port}/auth/finish`, response_type: 'token', scope: 'identify guilds' })}` }));
+            break;
+          }
+          case 'KEY': {
+            const { key } = parsedData;
+            publicKeys.set(ws, key);
+            break;
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
 });
 {
   const botValues = Object.values(bots);
@@ -419,5 +415,5 @@ app.get('/elementBuilder', (req, res) => {
 
 
 server.listen(port, () => {
-  console.log("Server is listening on http://localhost:" + port);
+  // console.log("Server is listening on http://localhost:" + port);
 });
