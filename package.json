@@ -5,8 +5,7 @@
     "main": "dist/index.js",
     "scripts": {
         "start": "pm2 start ecosystem.config.js",
-        "tsc": "tsc",
-        "nodemon": "nvm exec 16.6.2 nodemon ."
+        "dev": "tsc -w & nodemon ."
     },
     "author": "CyanMarine",
     "license": "GPL-3.0-or-later",

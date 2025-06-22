@@ -8,7 +8,5 @@ COPY package.json package.json
 COPY . .
 
 RUN npm install
-RUN npm run tsc
  
- 
-CMD [ "node", "." ]
+CMD [ "npm", "run", "dev" ]

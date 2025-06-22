@@ -7,16 +7,12 @@ import { createServer } from "http";
 // import { WebSocketServer } from "ws";
 import { cerby, d20, eli, krystal, ray, sadie, sieg } from "../clients";
 import { ExtendedError, Server, Socket } from "socket.io";
-import axios from "axios";
 import { getGuilds, getUser, User } from "../discordAuth";
-import { Guild, GuildMember, GuildMemberRoleManager } from "discord.js";
+import { Guild } from "discord.js";
 import { database } from "..";
 import { TIME } from "../common/variables";
-import { cp, readdir, readdirSync } from "fs";
-import { createCanvas, loadImage } from "canvas";
 import { createXpBar, defaultstyle } from "../d20/functions";
 import { getActivators } from "../common/functions";
-import { botNames } from "../model/botData";
 
 
 
