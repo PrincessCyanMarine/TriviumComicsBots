@@ -73,7 +73,7 @@ import { sadie_activities } from "../sadie/activities";
 import { TIME, disturb_channels, ignore_channels, isRestarting, marineId, setRestarting, testChannelId, triviumGuildId } from "./variables";
 import { spawn } from "child_process";
 import { CardStyle, createXpBar, defaultstyle, generatecard } from "../d20/functions";
-import simpleGit from "simple-git";
+// import simpleGit from "simple-git";
 import path, { parse } from "path";
 import { addSlashCommand, slash_commands } from "../interactions/slash/common";
 import { Inventory } from "../model/inventory";
@@ -1899,11 +1899,11 @@ export async function sendCardCustomizationMessage(
 }
 
 export const gitAddAsync = (paths: string | string[]) =>
-    new Promise((resolve, reject) => simpleGit().add(paths, (err, result) => (err ? reject(err) : resolve(result))));
+    void 0; // new Promise((resolve, reject) => simpleGit().add(paths, (err, result) => (err ? reject(err) : resolve(result))));
 export const gitCommitAsync = (message: string | string[], files?: string | string[], options?: { [key: string]: string }) =>
-    new Promise((resolve, reject) => simpleGit().commit(message, files, options, (err, result) => (err ? reject(err) : resolve(result))));
+    void 0; // new Promise((resolve, reject) => simpleGit().commit(message, files, options, (err, result) => (err ? reject(err) : resolve(result))));
 export const gitPushAsync = (remote: string, branch: string, options?: { [key: string]: string }) =>
-    new Promise((resolve, reject) => simpleGit().push(remote, branch, options, (err, result) => (err ? reject(err) : resolve(result))));
+    void 0; // new Promise((resolve, reject) => simpleGit().push(remote, branch, options, (err, result) => (err ? reject(err) : resolve(result))));
 
 let exclamationCommands: Partial<
     Record<
