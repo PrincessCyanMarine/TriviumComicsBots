@@ -22,7 +22,9 @@ export type getUserStuff = {
     user: User;
 };
 
-export function getGuilds(tokenType: string, accessToken: string): Promise<{ id: string }[]> {
+type Guild = { id: string, permissions: number, name: string };
+
+export function getGuilds(tokenType: string, accessToken: string): Promise<Guild[]> {
     return new Promise((resolve, reject) => {
         get(
             "https://discord.com/api/users/@me/guilds",
@@ -38,7 +40,7 @@ export function getGuilds(tokenType: string, accessToken: string): Promise<{ id:
                     rawData += chunk;
                 });
                 response.on("end", () => {
-                    let guilds: { id: string }[] = JSON.parse(rawData);
+                    let guilds: Guild[] = JSON.parse(rawData);
                     resolve(guilds);
                 });
             }
