@@ -45,8 +45,9 @@ type Role = {
     id: string;
     name: string;
     color: string;
+    moderator: boolean
 };
-var guildRoles: { [guild_id: string]: Role }  = { }
+var guildRoles: { [guild_id: string]: Role[] }  = { }
 var botGuilds: { [guild_id: string]: Guild } = {};
 const updateBotGuilds = () => new Promise<void>((resolve) => d20.guilds.fetch().then(guilds => {
   const _guilds = guilds.map(g=>g);
@@ -54,6 +55,7 @@ const updateBotGuilds = () => new Promise<void>((resolve) => d20.guilds.fetch().
   Object.entries(botGuilds).forEach(async ([key, g]) => {
     const guild = await d20.guilds.fetch(g.id);
     const moderatorRoles = (await database.child('guild_moderator_roles').child(key).once('value')).val();
+    console.debug('moderatorRoles', moderatorRoles);
     guildRoles[key] = (await guild.roles.fetch()).map(role => ({
       icon: role.iconURL(),
       unicodeEmoji: role.unicodeEmoji,
@@ -61,7 +63,7 @@ const updateBotGuilds = () => new Promise<void>((resolve) => d20.guilds.fetch().
       name: role.name,
       color: role.hexColor,
       moderator: moderatorRoles?.includes(role.id),
-    })) as any;
+    })) as Role[];
     resolve();
   });
 }));
@@ -96,12 +98,15 @@ const getData = async (auth: string, next: (err?: ExtendedError) => void) => {
   })))).reduce((acc, [key, roles]) => ({
     ...acc,
     [key]: roles,
-  }), {} as {[key: string]: any});
+  }), {} as {[key: string]: string[]});
   console.debug('userRoles', userRoles);
-  return {
+
+  const res = {
     guilds: guilds.map(guild => ({
       ...guild,
       userRoles: userRoles[guild.id],
+      moderator: !!guildRoles[guild.id].find((role) => role.moderator && userRoles[guild.id].includes(role.id)),
+      admin: !!(guild.permissions & 0x0000000000000008),
     })),
     user: {
       ...user,
@@ -109,6 +114,13 @@ const getData = async (auth: string, next: (err?: ExtendedError) => void) => {
       admin: adminList.includes(user.id),
     }
   }
+
+  console.log(res.guilds.map((guild) => ({
+    name: guild.name,
+    admin: guild.admin,
+    moderator: guild.moderator
+  })));
+  return res;
 }
 
 const sendUpdatedData = async (socket: Socket) => {
@@ -262,32 +274,39 @@ io.on('connection', socket => {
 
   socket.on('command-usage-report', async (guildId, callback) => {
     const user = socket.handshake.auth.user;
-    if (!guildId && !user.admin) return;
+    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     const report = await generateCommandUsageReport(guildId);
     callback(report);
   });
 
   socket.on('command-data', async (guildId, callback) => {
     const user = socket.handshake.auth.user;
+    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     const commandData = await getCommandData(guildId, user.id);
     callback(commandData);
   });
   socket.on('save-command-data', async (guildId, commandData) => {
     const user = socket.handshake.auth.user;
+    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     await saveCommandData(guildId, user.id, commandData);
   });
 
 
   socket.on('get-commands', async (guildId, callback) => {
     const user = socket.handshake.auth.user;
-    if (!guildId && !user.admin) return;
+    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     const commandList = await getCommands(guildId);
     callback(commandList);
   });
 
   socket.on('set-disabled-commands', async (commands, guildId, callback) => {
     const user = socket.handshake.auth.user;
-    if (!guildId && !user.admin) return;
+    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     
     database.child('deactivated-commands').child(guildId || 'general').set(commands);
 
@@ -297,6 +316,9 @@ io.on('connection', socket => {
 
 
   socket.on('message-report', async (guildId, callback) => {
+    const user = socket.handshake.auth.user;
+    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     const report = await generateMessageReport(guildId);
     console.debug('message-report', report);
     callback(report);
@@ -308,6 +330,9 @@ io.on('connection', socket => {
   })
 
   socket.on('set-guild-moderator-roles', async (guildId, moderatorRoles, callback) => {
+    const user = socket.handshake.auth.user;
+    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     await database.child('guild_moderator_roles').child(guildId).set(moderatorRoles);
     await updateBotGuilds();
     Object.values(sockets).forEach((s) => {
@@ -326,87 +351,9 @@ io.on('connection', socket => {
   sockets[socket.id] = socket;
 });
 
-
-// const wss = new WebSocketServer({ server });
-
-// wss.on('connection', async function connection(ws) {
-//   console.log('connected');
-//   ws.send(JSON.stringify((await krystal.guilds.fetch()).mapValues(guild => ({ name: guild.name, id: guild.id }))));
-
-//   // const socketId = sockets++;
-//   // // console.log("New connection", socketId);
-//   // function removeWsListener() {
-//   //   if (socketsListening.has(ws)) {
-//   //     const oldChannel = socketsListening.get(ws)!;
-//   //     if (channelsBeingListenedTo.has(oldChannel)) {
-//   //       const oldChannelListeners = channelsBeingListenedTo.get(oldChannel)!;
-//   //       channelsBeingListenedTo.set(oldChannel, oldChannelListeners.filter((listener) => listener !== ws));
-//   //     }
-//   //     socketsListening.delete(ws);
-//   //   }
-//   //   if (publicKeys.has(ws)) publicKeys.delete(ws);   
-//   // }
-  
-//   // ws.on('error', console.error);
-
-//   // ws.on('close', async (data) => {
-//   //   // console.log('closed', socketId);
-//   //   try {
-//   //     removeWsListener();
-//   //   } catch (err) {
-//   //     console.error(err);
-//   //   };
-//   // });
-
-//   // ws.on('message', async (data) => {
-//   //   try {
-//   //     console.log('received: %s', data);
-//   //     const parsedData = JSON.parse(data.toString());
-//   //     if (parsedData?.type) {
-//   //       switch (parsedData.type) {
-//   //         case 'SELECT_CHANNEL': {
-//   //           const { token, channelId } = parsedData;
-//   //           if (!token) throw new Error('No token provided');
-//   //           const { user } = await getUser(...(token.split(' ') as [string, string]));
-//   //           if (!user) throw new Error('User not found');
-//   //           let channel;
-//   //           if (channelId){
-//   //             for (const bot of Object.values(bots)) {
-//   //               try {
-//   //                 channel = await bot.channels.fetch(channelId);
-//   //                 if (channel) break;
-//   //               } catch(err) {};
-//   //             }
-//   //             if (!channel) throw new Error('Channel not found');
-//   //             if (!(channel instanceof TextChannel)) throw new Error('Channel is not a text channel');
-//   //           }
-//   //           const member = await channel?.guild.members.fetch(user.id);
-//   //           if (channelId && channel && !member?.permissions.has("KICK_MEMBERS")) throw new Error('You do not have permission to view this channel');
-//   //           removeWsListener();
-//   //           if (channelId && channel) {
-//   //             socketsListening.set(ws, channel);
-//   //             console.log('socketsListening', socketsListening)
-//   //             const listeners = channelsBeingListenedTo.get(channel) || [];
-//   //             channelsBeingListenedTo.set(channel, [...listeners, ws]);
-//   //           }
-//   //           break;
-//   //         }
-//   //         case 'START_AUTH': {
-//   //           ws.send(JSON.stringify({ type: 'AUTH_URL', url: `https://discord.com/oauth2/authorize?${toURL({ client_id: process.env.D20_CLIENT_ID!, redirect_uri: `http://192.168.18.5:${port}/auth/finish`, response_type: 'token', scope: 'identify guilds' })}` }));
-//   //           break;
-//   //         }
-//   //         case 'KEY': {
-//   //           const { key } = parsedData;
-//   //           publicKeys.set(ws, key);
-//   //           break;
-//   //         }
-//   //       }
-//   //     }
-//   //   } catch (err) {
-//   //     console.error(err);
-//   //   }
-//   // });
-// });
+app.get('/*', (req, res) => {
+  res.send('ok');
+})
 
 app.use(express.json());
 
