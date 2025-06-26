@@ -16,7 +16,20 @@ Assuming you are on Windows because if you are on Linux you don't need this tuto
 [https://git-scm.com/downloads](https://git-scm.com/downloads)
 
 ## Step 3: Download and install Node.JS
-[https://nodejs.org/en](https://nodejs.org/en)
+~~[https://nodejs.org/en](https://nodejs.org/en)~~
+
+Install nvm
+[https://github.com/nvm-sh/nvm](https://github.com/nvm-sh/nvm)
+
+Then run `nvm install 16` on a terminal
+This will install de nodejs version used to run the bots
+
+I'd also recommend already running
+```
+nvm use 16
+npm i -g typescript nodemon pm2
+```
+since that will be needed for when you actually start the bots up
 
 ## Step 4: Clone the repository using GIT
 - Using windows explorer, open the folder where you want the bots' folder to go (try to avoid spaces on the file path)
@@ -75,6 +88,30 @@ TESTING (defaults to false if the value is not exactly equal to "true")
 ```
 
 ### (Certain values on the `variables.ts` file also need to be redefined (big oversight on my part))
+
+## Running
+On a terminal, type
+```bash
+nvm use 16
+tsc
+pm2 start ecosystem.config.js
+```
+This will build and run the bots for production/testing
+
+### Tho, for development my suggested approach is:
+
+Run
+```bash
+nvm use 16
+npm i -g nodemon typescript
+tsc -w
+```
+in a terminal and
+```bash
+nvm use 16
+nodemon .
+```
+in another
 
 # How to use the (incomplete) `New Command System™`
 
