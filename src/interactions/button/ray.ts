@@ -7,8 +7,8 @@ import { get_rank_message } from "../../d20/functions";
 
 ray.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
-    if (testing && interaction.channelId != testChannelId) return;
-    else if (!testing && interaction.channelId == testChannelId) return;
+    // if (testing && interaction.channelId != testChannelId) return;
+    // else if (!testing && interaction.channelId == testChannelId) return;
 
     // console.log(interaction.customId);
 

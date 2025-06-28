@@ -8,8 +8,8 @@ import { killing, spared_player_id } from "../../krystal/functions";
 
 krystal.on("interactionCreate", async (interaction) => {
   if (!interaction.isContextMenu()) return;
-  if (testing && interaction.channelId != testChannelId) return;
-  else if (!testing && interaction.channelId == testChannelId) return;
+  // if (testing && interaction.channelId != testChannelId) return;
+  // else if (!testing && interaction.channelId == testChannelId) return;
 
   let user;
 

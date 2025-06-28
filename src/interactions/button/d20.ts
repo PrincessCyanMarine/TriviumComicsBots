@@ -41,8 +41,8 @@ export const addD20ButtonCommand = (names: string | string[], callback: (interac
 
 d20.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
-    if (testing && interaction.channelId != testChannelId) return;
-    else if (!testing && interaction.channelId == testChannelId) return;
+    // if (testing && interaction.channelId != testChannelId) return;
+    // else if (!testing && interaction.channelId == testChannelId) return;
     // console.log(interaction.customId);
 
     let ignore = ["play-against"];

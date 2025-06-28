@@ -15,8 +15,8 @@ eli.on("messageCreate", (msg) => {
 
 eli.on("interactionCreate", async (interaction) => {
     if (interaction.isButton()) {
-        if (testing && interaction.channelId != testChannelId) return;
-        if (!testing && interaction.channelId == testChannelId) return;
+        // if (testing && interaction.channelId != testChannelId) return;
+        // if (!testing && interaction.channelId == testChannelId) return;
 
         let calculator_match = interaction.customId.match(/calculator_?(?<id>[0-9]+?)?_button_(?<button>.+)/);
         if (calculator_match?.groups) {

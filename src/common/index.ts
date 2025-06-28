@@ -20,13 +20,11 @@ import { eating, killing } from "../krystal/functions";
 import {
     changeActivity,
     detectEmoji,
-    getCharacterEmoji,
     get_birds,
     notificationCult,
     random_from_array,
     update,
     say,
-    spawnAsync,
     wait,
     restart,
     sendCardCustomizationMessage,
@@ -34,18 +32,13 @@ import {
     createCharacterCard,
     getMana,
     setMana,
-    useMana,
     capitalize,
 } from "./functions";
 import {
     colors,
-    command_list,
     dodoId,
     ignore_channels,
-    isRestarting,
     marineId,
-    notificationChannel,
-    setRestarting,
     testChannelId,
     testGuildId,
     triviumGuildId,
@@ -61,8 +54,6 @@ import { Calculator } from "../games/calculator";
 // import { Help } from "./help";
 import { Harem } from "./harem";
 import axios from "axios";
-import { EmojiCycler } from "../d20/EmojiCycler";
-import { spawn } from "child_process";
 import { Inventory } from "../model/inventory";
 
 const _commands: { names: string[]; callback: (msg: Message, args: string[]) => Promise<void> }[] = [];
@@ -77,8 +68,8 @@ export const addExclamationCommand = (names: string | string[], callback: (msg: 
 d20.on("messageCreate", async (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot) return;
     if (ignore_channels.includes(msg.channel.id)) return;
-    if (testing && msg.channelId != testChannelId) return;
-    else if (!testing && msg.channelId == testChannelId) return;
+    // if (testing && msg.channelId != testChannelId) return;
+    // else if (!testing && msg.channelId == testChannelId) return;
     let args = msg.content.toLowerCase();
     let options = args.split(" ");
     if (args.startsWith("!")) {

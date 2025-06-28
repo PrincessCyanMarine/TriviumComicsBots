@@ -282,15 +282,11 @@ io.on('connection', socket => {
 
   socket.on('command-data', async (guildId, callback) => {
     const user = socket.handshake.auth.user;
-    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
-    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     const commandData = await getCommandData(guildId, user.id);
     callback(commandData);
   });
   socket.on('save-command-data', async (guildId, commandData) => {
     const user = socket.handshake.auth.user;
-    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
-    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     await saveCommandData(guildId, user.id, commandData);
   });
 
@@ -316,9 +312,9 @@ io.on('connection', socket => {
 
 
   socket.on('message-report', async (guildId, callback) => {
-    const user = socket.handshake.auth.user;
-    const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
-    if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
+    // const user = socket.handshake.auth.user;
+    // const guild = guildId ? (socket.handshake.auth.guilds as any[]).find(guild => guild.id === guildId) : null;
+    // if (guildId ? !guild?.admin && !guild?.moderator : !user.admin) return;
     const report = await generateMessageReport(guildId);
     console.debug('message-report', report);
     callback(report);

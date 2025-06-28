@@ -6,8 +6,8 @@ import { generatecard, mute_unmute } from "../../d20/functions";
 
 d20.on("interactionCreate", async (interaction) => {
     if (!interaction.isContextMenu()) return;
-    if (testing && interaction.channelId != testChannelId) return;
-    else if (!testing && interaction.channelId == testChannelId) return;
+    // if (testing && interaction.channelId != testChannelId) return;
+    // else if (!testing && interaction.channelId == testChannelId) return;
 
     switch (interaction.commandName) {
         case "card":

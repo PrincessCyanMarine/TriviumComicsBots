@@ -14,8 +14,8 @@ export const addSadieButtonCommand = (names: string | string[], callback: (inter
 
 sadie.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
-    if (testing && interaction.channelId != testChannelId) return;
-    else if (!testing && interaction.channelId == testChannelId) return;
+    // if (testing && interaction.channelId != testChannelId) return;
+    // else if (!testing && interaction.channelId == testChannelId) return;
     // console.log(interaction.customId);
 
     switch (interaction.customId) {

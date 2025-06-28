@@ -6,8 +6,8 @@ import { makeAnnouncement } from "./common";
 Object.values(clients).forEach(bot => {
     bot.on('interactionCreate', (interaction) => {
         if (!interaction.isContextMenu()) return;
-        if (testing && interaction.channelId != testChannelId) return;
-        else if (!testing && interaction.channelId == testChannelId) return;
+        // if (testing && interaction.channelId != testChannelId) return;
+        // else if (!testing && interaction.channelId == testChannelId) return;
 
         // console.log(interaction);
         switch (interaction.commandName) {
