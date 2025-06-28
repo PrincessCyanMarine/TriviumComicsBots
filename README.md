@@ -53,7 +53,17 @@ Then paste their TOKENS on the `.env` file using the names shown under `# [BOT T
 
 # (to be completed)
 ## Step 6: Create a firebase account and fill the values on the .env file
+Basically, just follow this [https://firebase.google.com/docs/admin/setup](https://firebase.google.com/docs/admin/setup)
+
 ## Step 7: Create 1-4 Discord webhooks and fill the values on the .env file
+
+## (optional/advanced) Step 8: Oauth2
+Although not required, this is a recommended step if you want some commands to work
+- Go to the Discord developer portal for the bot you plan on using for OAuth2
+- Select the Oauth2 tab on the left hand side of the website
+- Click on the `Add redirect` button and add the redirect uri
+- Press on the `copy` button under `Client ID` and paste that value as `CLIENT_ID` in your .env file
+
 
 # Enviroment Variables
 ## REQUIRED
@@ -151,7 +161,7 @@ Activators follow the following general structure
   "type": "command"
 }
 ```
-Tho for more detailed information about the structure of a command, please check the CommandType typescript type defined on `src/model/botData.ts`
+Tho for more detailed information about the structure of an activator, please check the ActivatorType typescript type defined on `src/model/botData.ts`
 
 \*This `.botmeta` file is basically just a renamed `.json` so the structure is the same
 
