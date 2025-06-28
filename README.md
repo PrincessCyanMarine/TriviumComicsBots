@@ -114,6 +114,46 @@ nodemon .
 in another
 
 # How to use the (incomplete) `New Command System™`
+This system was heavily inspired by Minecraft Datapack system
+
+So if you already know how Datapacks work, you are going to have an easy time with this
+
+- Go to the `data` folder
+- Create, or open a folder with the name of the bot you want to add a command for
+- Inside that, create a file ending on `.botmeta`\*. That file may be placed inside a folder (look at Krystal's data folder for examples)
+`.botmeta` files can represent commands or activators
+### Commands
+They define actions to be taken by the bots such as sending messages/images or even choosing a random command to call next
+
+Commands follow the following general structure
+```json
+{
+  "dataType": "command";
+  "name": string;
+  "description": string;
+  "bot": "sadie" | "krystal" | "ray" | "eli" | "cerberus" | "siegfried" | "d20";
+  "type": "string" | "boolean" | "function" | "command" | "message" | "array" | "conditional" | "get-variable" | "percentage" | "targeted" | "sequence" | "random" | "random-weighted" | "set-variable"
+}
+```
+Tho for more detailed information about the structure of a command, please check the CommandType typescript type defined on `src/model/botData.ts`
+
+### Activators
+They call commands upon specific actions such as a message being sent on a server or a discord slash command being used
+
+Activators follow the following general structure
+```json
+{
+  "dataType": "activator";
+  "name": string;
+  "description": string;
+  "bot": "sadie" | "krystal" | "ray" | "eli" | "cerberus" | "siegfried" | "d20";
+  "method": "slash" | "message" | "reaction" | "exclamation"
+  "type": "command"
+}
+```
+Tho for more detailed information about the structure of a command, please check the CommandType typescript type defined on `src/model/botData.ts`
+
+\*This `.botmeta` file is basically just a renamed `.json` so the structure is the same
 
 # Commands
 The command system is currently being rewritten, for commands implemented under the new system, check [this list](https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/commands.md)
