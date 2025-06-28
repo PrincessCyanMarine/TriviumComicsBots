@@ -136,7 +136,7 @@ So if you already know how Datapacks work, you are going to have an easy time wi
 They define actions to be taken by the bots such as sending messages/images or even choosing a random command to call next
 
 Commands follow the following general structure
-```json
+```typescript
 {
   "dataType": "command";
   "name": string;
@@ -151,7 +151,7 @@ Tho for more detailed information about the structure of a command, please check
 They call commands upon specific actions such as a message being sent on a server or a discord slash command being used
 
 Activators follow the following general structure
-```json
+```typescript
 {
   "dataType": "activator";
   "name": string;
