@@ -1,5 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import {
+    ApplicationCommandDataResolvable,
+    BaseCommandInteraction,
     CacheType,
     Client,
     CommandInteraction,
@@ -55,9 +57,33 @@ export const addCommandToGuild = async (guild: Guild, command: SlashCommandBuild
     guild.commands.create(command.toJSON());
 };
 
+export const addApplicationCommand = async (guild: Guild, command: ApplicationCommandDataResolvable) => {
+    const client = guild.client;
+    if (!client.application) throw 'No client.application';
+
+    let commands = await client.application.commands.fetch();
+    commands.delete(command.name);
+    // console.log(`Adding command ${command.name} to guild ${guild.name} (${guild.id})}`);
+    client.application.commands.create(command);
+};
+
 export const slash_commands: Record<
     BotNames,
     { name: string; callback: (interaction: CommandInteraction<CacheType>, startTime: number) => Promise<void> }[]
+> = {
+    sadie: [],
+    d20: [],
+    cerberus: [],
+    common: [],
+    eli: [],
+    krystal: [],
+    ray: [],
+    siegfried: [],
+    odod: [],
+};
+export const application_commands: Record<
+    BotNames,
+    { name: string; callback: (interaction: BaseCommandInteraction<CacheType>, startTime: number) => Promise<void> }[]
 > = {
     sadie: [],
     d20: [],
@@ -91,6 +117,33 @@ export const addSlashCommand = async (
 
     slash_commands[botName] = slash_commands[botName].filter((c) => c.name != command.name);
     slash_commands[botName].push({
+        name: command.name,
+        callback,
+    });
+};
+
+
+export const addMessageCommand = async (
+    botName: keyof typeof slash_commands,
+    command: ApplicationCommandDataResolvable,
+    callback: (interaction: BaseCommandInteraction<CacheType>, startTime: number) => Promise<void>,
+    addToGuilds?: string[]
+) => {
+    let bot = clients[botName];
+    // console.log("Adding " + command.name + " command to " + botName);
+    if (testing) {
+        let guild = await bot.guilds.fetch(testGuildId);
+        addApplicationCommand(guild, command);
+    } else {
+        let guilds = await bot.guilds.fetch();
+        if (addToGuilds) guilds = guilds.filter((guild) => addToGuilds.includes(guild.id));
+        for (let guild of guilds.values()) {
+            await addApplicationCommand(await guild.fetch(), command);
+        }
+    }
+
+    application_commands[botName] = application_commands[botName].filter((c) => c.name != command.name);
+    application_commands[botName].push({
         name: command.name,
         callback,
     });

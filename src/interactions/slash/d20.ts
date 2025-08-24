@@ -1,10 +1,10 @@
-import { CacheType, CommandInteraction, Guild, GuildMember, Message, MessageActionRow, MessageButton, MessageSelectMenu } from "discord.js";
+import { CacheType, CommandInteraction, GuildMember, Message } from "discord.js";
 import { database, testing } from "../..";
 import { clients, d20 } from "../../clients";
 import { say } from "../../common/functions";
 import { ignore_channels, marineId, setTestChannelId, testChannelId, testGuildId } from "../../common/variables";
-import { bankick, generatecard, mute_unmute, prestige, warn } from "../../d20/functions";
-import { addCommandToGuild, addSlashCommand, followup, reply, slash_commands } from "./common";
+import { bankick, generatecard, prestige } from "../../d20/functions";
+import {  addMessageCommand, addSlashCommand, application_commands, followup, reply, slash_commands } from "./common";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 export const addD20SlashCommand = async (command: SlashCommandBuilder, callback: (interaction: CommandInteraction<CacheType>) => Promise<void>) => {
@@ -13,6 +13,20 @@ export const addD20SlashCommand = async (command: SlashCommandBuilder, callback:
 
 d20.on("ready", async () => {
     console.log("D20 is processing slash commands");
+    addMessageCommand('d20', {
+            type: 'MESSAGE',
+            name: 'test'
+        },
+        async (interaction) => { 
+            if (!interaction.isMessageContextMenu()) return;
+            const sticker = interaction.targetMessage.stickers?.at(0);
+            if (!sticker) return;
+            interaction.reply({
+                content: `. https://media.discordapp.net/stickers/${sticker.id}.png?size=4096`,
+                ephemeral: true,
+            });
+         },
+    )
 });
 d20.on("interactionCreate", async (interaction) => {
     let startTime = Date.now();
@@ -190,4 +204,24 @@ d20.on("interactionCreate", async (interaction) => {
             interaction.reply({ ephemeral: true, content: "The command /" + interaction.commandName + " has not been implemented" });
             break;
     }
+});
+
+d20.on("interactionCreate", async (interaction) => {
+    let startTime = Date.now();
+    if (!interaction.isApplicationCommand()) return;
+    if (ignore_channels.includes(interaction.channelId)) {
+        interaction.reply({
+            content: "Try another channel",
+            ephemeral: true,
+        });
+        return;
+    }
+    for (let { name, callback } of application_commands["d20"]) {
+        // console.log(interaction.commandName, name);
+        if (name == interaction.commandName) {
+            callback(interaction, startTime);
+            return;
+        }
+    }
+    interaction.reply({ ephemeral: true, content: "The command " + interaction.commandName + " has not been implemented" });
 });
