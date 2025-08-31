@@ -20,9 +20,15 @@ d20.on("ready", async () => {
         async (interaction) => { 
             if (!interaction.isMessageContextMenu()) return;
             const sticker = interaction.targetMessage.stickers?.at(0);
-            if (!sticker) return;
+            console.debug();
+            let url;
+            if (!sticker) {
+                const emoji = interaction.targetMessage.content.match(/<(a?):.+:([0-9]+?)>/);
+                if (!emoji) return;
+                url = `https://cdn.discordapp.com/emojis/${emoji[2]}.${!!emoji[1] ? 'gif' : 'png' }?size=4096&animated=${!!emoji[1]}`;
+            } else url = `https://media.discordapp.net/stickers/${sticker.id}.png?size=4096`;
             interaction.reply({
-                content: `. https://media.discordapp.net/stickers/${sticker.id}.png?size=4096`,
+                content: `. ${url}`,
                 ephemeral: true,
             });
          },
