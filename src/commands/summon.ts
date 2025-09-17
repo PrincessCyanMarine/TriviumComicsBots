@@ -76,15 +76,19 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
         ) => {
             if (typeof content === "string") content = { content: content } as MessageOptions;
             let components = content.components || [];
-            if (button && bot.user!.id === sadieId)
+            if (button && bot.user!.id === sadieId) {
+                let buttonId = [`id=${author.id}`];
+                if (mentioned) buttonId.push(`&mentioned=${mentioned}`);
+                if (options[1] && !isNaN(parseInt(options[1]))) buttonId.push(`&summon=${summoned_creature}`);
                 components.push(
                     new MessageActionRow().addComponents(
                         new MessageButton()
-                            .setCustomId("summon?id=" + author.id + (mentioned ? "&mentioned=" + mentioned : ""))
+                            .setCustomId(`summon?${buttonId.join('&')}`)
                             .setLabel("SUMMON")
                             .setStyle("PRIMARY")
                     )
                 );
+            }
             content.components = components;
             if (!content.files) content.files = [];
             if (previousMessage && bot.user!.id != previousMessage.author.id) {
@@ -105,8 +109,9 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
         let summoned_creature = Math.floor(Math.random() * 21);
         let summoned_name: number | string | undefined = undefined;
         let mana_cost = 30;
-        if (options[1] && !isNaN(parseInt(options[1]))) {
-            summoned_creature = author.id == marineId ? parseInt(options[1]) : 0;
+        const chosen_summon = moi instanceof Message ? options[1] : moi.customId.match(/&summon=([0-9]+?)(&|$)/)?.[1];
+        if (chosen_summon && !isNaN(parseInt(chosen_summon))) {
+            summoned_creature = author.id == marineId ? parseInt(chosen_summon) : 0;
             mana_cost = 0;
         }
         if (summoned_creature == 0) {
