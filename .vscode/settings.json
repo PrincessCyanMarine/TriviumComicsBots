@@ -10,7 +10,7 @@
         "**/.settings": true,
         "**/.factorypath": true,
         "**/CVS": true,
-        "**/node_modules": false,
+        "**/node_modules": true,
         "**/dist": true
     },
     "json.schemas": [

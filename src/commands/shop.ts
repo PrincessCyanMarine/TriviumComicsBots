@@ -100,6 +100,8 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
         Number.MAX_VALUE,
         75
     ),
+    { id: Inventory.ITEM_DICT["Wood Sword"]},
+    { id: Inventory.ITEM_DICT["Stone Sword"] },
 ];
 
 let getWelcomeMessage = async (moi: Message | Interaction) => {

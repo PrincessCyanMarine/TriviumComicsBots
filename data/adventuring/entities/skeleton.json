@@ -1,0 +1,9 @@
+{
+    "name": "Skeleton",
+    "id": "skeleton",
+    "maxHp": 5,
+    "attack": 0,
+    "defense": 5,
+    "damage": [],
+    "inventory": [{ "id": "stone_sword", "equipped": true }]
+}

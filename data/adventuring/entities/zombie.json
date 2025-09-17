@@ -1,0 +1,9 @@
+{
+    "name": "Zombie",
+    "id": "zombie",
+    "maxHp": 10,
+    "attack": 3,
+    "defense": 7,
+    "damage": [[1,8]],
+    "inventory": [{ "id": "wood_sword"}]
+}

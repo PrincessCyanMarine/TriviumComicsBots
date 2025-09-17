@@ -3,6 +3,7 @@ import { database } from "..";
 import { capitalize, getMana, setMana } from "../common/functions";
 import { type } from "os";
 import { TIME } from "../common/variables";
+import { Dice } from "../games/adventuring/common";
 
 export namespace Inventory {
     export type ItemType = "weapon" | "armor" | "consumable" | "misc";
@@ -14,7 +15,7 @@ export namespace Inventory {
     export const ItemEffects = ["buff", "debuff", "damage", "heal", "other"] as const;
     export const ItemEffectTypes = [
         "attack",
-        // "defense",
+        "defense",
         // "health",
         "mana",
         // "speed",
@@ -23,6 +24,7 @@ export namespace Inventory {
         // "evasion",
         "manaregen",
         // "healthRegen",
+        "damage"
     ] as const;
     export const ItemEffectTargets = ["self", "enemy", "allies", "enemies"] as const;
     export type ItemEffectType = (typeof ItemEffectTypes)[number];
@@ -46,17 +48,21 @@ export namespace Inventory {
         equippable?: boolean;
         consumable?: boolean;
         equipped?: boolean;
-        id: number;
+        id: number | string;
         maxCount?: number;
         count?: number;
         unstackable?: boolean;
         equippedAt?: number | null;
         buyPrice: number;
         sellPrice: number;
+        drop_chance?: number;
     } & (
         | {
               type: "weapon";
               weaponType?: WeaponType;
+              damage: Dice[],
+              durability: number,
+              attack?: number,
           }
         | {
               type: "armor";
@@ -75,22 +81,22 @@ export namespace Inventory {
     export type Inventory = {
         items: Item[];
         equipped?: {
-            weapon?: number | null;
+            weapon?: number | string | null;
             armor?: {
-                head?: number | null;
-                chest?: number | null;
-                legs?: number | null;
-                feet?: number | null;
-                ring?: number | null;
-                neck?: number | null;
-                offhand?: number | null;
-                mainhand?: number | null;
+                head?: number | null | string;
+                chest?: number | null | string;
+                legs?: number | null | string;
+                feet?: number | null | string;
+                ring?: number | null | string;
+                neck?: number | null | string;
+                offhand?: number | null | string;
+                mainhand?: number | null | string;
             };
         };
         gold: number;
     };
 
-    export function getItemById<T extends number | null | undefined, R extends T extends number ? Item : null>(id: T): R {
+    export function getItemById<T extends number | string | null | undefined, R extends T extends number ? Item : (T extends string ? Item : null)>(id: T): R {
         if (!id && id != 0) return null as R;
         let item = ITEMS[id!] as R;
         if (!item) throw new Error("No item with id " + id);
@@ -271,7 +277,7 @@ export namespace Inventory {
         if (item.equipped) throw new Error("Item at index " + index + " is already equipped");
         inventory.items[index].equipped = true;
         inventory.items[index].equippedAt = Date.now();
-        let alredyEquipped: number | null = null;
+        let alredyEquipped: number | string | null = null;
         if (!inventory.equipped) inventory.equipped = {};
         switch (item.type) {
             case "armor":
@@ -344,13 +350,14 @@ export namespace Inventory {
 
     export async function give(
         moi: Message | Interaction,
-        item: Item | number,
+        item: Item | number | string,
         count = 1,
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
     ): Promise<Inventory> {
-        // console.log(item);
-        if (typeof item == "number") item = getItemById(item);
+        console.debug('item', item);
+        if (typeof item === "number") item = getItemById(item);
+        if (typeof item === "string") item = getItemById(item);
         if (!item) throw new Error("Invalid item id " + item);
         if (!inventory) inventory = await get(moi, target);
         if (count < 0) return take(moi, item, -count, target, inventory);
@@ -500,6 +507,14 @@ export namespace Inventory {
         "The test stick" = -1,
         "Shiny rock" = 5,
         "Potion" = 6,
+        "Basic Sword" = 'basic_sword',
+        "Wood Sword" = 'wood_sword',
+        "Gold Sword" = 'gold_sword',
+        "Stone Sword" = 'stone_sword',
+        "Iron Sword" = 'iron_sword',
+        "Diamond Sword" = 'diamond_sword',
+        "Netherite Sword" = 'netherite_sword',
+        "Slime Goo" = 'slime_goo',
         "D20 of perfect rolls" = 20,
     }
 
@@ -510,7 +525,7 @@ export namespace Inventory {
         consumableType: "potion";
     };
 
-    export const ITEMS: Record<number, Item> = {
+    export const ITEMS: Record<number | string, Item> = {
         0: {
             description: "A ring specially forged for Razraz. It increases his mana by 20",
             effects: [
@@ -617,6 +632,8 @@ export namespace Inventory {
             maxCount: 64,
             buyPrice: -1,
             sellPrice: -1,
+            damage: [[100, 100]],
+            durability: -1,
         },
         5: {
             name: "Shiny rock",
@@ -642,6 +659,36 @@ export namespace Inventory {
             buyPrice: -1,
             sellPrice: -1,
         },
+        [ITEM_DICT["Basic Sword"]]: {
+            name: "Basic Sword",
+            description: "",
+            id: ITEM_DICT["Basic Sword"],
+            equippable: true,
+            rarity: "common",
+            type: "weapon",
+            buyPrice: -1,
+            sellPrice: -1,
+            effects: [],
+            weaponType: "sword",
+            damage: [],
+            attack: 0,
+            maxCount: 64,
+            drop_chance: 0,
+            durability: -1
+        },
+        [ITEM_DICT["Slime Goo"]]: {
+            name: "Slime Goo",
+            description: "A basic sword commonly used by starting adventurers",
+            id: ITEM_DICT["Slime Goo"],
+            equippable: true,
+            rarity: "common",
+            type: "misc",
+            buyPrice: 5,
+            sellPrice: 3,
+            effects: [],
+            miscType: "material",
+            drop_chance: 0.5,
+        },
         20: {
             name: "D20 of perfect rolls",
             description: "A magical D20 that guarantees only the best of rolls",
@@ -664,4 +711,65 @@ export namespace Inventory {
             sellPrice: -1,
         },
     };
+
+    const swords: (Partial<Item & {type: "weapon"}> & {id: ITEM_DICT})[] = [
+        {
+            id: ITEM_DICT["Wood Sword"],
+            name: 'Wood Sword',
+            description: 'A basic sword used by new adventurers',
+            damage: [[1, 4]],
+            attack: -1,
+            durability: 8,
+            buyPrice: 10,
+            sellPrice: 5,
+        },
+        {
+            id: ITEM_DICT["Gold Sword"],
+            name: 'Gold Sword',
+            description: 'Like the wood sword but worse',
+            damage: [[1, 4]],
+            attack: -1,
+            durability: 2,
+        },
+        {
+            id: ITEM_DICT["Stone Sword"],
+            name: 'Stone Sword',
+            description: 'A slightly sturdier sword for more slightly more experienced adventurers',
+            damage: [[1, 6]],
+            attack: 0,
+            durability: 8,
+            buyPrice: 20,
+            sellPrice: 10,
+        },
+        {
+            id: ITEM_DICT["Iron Sword"],
+            name: 'Iron Sword',
+            description: 'The sword used by most adventurers',
+            damage: [[1, 8]],
+            attack: 1,
+            durability: 24,
+        },
+        {
+            id: ITEM_DICT["Diamond Sword"],
+            name: 'Diamond Sword',
+            description: 'An expensive sword used by high ranking adventurers',
+            damage: [[2, 8]],
+            attack: 2,
+            durability: 40,
+        },
+        {
+            id: ITEM_DICT["Netherite Sword"],
+            name: 'Netherite Sword',
+            description: 'Just the sight of this blade is enough to send shivers down the spines of some ancient dragons',
+            damage: [[3, 10]],
+            attack: 3,
+            durability: 64,
+        }
+    ]
+    for (const sword of swords) {
+        ITEMS[sword.id] = {
+            ...ITEMS[ITEM_DICT['Basic Sword']],
+            ...sword,
+        } as any;
+    }
 }

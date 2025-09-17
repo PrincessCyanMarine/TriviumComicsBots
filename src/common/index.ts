@@ -308,10 +308,10 @@ d20.on("messageCreate", async (msg) => {
             case "inventory": {
                 try {
                     let target = msg.mentions.users?.first() || msg.author;
-                    if (target.id == msg.author.id) {
-                        otherCommands();
-                        break;
-                    }
+                    // if (target.id == msg.author.id) {
+                    //     otherCommands();
+                    //     break;
+                    // }
                     let inventory = await Inventory.get(msg, target);
                     let inventoryStr = [];
                     let i = 0;
@@ -431,7 +431,16 @@ d20.on("messageCreate", async (msg) => {
                 } catch (err) {}
                 if (!options[1] || (!id && id != 0) || isNaN(id) || !item) {
                     let items = Object.entries(Inventory.ITEMS)
-                        .sort((a, b) => a[1].id - b[1].id)
+                        .sort((a, b) => {
+                            if (typeof a[1].id === typeof b[1].id) {
+                                if (typeof b[1].id === 'number') return (a[1].id as number) - b[1].id;
+                                else (a[1].id as string).localeCompare(b[1].id);
+                            } else {
+                                if (typeof b[1].id === 'number') return 1;
+                                else return -1;
+                            }
+                            return 0;
+                        })
                         .map(([id, item]) => `${item.id}: ${item.name} (${item.maxCount || "∞"})`);
                     msg.reply(`\`\`\`\n${items.join("\n")}\n\`\`\``);
                 } else {
@@ -488,21 +497,21 @@ d20.on("messageCreate", async (msg) => {
                 }
                 try {
                     let target = msg.mentions.users?.first() || msg.author;
-                    let itemIdOrIndex = parseInt(options[1]);
+                    let itemIdOrIndex: string | number = options[1];
                     if (options[1] == "potion") itemIdOrIndex = Inventory.ITEM_DICT["Potion"];
-                    // console.log(options[1], itemId);
-                    if ((!itemIdOrIndex && itemIdOrIndex != 0) || isNaN(itemIdOrIndex)) {
+                    console.log(options[1], itemIdOrIndex);
+                    if ((!itemIdOrIndex && itemIdOrIndex != 0) || command == "take" && isNaN(parseInt(itemIdOrIndex.toString()))) {
                         msg.reply("Invalid item id");
                         return;
                     }
                     let amount = parseInt(options[2] || "1") || 1;
                     if (isNaN(amount)) new Error("Invalid amount");
                     if (command == "take") amount = -amount;
-                    if (msg.author.id != marineId && amount >= 1 && [0, 1].includes(itemIdOrIndex) && target.id != "852639258690191370") {
+                    if (msg.author.id != marineId && amount >= 1 && typeof itemIdOrIndex === 'number' && [0, 1].includes(itemIdOrIndex) && target.id != "852639258690191370") {
                         msg.reply("That item is exclusive to AC");
                         return;
                     }
-                    let item = command == "take" ? (await Inventory.get(msg, target)).items[itemIdOrIndex] : Inventory.getItemById(itemIdOrIndex);
+                    let item = command == "take" ? (await Inventory.get(msg, target)).items[parseInt(itemIdOrIndex.toString())] : Inventory.getItemById(itemIdOrIndex);
                     // console.log(item);
                     if (!item) {
                         msg.reply("Invalid item id");

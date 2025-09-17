@@ -1,0 +1,9 @@
+{
+    "name": "Slime",
+    "id": "slime",
+    "maxHp": 3,
+    "attack": -1,
+    "defense": 3,
+    "damage": [[1,4]],
+    "inventory": [{"id": "slime_goo"}]
+}
