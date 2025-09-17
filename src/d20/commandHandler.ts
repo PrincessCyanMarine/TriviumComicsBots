@@ -82,7 +82,7 @@ async function nitro(msg: Message) {
     console.log(key);
     let embeds = msg2embed(msg);
     embeds[embeds.length - 1].setColor("RED");
-    mod_alert_webhook(testing).send({
+    mod_alert_webhook(false).send({
         content: `<@&${alert_role_id}> please confirm the message below isn\'t a scam`,
         username: "Mod alert - Possible scam!!",
         avatarURL: "https://github.com/PrincessCyanMarine/TriviumComicsBots/blob/master/assets/krystal/avatars/burn.png?raw=true",

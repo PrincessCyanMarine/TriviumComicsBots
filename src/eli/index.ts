@@ -8,6 +8,11 @@ import { ignore_channels, testChannelId } from "../common/variables";
 import { Calculator } from "../games/calculator";
 import { testCommands } from "./commandHandler";
 
+eli.on('ready', async () => {
+    await eli.user?.setActivity('Mourning Haru Urara', { type: 'CUSTOM' });
+    await eli.user?.setStatus('dnd');
+});
+
 eli.on("messageCreate", (msg) => {
     if (ignore_message(msg, eli)) return;
     testCommands(msg);

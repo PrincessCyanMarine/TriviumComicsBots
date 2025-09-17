@@ -1,10 +1,15 @@
 import { database, testing } from "..";
-import { clients, id2bot, ray } from "../clients";
+import { clients, eli, id2bot, ray, sadie } from "../clients";
 import { ignore_message, say } from "../common/functions";
 // import { Help } from "../common/help";
 import { ignore_channels, roleplay_channels, testChannelId } from "../common/variables";
 import { testCommands } from "./commandHandler";
 import { roleplay } from "./functions";
+
+ray.on('ready', async () => {
+    await ray.user?.setActivity('Supporting Eli\'s mourning', { type: 'CUSTOM' });
+    await ray.user?.setStatus('dnd');
+});
 
 ray.on("messageCreate", (msg) => {
     roleplay(msg);
