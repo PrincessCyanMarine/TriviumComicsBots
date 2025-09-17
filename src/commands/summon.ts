@@ -66,6 +66,7 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
         const author = moi instanceof Message ? moi.author : moi.user;
         let mentioned = moi instanceof Message ? moi.mentions.members?.first()?.id : moi.customId.match(/mentioned=(.+?)(&|$)/)?.[1];
         let previousMessage: Message  | null = moi instanceof ButtonInteraction ? moi.message as Message : null;
+        const chosen_summon = moi instanceof Message ? options[1] : moi.customId.match(/&summon=([0-9]+?)(&|$)/)?.[1];
         const send = async (
             bot: Client,
             channel: TextBasedChannel | string,
@@ -79,7 +80,7 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
             if (button && bot.user!.id === sadieId) {
                 let buttonId = [`id=${author.id}`];
                 if (mentioned) buttonId.push(`&mentioned=${mentioned}`);
-                if (options[1] && !isNaN(parseInt(options[1]))) buttonId.push(`&summon=${summoned_creature}`);
+                if (chosen_summon && !isNaN(parseInt(chosen_summon))) buttonId.push(`&summon=${summoned_creature}`);
                 components.push(
                     new MessageActionRow().addComponents(
                         new MessageButton()
@@ -109,7 +110,8 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
         let summoned_creature = Math.floor(Math.random() * 21);
         let summoned_name: number | string | undefined = undefined;
         let mana_cost = 30;
-        const chosen_summon = moi instanceof Message ? options[1] : moi.customId.match(/&summon=([0-9]+?)(&|$)/)?.[1];
+        if (!(moi instanceof Message)) console.debug(moi.customId);
+        console.debug(chosen_summon);
         if (chosen_summon && !isNaN(parseInt(chosen_summon))) {
             summoned_creature = author.id == marineId ? parseInt(chosen_summon) : 0;
             mana_cost = 0;
@@ -130,19 +132,21 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                 `Mana go. Circle appear.`,
                 `Circle appear. Mana go.`,
             ]);
-            await send(
-                sadie,
-                channel,
-                {
-                    content: text + `\n(${Math.floor(mana.value)}/${mana.max} mana remaining)`,
-                    files: [new MessageAttachment(`./assets/ray/roll/${summoned_creature}.gif`, "Roll.gif")],
-                },
-                500,
-                undefined,
-                false
-            );
-            await wait(2000);
-            await send(sadie, channel, "You chant the ancient words of summoning…", 500, undefined, false);
+            if (!(chosen_summon && !isNaN(parseInt(chosen_summon)))) {
+                await send(
+                    sadie,
+                    channel,
+                    {
+                        content: text + `\n(${Math.floor(mana.value)}/${mana.max} mana remaining)`,
+                        files: [new MessageAttachment(`./assets/ray/roll/${summoned_creature}.gif`, "Roll.gif")],
+                    },
+                    500,
+                    undefined,
+                    false
+                );
+                await wait(2000);
+                await send(sadie, channel, "You chant the ancient words of summoning…", 500, undefined, false);
+            }
             switch (summoned_creature) {
                 case 1:
                     await send(
@@ -201,28 +205,29 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
                     summoned_name = SUMMON_NAMES.PLANE;
                     break;
                 case 14:
-                    if (!mentioned)
-                        if (moi.guild?.id == triviumGuildId) mentioned = random_from_array(Object.values(SUMMON_TARGETS));
-                        else mentioned = author.id;
-                    if (mentioned == author.id)
+                    let _mentioned = mentioned;
+                    if (!_mentioned)
+                        if (moi.guild?.id == triviumGuildId) _mentioned = random_from_array(Object.values(SUMMON_TARGETS));
+                        else _mentioned = author.id;
+                    if (_mentioned == author.id)
                         await send(
                             sadie,
                             channel,
                             `[${summoned_creature}] ` +
                                 "A wild " +
-                                userMention(mentioned) +
+                                userMention(_mentioned) +
                                 " appears!\n\nWait did you just summon yourself? Is that even possible?",
                             250
                         );
-                    else await send(sadie, channel, `[${summoned_creature}] ` + "A wild " + userMention(mentioned) + " appears!", 250);
-                    // if (mentioned == SUMMON_TARGETS.SWITCH)
+                    else await send(sadie, channel, `[${summoned_creature}] ` + "A wild " + userMention(_mentioned) + " appears!", 250);
+                    // if (_mentioned == SUMMON_TARGETS.SWITCH)
                     //     await send(krystal, channel, {
                     //         files: [await killing(undefined, msg.author, undefined, undefined)],
                     //         content: "We don't have permission to use Merry's art",
                     //     });
-                    if (mentioned == "297531251081084941") summoned_name = SUMMON_NAMES.DODO;
-                    else if ((await moi.guild?.members.fetch(mentioned))?.permissions.has("KICK_MEMBERS")) summoned_name = "mod/" + mentioned;
-                    else summoned_name = "player/" + mentioned;
+                    if (_mentioned == "297531251081084941") summoned_name = SUMMON_NAMES.DODO;
+                    else if ((await moi.guild?.members.fetch(_mentioned))?.permissions.has("KICK_MEMBERS")) summoned_name = "mod/" + _mentioned;
+                    else summoned_name = "player/" + _mentioned;
                     break;
                 case 15:
                     await send(sadie, channel, `[${summoned_creature}] ` + "You summoned a bird. It's not a dodo", 300);
