@@ -30,6 +30,7 @@ enum SUMMON_TARGETS {
     ACCHAN = "852639258690191370",
     // XBOX = "171294034290016276",
     ROY = "1258452263379406919",
+    ARSENA = "491029828955537418"
 }
 
 export enum SUMMON_NAMES {
@@ -103,20 +104,24 @@ export async function summon(moi: Message | ButtonInteraction, options: string[]
         // console.log(SUMMON_NAMES);
         let summoned_creature = Math.floor(Math.random() * 21);
         let summoned_name: number | string | undefined = undefined;
-        if (options[1] && !isNaN(parseInt(options[1]))) summoned_creature = author.id == marineId ? parseInt(options[1]) : 0;
+        let mana_cost = 30;
+        if (options[1] && !isNaN(parseInt(options[1]))) {
+            summoned_creature = author.id == marineId ? parseInt(options[1]) : 0;
+            mana_cost = 0;
+        }
         if (summoned_creature == 0) {
             await send(sadie, channel, "no", undefined, undefined, false);
             summoned_name = SUMMON_NAMES.NO;
         } else {
-            let [canUse, mana] = await useMana(moi, 30);
+            let [canUse, mana] = await useMana(moi, mana_cost);
             if (!canUse) {
-                await send(sadie, channel, `Not enough mana to summon!\nSummoning cost: 30\nCurrent mana: ${Math.floor(mana.value)}`);
+                await send(sadie, channel, `Not enough mana to summon!\nSummoning cost: ${mana_cost}\nCurrent mana: ${Math.floor(mana.value)}`);
                 return;
             }
             let text = random_from_array([
-                `*You draw a magic circle on the ground, consuming 30 mana…*`,
-                `*You draw a magic circle on the ground, and pour 30 mana into it*`,
-                `*You waste 30 of your hard earned mana to conjure a magic circle*`,
+                `*You draw a magic circle on the ground, consuming ${mana_cost} mana…*`,
+                `*You draw a magic circle on the ground, and pour ${mana_cost} mana into it*`,
+                `*You waste ${mana_cost} of your hard earned mana to conjure a magic circle*`,
                 `Mana go. Circle appear.`,
                 `Circle appear. Mana go.`,
             ]);
