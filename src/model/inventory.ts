@@ -60,7 +60,7 @@ export namespace Inventory {
         | {
               type: "weapon";
               weaponType?: WeaponType;
-              damage: Dice[],
+              damage: (Dice | number)[],
               durability: number,
               attack?: number,
           }
@@ -632,7 +632,7 @@ export namespace Inventory {
             maxCount: 64,
             buyPrice: -1,
             sellPrice: -1,
-            damage: [[100, 100]],
+            damage: [[200, -1]],
             durability: -1,
         },
         5: {
@@ -678,7 +678,7 @@ export namespace Inventory {
         },
         [ITEM_DICT["Slime Goo"]]: {
             name: "Slime Goo",
-            description: "A basic sword commonly used by starting adventurers",
+            description: "Gooey substance left behind by a weak enemy. There are no known uses for it currently",
             id: ITEM_DICT["Slime Goo"],
             equippable: true,
             rarity: "common",

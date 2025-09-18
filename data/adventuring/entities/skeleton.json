@@ -5,5 +5,7 @@
     "attack": 0,
     "defense": 5,
     "damage": [],
-    "inventory": [{ "id": "stone_sword", "equipped": true }]
+    "inventory": [{ "id": "stone_sword", "equipped": true }],
+    "drops": [[0.1, { "id": "stone_sword" }]],
+    "gold": [2, 6]
 }

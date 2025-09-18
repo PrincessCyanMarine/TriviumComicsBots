@@ -5,6 +5,7 @@ export type InteractionIdData = {
 
 export enum COMMANDS {
     ATTACK='attack',
+    BATTLE='battle',
     ROUTE='route',
 };
 

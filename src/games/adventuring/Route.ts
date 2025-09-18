@@ -26,7 +26,7 @@ export default class Route implements RouteDataObject {
         return Entity.spawn(this._moi, random_from_array(this._encounters));
     }
 
-    toString() { return this.name; }
+    toString() { return `***${this.name}***`; }
 }
 
 const readRoutePath = (path: string) => {

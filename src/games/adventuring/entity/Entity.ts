@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "fs";
 import { Dice, rollDice, rollDie, RolledDice, RolledDie } from "../common";
 import { Inventory } from "../../../model/inventory";
-import { getMana } from "../../../common/functions";
+import { getMana, randomchance } from "../../../common/functions";
 import { User, Interaction, Message, GuildMember, ButtonInteraction } from "discord.js";
 import { database } from "../../..";
 
@@ -14,6 +14,8 @@ type EntityDataObject = {
     readonly defense: number;
     readonly damage: (Dice | number)[];
     readonly inventory: (Partial<Inventory.Item> & { id: number | string })[]
+    readonly drops?: [number, Inventory.Item][]
+    readonly gold?: [number, number]
 };
 
 type PlayerEntityDataObject = EntityDataObject & {
@@ -39,8 +41,10 @@ export default class Entity implements EntityDataObject {
     protected _damage!: (Dice | number)[];
     protected _name!: string;
     protected _hp!: number;
+    protected _drops!: [number, Inventory.Item][]
     protected _inventory!: Inventory.Item[];
     protected _player: GuildMember;
+    protected _gold!: [number, number];
     
     get hp() { return this._hp };
     get maxHp() { return this._maxHp };
@@ -50,7 +54,11 @@ export default class Entity implements EntityDataObject {
     get id() { return this._id };
     get name() { return this._name };
     get inventory() { return this._inventory }
-    get dead() { return this.hp <= 0 }
+    get drops() { return this._drops };
+    get gold() { return this._gold };
+
+    get dead() { return this.hp <= 0 };
+
 
     set hp(value: number) {
         this._hp = value;
@@ -147,6 +155,15 @@ export default class Entity implements EntityDataObject {
         this.hp -= damage;
     }
 
+    rollDrops() {
+        return this.drops.filter((drop) => Math.random() < drop[0]).map((drop) => drop[1]);
+    }
+
+    rollGold() {
+        const [min, max] = this.gold;
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
     toObject(): EntityDataObject & { hp: number  } {
         return {
             name: this.name,
@@ -161,7 +178,7 @@ export default class Entity implements EntityDataObject {
     }
 
     toString() {
-        return this.name;
+        return `***${this.name}***`;
     }
 }
 
@@ -226,7 +243,7 @@ export class PlayerEntity extends Entity implements PlayerEntityDataObject {
     }
 
     toString(): string {
-        return `<@${this._player.id}>`
+        return `***<@${this._player.id}>***`
     }
 }
 

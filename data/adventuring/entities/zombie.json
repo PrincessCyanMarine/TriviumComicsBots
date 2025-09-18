@@ -5,5 +5,7 @@
     "attack": 3,
     "defense": 7,
     "damage": [[1,8]],
-    "inventory": [{ "id": "wood_sword"}]
+    "inventory": [{ "id": "wood_sword"}],
+    "drops": [[0.1, { "id": "wood_sword"}]],
+    "gold": [2, 8]
 }

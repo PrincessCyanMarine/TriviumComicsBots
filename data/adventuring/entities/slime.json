@@ -5,5 +5,7 @@
     "attack": -1,
     "defense": 3,
     "damage": [[1,4]],
-    "inventory": [{"id": "slime_goo"}]
+    "inventory": [],
+    "drops": [[0.4, {"id": "slime_goo"}]],
+    "gold": [1, 4]
 }
