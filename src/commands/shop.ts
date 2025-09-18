@@ -8,6 +8,7 @@ import { addD20ButtonCommand } from "../interactions/button/d20";
 import { addSadieButtonCommand } from "../interactions/button/sadie";
 
 let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | undefined])[] = [
+    ...Inventory.shop_items,
     { id: Inventory.ITEM_DICT["Divorce papers"] },
     Inventory.makePotion(
         {
@@ -100,8 +101,6 @@ let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | und
         Number.MAX_VALUE,
         75
     ),
-    { id: Inventory.ITEM_DICT["Wood Sword"]},
-    { id: Inventory.ITEM_DICT["Stone Sword"] },
 ];
 
 let getWelcomeMessage = async (moi: Message | Interaction) => {

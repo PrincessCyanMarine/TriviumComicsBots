@@ -79,9 +79,11 @@ export default class Entity implements EntityDataObject {
         this._hp = hp || this._maxHp
         this._inventory = this._inventory.map((item) => ({ ...Inventory.getItemById(item.id), ...item }));
         for (const item of this.inventory) {
-            if (item.type !== 'weapon' || !item.equipped) continue;
-            this._damage = [...this.damage, ...item.damage];
+            if (!item.equipped) continue;
+            if (item.damage && Array.isArray(item.damage)) this._damage = [...this.damage, ...item.damage];
             this._attack += item.attack || 0;
+            this._defense += item.defense || 0;
+            this._maxHp += item.maxHp || 0;
         }
         this._damage.sort((a, b) => {
             if (typeof a !== typeof b) {

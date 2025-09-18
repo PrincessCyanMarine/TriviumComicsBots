@@ -56,13 +56,15 @@ export namespace Inventory {
         buyPrice: number;
         sellPrice: number;
         drop_chance?: number;
+        damage?: (Dice | number)[],
+        attack?: number,
+        defense?: number;
+        maxHp?: number;
     } & (
         | {
               type: "weapon";
               weaponType?: WeaponType;
-              damage: (Dice | number)[],
               durability: number,
-              attack?: number,
           }
         | {
               type: "armor";
@@ -355,7 +357,7 @@ export namespace Inventory {
         target = moi instanceof Message ? moi.author : moi.user,
         inventory?: Inventory
     ): Promise<Inventory> {
-        console.debug('item', item);
+        // console.debug('item', item);
         if (typeof item === "number") item = getItemById(item);
         if (typeof item === "string") item = getItemById(item);
         if (!item) throw new Error("Invalid item id " + item);
@@ -516,6 +518,12 @@ export namespace Inventory {
         "Netherite Sword" = 'netherite_sword',
         "Slime Goo" = 'slime_goo',
         "D20 of perfect rolls" = 20,
+        "Basic Boots" = 'basic_boots',
+        "Basic Leggings" = 'basic_leggings',
+        "Basic Chestplate" = 'basic_chestplate',
+        "Basic Helmet" = 'basic_helmet',
+        "Basic Ring" = 'basic_ring',
+        "Basic Lesser Ring" = 'basic_lesser_ring',
     }
 
     export type Potion = Item & {
@@ -540,6 +548,7 @@ export namespace Inventory {
             rarity: "uncommon",
             slot: "ring",
             type: "armor",
+            equipped: true,
             id: 0,
             maxCount: 1,
             buyPrice: -1,
@@ -558,6 +567,7 @@ export namespace Inventory {
             name: "AC's Unhelpful Ring",
             rarity: "uncommon",
             slot: "ring",
+            equipped: true,
             type: "armor",
             id: 1,
             maxCount: 1,
@@ -689,6 +699,78 @@ export namespace Inventory {
             miscType: "material",
             drop_chance: 0.5,
         },
+        [ITEM_DICT["Basic Boots"]]: {
+            name: "Basic Boots",
+            description: "",
+            id: ITEM_DICT["Basic Boots"],
+            equippable: true,
+            rarity: "common",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "feet",
+        },
+        [ITEM_DICT["Basic Leggings"]]: {
+            name: "Basic Leggings",
+            description: "",
+            id: ITEM_DICT["Basic Leggings"],
+            equippable: true,
+            rarity: "common",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "legs",
+        },
+        [ITEM_DICT["Basic Chestplate"]]: {
+            name: "Basic Chestplate",
+            description: "",
+            id: ITEM_DICT["Basic Chestplate"],
+            equippable: true,
+            rarity: "common",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "chest",
+        },
+        [ITEM_DICT["Basic Helmet"]]: {
+            name: "Basic Helmet",
+            description: "",
+            id: ITEM_DICT["Basic Helmet"],
+            equippable: true,
+            rarity: "common",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "head",
+        },
+        [ITEM_DICT["Basic Ring"]]: {
+            name: "Basic Ring",
+            description: "",
+            id: ITEM_DICT["Basic Ring"],
+            equippable: true,
+            rarity: "common",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "ring",
+        },
+        [ITEM_DICT["Basic Lesser Ring"]]: {
+            name: "Basic Lesser Ring",
+            description: "",
+            id: ITEM_DICT["Basic Lesser Ring"],
+            equippable: true,
+            rarity: "common",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "ring",
+        },
         20: {
             name: "D20 of perfect rolls",
             description: "A magical D20 that guarantees only the best of rolls",
@@ -726,15 +808,17 @@ export namespace Inventory {
         {
             id: ITEM_DICT["Gold Sword"],
             name: 'Gold Sword',
-            description: 'Like the wood sword but worse',
+            description: 'Like the wood sword but worse in every way (scam item)',
             damage: [[1, 4]],
             attack: -1,
+            buyPrice: 10000,
+            sellPrice: 10000,
             durability: 2,
         },
         {
             id: ITEM_DICT["Stone Sword"],
             name: 'Stone Sword',
-            description: 'A slightly sturdier sword for more slightly more experienced adventurers',
+            description: 'A slightly sturdier sword for slightly more experienced adventurers',
             damage: [[1, 6]],
             attack: 0,
             durability: 8,
@@ -747,6 +831,8 @@ export namespace Inventory {
             description: 'The sword used by most adventurers',
             damage: [[1, 8]],
             attack: 1,
+            buyPrice: 40,
+            sellPrice: 20,
             durability: 24,
         },
         {
@@ -766,10 +852,91 @@ export namespace Inventory {
             durability: 64,
         }
     ]
+    export const shop_items: Partial<Item>[] = [];
+    const addToShop = (id: string | ITEM_DICT) => shop_items.push({ id });
     for (const sword of swords) {
+        sword.description = `[${sword.damage!.map((d) => typeof d === 'number' ? d : d.join('d')).join('+')}] (${sword.attack! >= 0 ? '+' : ''}${sword.attack!} attack) ${sword.description}`
         ITEMS[sword.id] = {
             ...ITEMS[ITEM_DICT['Basic Sword']],
             ...sword,
         } as any;
+        addToShop(sword.id);
     }
+    const armor_materials = [
+        {
+            name: 'Leather',
+            defense: [1, 2, 3, 1],
+            price: [10, 30, 50, 20]
+        },
+        {
+            name: 'Chainmail',
+            defense: [2, 3, 4, 2],
+            price: [40, 60, 80, 50]
+        }
+    ]
+    // "head" | "chest" | "legs" | "feet" | "ring" | "neck" | "offhand" | "mainhand";
+    const armor_pieces = ['Boots', 'Leggings', 'Chestplate', 'Helmet']
+    for (const material of armor_materials) {
+        for (let i = 0; i < armor_pieces.length; i++) {
+            const piece = armor_pieces[i];
+            const armor = {...ITEMS[`basic_${piece.toLowerCase()}`]};
+            armor.defense = material.defense[i];
+            armor.buyPrice = material.price[i];
+            armor.sellPrice = armor.buyPrice / 2;
+            armor.description = `+${armor.defense} defense`;
+            armor.name = `${material.name} ${piece}`;
+            armor.id = `${material.name.toLowerCase()}_${piece.toLowerCase()}`;
+            ITEMS[armor.id] = armor;
+            addToShop(armor.id);
+        }
+    }
+    const rings = [
+        {
+            name: 'Health',
+            values: [5, 10],
+            prices: [20, 40],
+            property: 'health'
+        },
+        {
+            name: 'Defense',
+            values: [2, 3],
+            prices: [40, 90],
+            property: 'defense'
+        },
+        {
+            name: 'Strength',
+            values: [[1], [2]],
+            prices: [20, 40],
+            property: 'damage'
+        },
+        {
+            name: 'Accuracy',
+            values: [1, 2],
+            prices: [30, 60],
+            property: 'attack'
+        }
+    ];
+    const ring_types = [['lesser_', 'Lesser'], ['', '']]
+    for (const _ring of rings) {
+        for (let i = 0; i < ring_types.length; i++) {
+            const [type, typeName] = ring_types[i];
+            const ring = {...ITEMS[`basic_${type}ring`]};
+            (ring as any)[_ring.property] = _ring.values[i];
+            ring.buyPrice = _ring.prices[i];
+            ring.sellPrice = ring.buyPrice / 2;
+            ring.description = `+${_ring.values[i]} ${_ring.property}`;
+            ring.name = `${typeName} ${_ring.name} Ring`;
+            ring.id = `${type}${_ring.name.toLowerCase()}_ring`;
+            ITEMS[ring.id] = ring;
+            addToShop(ring.id);
+        }
+    }
+    /*
+        "Lesser Health Ring" = 'lesser_health_ring',
+        "Health Ring" = 'health_ring',
+        'Lesser Strength Ring' = 'lesser_strength_ring',
+        'Strength Ring' = 'strength_ring',
+        'Lesser Defense Ring' = 'lesser_defense_ring',
+        'Defense Ring' = 'defense_ring',
+    */
 }

@@ -41,10 +41,31 @@ const sendMessage = async (moi: Message | ButtonInteraction, encounter: Entity, 
     };
 }
 
+const processing: {[id: string]: boolean} = {};
+
+const testValid = async (interaction: ButtonInteraction) => {
+    try {
+        const data = InteractionId.customIdToObject<AttackData>(interaction.customId);
+        if (data.id !== interaction.user.id) {
+            await interaction.reply({ content: 'You can\'t press other people\'s buttons', ephemeral: true });
+            return false;
+        }
+        if (processing[interaction.message.id]) {
+            console.debug('already processing');
+            await interaction.reply({ content: 'Already processing action', ephemeral: true });
+            return false;
+        }
+        return true;
+    } catch(err) {
+        console.error(err);
+        return false;
+    }
+}
+
 addExclamationCommand('battle', async (msg, args) => {
     try {
         const inventory = await Inventory.get(msg);
-        const hasTestStick = inventory.items.find((item) => item.id === Inventory.ITEM_DICT['The test stick'] && item.equipped);
+        const hasTestStick = msg.guildId === '620635349173010465' || inventory.items.find((item) => item.id === Inventory.ITEM_DICT['The test stick'] && item.equipped);
         const stamina = (await getStamina(msg));
         if (!hasTestStick && stamina.value < COST) {
             msg.reply({content: `Not enough stamina (${Math.floor(stamina.value)}/${Math.floor(stamina.max)})\nYou need at least ${COST} stamina`, components: [goAgainButton(msg)]})
@@ -68,24 +89,23 @@ addExclamationCommand('battle', async (msg, args) => {
 });
 addD20ButtonCommand(COMMANDS.BATTLE, async (interaction) => {
     try {
-        const data = InteractionId.customIdToObject<AttackData>(interaction.customId);
-        if (data.id !== interaction.user.id) {
-            await interaction.reply({ content: 'You can\'t press other people\'s buttons', ephemeral: true });
-            return;
-        }
+        if (!await testValid(interaction)) return;
+        processing[interaction.message.id] = true;
+        await interaction.deferUpdate()
         const inventory = await Inventory.get(interaction);
-        const hasTestStick = inventory.items.find((item) => item.id === Inventory.ITEM_DICT['The test stick'] && item.equipped);
+        const hasTestStick = interaction.guildId === '620635349173010465' || inventory.items.find((item) => item.id === Inventory.ITEM_DICT['The test stick'] && item.equipped);
         const stamina = (await getStamina(interaction));
         const cost = COST;
         if (!hasTestStick && stamina.value < cost) {
-            await interaction.update({content: `Not enough stamina (${Math.floor(stamina.value)}/${Math.floor(stamina.max)})\nYou need at least ${COST} stamina`, components: [goAgainButton(interaction)]})
+            await interaction.editReply({content: `Not enough stamina (${Math.floor(stamina.value)}/${Math.floor(stamina.max)})\nYou need at least ${COST} stamina`, components: [goAgainButton(interaction)]})
             return;
         }
         const route = new Route('forest', interaction)
         const player = await PlayerEntity.spawn(interaction);
         let enemy = await route.encounter();
         if (!hasTestStick) await useStamina(interaction, COST);
-        await interaction.update(await sendMessage(interaction, enemy, player, route));
+        await interaction.editReply(await sendMessage(interaction, enemy, player, route));
+        delete processing[interaction.message.id];
     } catch(err) {
         console.error(err);
         // interaction.reply({ content: 'An error has ocurred. Please try again', ephemeral: true });
@@ -93,11 +113,10 @@ addD20ButtonCommand(COMMANDS.BATTLE, async (interaction) => {
 });
 addD20ButtonCommand(COMMANDS.ATTACK, async (interaction) => {
     try {
+        if (!await testValid(interaction)) return;
+        processing[interaction.message.id] = true;
+        await interaction.deferUpdate();
         const data = InteractionId.customIdToObject<AttackData>(interaction.customId);
-        if (data.id !== interaction.user.id) {
-            interaction.reply({ content: 'You can\'t press other people\'s buttons', ephemeral: true });
-            return;
-        }
         console.debug(data);
         const route = new Route('forest', interaction);
         const enemy = await Entity.spawn(interaction, data.eId, parseInt(data.ehp));
@@ -125,7 +144,8 @@ addD20ButtonCommand(COMMANDS.ATTACK, async (interaction) => {
         const msg = await sendMessage(interaction, enemy, player, route);
         msg.content += `\n\n\n\n`;
         msg.content += actions.join('\n');
-        await interaction.update(msg);
+        await interaction.editReply(msg);
+        delete processing[interaction.message.id];
     } catch(err) {
         console.error(err);
         // interaction.reply({ content: 'An error has ocurred. Please try again', ephemeral: true });
@@ -155,10 +175,11 @@ const tryResolve = (interaction: ButtonInteraction, player: PlayerEntity, enemy:
     const resolve = (winner: Entity, loser: Entity, append?: string) => {
         let msg = `${winner} won against ${loser} on ${route}`;
         if (append) msg += '\n' + append;
-        interaction.update({
+        interaction.editReply({
             content: msg,
             components: [goAgainButton(interaction)],
         });
+        delete processing[interaction.message.id];
         return true;
     }
     if (enemy.dead) {
