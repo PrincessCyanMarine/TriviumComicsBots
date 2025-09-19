@@ -1,0 +1,11 @@
+{
+    "name": "Creeper",
+    "id": "creeper",
+    "maxHp": 8,
+    "attack": 20,
+    "defense": 10,
+    "damage": [[5,12]],
+    "inventory": [],
+    "drops": [[0.8, { "id": "gunpowder"}]],
+    "gold": [8, 16]
+}

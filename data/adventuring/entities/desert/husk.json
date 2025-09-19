@@ -1,0 +1,11 @@
+{
+    "name": "Husk",
+    "id": "husk",
+    "maxHp": 15,
+    "attack": 5,
+    "defense": 10,
+    "damage": [[1,12]],
+    "inventory": [{ "id": "iron_sword"}],
+    "drops": [[0.1, { "id": "iron_sword"}]],
+    "gold": [4, 12]
+}

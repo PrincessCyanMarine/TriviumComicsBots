@@ -1,0 +1,7 @@
+{
+    "id": "desert",
+    "name": "Desert",
+    "encounters": ["zombie", "husk", "creeper"],
+    "level": 1,
+    "cost": 10
+}

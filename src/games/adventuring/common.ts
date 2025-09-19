@@ -11,3 +11,9 @@ export function rollDice (amount: [number, number] | number, sides?: number): Ro
     for (let i = 0; i < amount; i++) dice.push([sides!, rollDie(sides!)]);
     return dice;
 }
+type typeofType = 'bigint' | 'boolean' | 'function' | 'number' | 'object' | 'string' | 'symbol' | 'undefined'
+
+export function testArgsInObj<T>(obj: any, args: (keyof T)[], type: typeofType) {
+    for (const arg of args) if (!(arg in obj) || typeof obj[arg] !== type) return false;
+    return true;
+}

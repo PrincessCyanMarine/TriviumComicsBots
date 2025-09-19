@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "fs";
-import { Dice, rollDice, rollDie, RolledDice, RolledDie } from "../common";
+import { Dice, rollDice, rollDie, RolledDice, RolledDie, testArgsInObj } from "../common";
 import { Inventory } from "../../../model/inventory";
 import { getMana, randomchance } from "../../../common/functions";
 import { User, Interaction, Message, GuildMember, ButtonInteraction } from "discord.js";
@@ -76,7 +76,6 @@ export default class Entity implements EntityDataObject {
 
     protected async populate(hp?: number) {
         for (const [key, value] of Object.entries(await this.getTypeData())) (this as any)['_' + key] = value;
-        this._hp = hp || this._maxHp
         this._inventory = this._inventory.map((item) => ({ ...Inventory.getItemById(item.id), ...item }));
         for (const item of this.inventory) {
             if (!item.equipped) continue;
@@ -85,6 +84,7 @@ export default class Entity implements EntityDataObject {
             this._defense += item.defense || 0;
             this._maxHp += item.maxHp || 0;
         }
+        this._hp = hp || this._maxHp
         this._damage.sort((a, b) => {
             if (typeof a !== typeof b) {
                 if (typeof a === 'number') return 1;
@@ -98,8 +98,8 @@ export default class Entity implements EntityDataObject {
 
     static validate(obj: any): obj is EntityDataObject {
         if (typeof obj !== 'object' || Array.isArray(obj)) return false;
-        for (const num of ['maxHp', 'attack', 'defense']) if (!(num in obj) || typeof obj[num] !== 'number') return false;
-        for (const str of ['name', 'id']) if (!(str in obj) || typeof obj[str] !== 'string') return false;
+        if (!testArgsInObj(obj, ['maxHp', 'attack', 'defense'], 'number')) return false;
+        if (!testArgsInObj(obj, ['name', 'id'], 'string')) return false;
         if (!('damage' in obj) || !Array.isArray(obj.damage)) return false;
         if (!('inventory' in obj) || !Array.isArray(obj.inventory)) return false;
         for (const value of obj.damage) {
@@ -206,8 +206,8 @@ export class PlayerEntity extends Entity implements PlayerEntityDataObject {
 
     static validate(obj: any): obj is PlayerEntityDataObject {
         if (!super.validate(obj)) return false;
-        for (const num of ['stamina', 'mana']) if (!(num in obj) || typeof (obj as any)[num] !== 'number') return false;
-        for (const str of ['playerId']) if (!(str in obj) || typeof (obj as any)[str] !== 'string') return false;
+        if (!testArgsInObj(obj, ['stamina', 'mana'], 'number')) return false;
+        if (!testArgsInObj(obj, ['playerId'], 'string')) return false;
         return true;
     }
 

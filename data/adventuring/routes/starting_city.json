@@ -1,0 +1,7 @@
+{
+    "id": "starting_city",
+    "name": "Starting City",
+    "encounters": ["slime"],
+    "level": 1,
+    "cost": 3
+}

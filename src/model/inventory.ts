@@ -895,7 +895,7 @@ export namespace Inventory {
             name: 'Health',
             values: [5, 10],
             prices: [20, 40],
-            property: 'health'
+            property: 'maxHp'
         },
         {
             name: 'Defense',

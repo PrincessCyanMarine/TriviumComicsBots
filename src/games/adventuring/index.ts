@@ -1,7 +1,7 @@
 import { ButtonBuilder } from "@discordjs/builders";
 import { addExclamationCommand } from "../../common";
 import Entity, { AttackInfo, PlayerEntity } from "./entity/Entity";
-import Route from "./Route";
+import Route, { routes } from "./Route";
 import { ButtonInteraction, Message, MessageActionRow, MessageButton } from "discord.js";
 import InteractionId, { AttackData, COMMANDS } from "./InteractionId";
 import { MessageButtonStyles } from "discord.js/typings/enums";
@@ -62,8 +62,31 @@ const testValid = async (interaction: ButtonInteraction) => {
     }
 }
 
+const start = async (moi: Message | ButtonInteraction, pos = 0) => {
+    const stamina = await getStamina(moi);
+    const buttons = Object.values(routes)
+        .sort((a,b) => a.cost - b.cost )
+        .slice(pos, pos + 5)
+        .map(route => new MessageButton()
+            .setCustomId(InteractionId.objectToCustomId({
+                command: COMMANDS.BATTLE,
+                id: moi instanceof Message ? moi.author.id : moi.user.id,
+                route: route.id,
+            }))
+            .setLabel(`${route.name} (${route.cost} stamina)`)
+            .setStyle(MessageButtonStyles.PRIMARY)
+            .setDisabled(stamina.max < route.cost)
+        );
+    return [new MessageActionRow().addComponents(buttons)]
+};
+
 addExclamationCommand('battle', async (msg, args) => {
     try {
+        // msg.reply({
+        //     components: await start(msg),
+        //     content: 'a'
+        // });
+        // return;
         const inventory = await Inventory.get(msg);
         const hasTestStick = msg.guildId === '620635349173010465' || inventory.items.find((item) => item.id === Inventory.ITEM_DICT['The test stick'] && item.equipped);
         const stamina = (await getStamina(msg));
