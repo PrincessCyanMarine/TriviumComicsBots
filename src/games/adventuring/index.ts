@@ -146,9 +146,9 @@ addD20ButtonCommand(COMMANDS.ATTACK, async (interaction) => {
         const player = await PlayerEntity.spawn(interaction, undefined, parseInt(data.php));
 
         const playerAttack = player.attackEntity(enemy);
-        if (tryResolve(interaction, player, enemy, route)) return;
+        if (await tryResolve(interaction, player, enemy, route)) return;
         const enemyAttack = enemy.attackEntity(player);
-        if (tryResolve(interaction, player, enemy, route)) return;
+        if (await tryResolve(interaction, player, enemy, route)) return;
 
         const actions: string[] = [];
         const populateActions = (entity: Entity, target: Entity, info: AttackInfo) => {
@@ -175,7 +175,9 @@ addD20ButtonCommand(COMMANDS.ATTACK, async (interaction) => {
     }
 })
 
-const win = (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entity, route: Route) => {
+const win = async (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entity, route: Route) => {
+    const inventory = await Inventory.get(interaction);
+    if (inventory.items.find((item) => item.id === Inventory.ITEM_DICT['The test stick'] && item.equipped)) return '';
     const drops = enemy.rollDrops();
     const gold = enemy.rollGold()
     drops.forEach((item) => Inventory.give(interaction, item, item.count || 1));
@@ -186,7 +188,9 @@ const win = (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entity
     return res.join('\n');
 }
 
-const lose = (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entity, route: Route) => {
+const lose = async (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entity, route: Route) => {
+    const inventory = await Inventory.get(interaction);
+    if (inventory.items.find((item) => item.id === Inventory.ITEM_DICT['The test stick'] && item.equipped)) return '';
     const gold = enemy.rollGold()
     Inventory.addGold(interaction, -gold);
     const res = [];
@@ -194,7 +198,7 @@ const lose = (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entit
     return res.join('\n');
 }
 
-const tryResolve = (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entity, route: Route): Boolean => {
+const tryResolve = async (interaction: ButtonInteraction, player: PlayerEntity, enemy: Entity, route: Route): Promise<Boolean> => {
     const resolve = (winner: Entity, loser: Entity, append?: string) => {
         let msg = `${winner} won against ${loser} on ${route}`;
         if (append) msg += '\n' + append;
@@ -206,9 +210,9 @@ const tryResolve = (interaction: ButtonInteraction, player: PlayerEntity, enemy:
         return true;
     }
     if (enemy.dead) {
-        return resolve(player, enemy, win(interaction, player, enemy, route));
+        return resolve(player, enemy, await win(interaction, player, enemy, route));
     }
-    if (player.dead) return resolve(enemy, player, lose(interaction, player, enemy, route));
+    if (player.dead) return resolve(enemy, player, await lose(interaction, player, enemy, route));
     return false;
 };
 const goAgainButton = (moi: Message | ButtonInteraction) => new MessageActionRow().addComponents(
