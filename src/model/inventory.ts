@@ -48,6 +48,8 @@ export namespace Inventory {
         equippable?: boolean;
         consumable?: boolean;
         equipped?: boolean;
+        disadvantage?: boolean;
+        advantage?: boolean;
         id: number | string;
         maxCount?: number;
         count?: number;
@@ -758,6 +760,32 @@ export namespace Inventory {
             sellPrice: 0,
             effects: [],
             slot: "ring",
+        },
+        'unlucky_ring': {
+            name: "Unlucky Ring",
+            description: "A ring that gives the wearer disadvantage",
+            id: 'unlucky_ring',
+            equippable: true,
+            rarity: "legendary",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "ring",
+            disadvantage: true
+        },
+        'lucky_ring': {
+            name: "Lucky Ring",
+            description: "A ring that gives the wearer advantage",
+            id: 'lucky_ring',
+            equippable: true,
+            rarity: "legendary",
+            type: "armor",
+            buyPrice: 0,
+            sellPrice: 0,
+            effects: [],
+            slot: "ring",
+            advantage: true
         },
         [ITEM_DICT["Basic Lesser Ring"]]: {
             name: "Basic Lesser Ring",

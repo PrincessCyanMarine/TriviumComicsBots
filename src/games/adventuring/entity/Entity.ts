@@ -131,9 +131,17 @@ export default class Entity implements EntityDataObject {
         return this.damage.reduce((acc, die) => [...acc, ...(typeof die === 'number' ? [([0, die] as unknown as RolledDie)] : rollDice(die))], [] as RolledDice);
     }
 
+    rollAttack() {
+        const disadvantage = this.inventory.find(item => item.equipped && item.disadvantage);
+        const advantage = this.inventory.find(item => item.equipped && item.advantage);
+        const firstRoll = rollDie(20);
+        const secondRoll = rollDie(20);
+        return !disadvantage && !advantage ? firstRoll : disadvantage ? Math.min(firstRoll, secondRoll) : Math.max(firstRoll, secondRoll);
+    }
+
     attackEntity(target: Entity): AttackInfo {
         const res: AttackInfo = { rolled: [], damage: 0, crit: false, critFail: false, hit: false, roll: 0 };
-        const roll = rollDie(20);
+        const roll = this.rollAttack();
         res.roll = roll;
         res.crit = this.testCrit(roll, target);
         res.critFail = this.testCritFail(roll, target);
