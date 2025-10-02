@@ -4,7 +4,6 @@ import { Inventory } from "../model/inventory";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { say } from "../common/functions";
 import { sadie } from "../clients";
-import { addD20ButtonCommand } from "../interactions/button/d20";
 import { addSadieButtonCommand } from "../interactions/button/sadie";
 
 let ShopItems: (Partial<Inventory.Item> | [Partial<Inventory.Item>, number | undefined])[] = [

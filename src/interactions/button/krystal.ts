@@ -1,13 +1,28 @@
-import { GuildMember } from "discord.js";
+import { ButtonInteraction, GuildMember } from "discord.js";
 import { database, testing } from "../..";
 import { krystal } from "../../clients";
 import { colors, isRestarting, triviumGuildId } from "../../common/variables";
 import { gitpull, restart, stop, update } from "../../common/functions";
 
+const _commands: { [name: string]: (interaction: ButtonInteraction) => Promise<void> } = {};
+export const addKrystalButtonCommand = (name: string, callback: (interaction: ButtonInteraction) => Promise<void>) => {
+    _commands[name] = callback;
+};
+
+
 krystal.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
-    if (testing && interaction.channelId != "892800588469911663") return;
-    else if (!testing && interaction.channelId == "892800588469911663") return;
+    const _command = _commands[interaction.customId.split("?")[0]];
+    if (_command) {
+        try {
+            await _command(interaction);
+        } catch(err) {
+            console.error(err);
+        }
+        return;
+    }
+    // if (testing && interaction.channelId != "892800588469911663") return;
+    // else if (!testing && interaction.channelId == "892800588469911663") return;
     // console.log(interaction.customId);
     if (["restart", "update", "stop", "gitpull"].includes(interaction.customId)) {
         if (isRestarting()) {
@@ -63,4 +78,6 @@ krystal.on("interactionCreate", async (interaction) => {
             console.error(e);
         }
     }
+
+    interaction.reply({ ephemeral: true, content: "The command " + interaction.customId.split("?")[0] + " has not been implemented" });
 });

@@ -30,13 +30,9 @@ import { getCardStyle, sendCardCustomizationMessage, setCardStyle } from "../../
 import { TextInputStyles } from "discord.js/typings/enums";
 import { defaultstyle, isCardCustomizationMessageFromUser } from "../../d20/functions";
 
-const _commands: { names: string[]; callback: (interaction: ButtonInteraction) => Promise<void> }[] = [];
-export const addD20ButtonCommand = (names: string | string[], callback: (interaction: ButtonInteraction) => Promise<void>) => {
-    if (!Array.isArray(names)) names = [names];
-    _commands.push({
-        names,
-        callback,
-    });
+const _commands: { [name: string]: (interaction: ButtonInteraction) => Promise<void> } = {};
+export const addD20ButtonCommand = (name: string, callback: (interaction: ButtonInteraction) => Promise<void>) => {
+    _commands[name] = callback;
 };
 
 d20.on("interactionCreate", async (interaction) => {
@@ -44,6 +40,11 @@ d20.on("interactionCreate", async (interaction) => {
     // if (testing && interaction.channelId != testChannelId) return;
     // else if (!testing && interaction.channelId == testChannelId) return;
     // console.log(interaction.customId);
+    const _command = _commands[interaction.customId.split("?")[0]];
+    if (_command) {
+        await _command(interaction);
+        return;
+    }
 
     let ignore = ["play-against"];
     for (let command of ignore) if (interaction.customId.startsWith(command)) return;
@@ -141,12 +142,6 @@ d20.on("interactionCreate", async (interaction) => {
             break;
         }
         default:
-            for (let { names, callback } of _commands) {
-                if (names.includes(interaction.customId.split("?")[0])) {
-                    await callback(interaction);
-                    return;
-                }
-            }
             interaction.reply({ ephemeral: true, content: "The command " + interaction.customId.split("?")[0] + " has not been implemented" });
             break;
     }
