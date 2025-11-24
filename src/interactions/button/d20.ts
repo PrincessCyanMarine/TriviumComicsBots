@@ -37,6 +37,7 @@ export const addD20ButtonCommand = (name: string, callback: (interaction: Button
 
 d20.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
+    console.debug('button interaction received:', interaction.customId);
     // if (testing && interaction.channelId != testChannelId) return;
     // else if (!testing && interaction.channelId == testChannelId) return;
     // console.log(interaction.customId);

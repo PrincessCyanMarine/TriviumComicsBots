@@ -16,6 +16,7 @@ export const addD20ModalCommand = (names: string | string[], callback: (interact
 };
 d20.on("interactionCreate", async (interaction) => {
     if (!interaction.isModalSubmit()) return;
+    console.debug('modal submit interaction received:', interaction.customId);
     // if (testing && interaction.channelId != testChannelId) return;
     // else if (!testing && interaction.channelId == testChannelId) return;
 

@@ -104,20 +104,33 @@ export const addSlashCommand = async (
 ) => {
     let bot = clients[botName];
     // console.log("Adding " + command.name + " command to " + botName);
-    if (testing) {
-        let guild = await bot.guilds.fetch(testGuildId);
-        addCommandToGuild(guild, command);
-    } else {
+    // if (testing) {
+    //     let guild = await bot.guilds.fetch(testGuildId);
+    //     addCommandToGuild(guild, command);
+    // } else {
         let guilds = await bot.guilds.fetch();
         if (addToGuilds) guilds = guilds.filter((guild) => addToGuilds.includes(guild.id));
         for (let guild of guilds.values()) {
             await addCommandToGuild(await guild.fetch(), command);
         }
-    }
+    // }
 
     slash_commands[botName] = slash_commands[botName].filter((c) => c.name != command.name);
     slash_commands[botName].push({
         name: command.name,
+        callback,
+    });
+    console.debug('Added command', command.name, 'to', botName);
+};
+
+export const addSlashCommandListener = async (
+    botName: keyof typeof slash_commands,
+    name: string,
+    callback: (interaction: CommandInteraction<CacheType>, startTime: number) => Promise<void>
+) => {
+    slash_commands[botName] = slash_commands[botName].filter((c) => c.name != name);
+    slash_commands[botName].push({
+        name: name,
         callback,
     });
 };

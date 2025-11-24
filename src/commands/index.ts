@@ -4,4 +4,6 @@ let dir = parse(require.resolve(".")).dir;
 readdirSync(dir)
     .filter((f) => !f.startsWith("index"))
     .forEach((file) => require(dir + "/" + file));
-// import "./EmojiRotation";
+import "./EmojiRotation";
+
+// import './quiz'

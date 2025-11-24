@@ -73,6 +73,7 @@ import "./d20/index";
 import "./common/index";
 import "./eli/index";
 import "./ray/index";
+import "./sieg/index";
 import "./interactions/index";
 import "./games/index";
 

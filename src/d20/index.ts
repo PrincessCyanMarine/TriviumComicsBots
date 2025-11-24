@@ -1,13 +1,16 @@
-import { MessageEmbed } from "discord.js";
-import { testing } from "..";
-import { client_list, clients, d20, krystal, logwebhook, mod_alert_webhook } from "../clients";
-import { ignore_message, random_from_array, spawnAsync, wait } from "../common/functions";
+import { MessageEmbed, TextChannel } from "discord.js";
+import { database, testing } from "..";
+import { client_list, clients, d20, krystal, logwebhook, mod_alert_webhook, sadie } from "../clients";
+import { ignore_message, random_from_array, randomchance, spawnAsync, wait } from "../common/functions";
 import { marineId, testChannelId, TIME, triviumGuildId } from "../common/variables";
 import { EmojiCycler } from "./EmojiCycler";
 import { emojiReact, testCommands } from "./commandHandler";
 import { countMessages, d20TimedFunction } from "./functions";
 import { msg2embed } from "../common/functions";
 import { exec } from "child_process";
+import { userMention } from "@discordjs/builders";
+import { addMessageCommand } from "../interactions/slash/common";
+import { addExclamationCommand } from "../common";
 
 d20.on("ready", () => {
     require("../app/index");

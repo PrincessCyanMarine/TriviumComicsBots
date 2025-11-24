@@ -353,8 +353,8 @@ app.get('/*', (req, res) => {
 
 app.use(express.json());
 
-setTimeout(() => {
-  server.listen(port, () => {
-    console.log("Server is listening on http://localhost:" + port);
-  });
-}, 1000);
+// setTimeout(() => {
+//   // server.listen(port, () => {
+//   //   console.log("Server is listening on http://localhost:" + port);
+//   // });
+// }, 1000);

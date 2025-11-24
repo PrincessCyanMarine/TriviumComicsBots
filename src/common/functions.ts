@@ -1556,7 +1556,7 @@ export function changeActivities() {
 }
 
 export function ignore_message(msg: Message, bot: Client): boolean {
-    if (!msg || !msg.member || !msg.author || msg.author.bot || msg.channel.isThread()) return true;
+    if (!msg || !msg.member || !msg.author || msg.author.bot || msg.channel.isThread() || !msg.guild) return true;
     if (msg.content.startsWith("!")) return true;
     if (ignore_channels.includes(msg.channel.id)) return true;
     // if (testing) {

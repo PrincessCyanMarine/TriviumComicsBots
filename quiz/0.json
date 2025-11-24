@@ -1,0 +1,12 @@
+{
+    "question": "Is the correct answer B?",
+    "answers": [
+        "Yes",
+        "No",
+        "Yes",
+        "Yes"
+    ],
+    "correct": "c",
+    "bot": "krystal",
+    "id": "0"
+}

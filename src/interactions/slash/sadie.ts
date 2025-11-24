@@ -33,7 +33,7 @@ sadie.on("interactionCreate", async (interaction) => {
 
     if (testing && interaction.channelId != testChannelId) return;
     else if (!testing && interaction.channelId == testChannelId) return;
-
+    
     switch (interaction.commandName) {
         default:
             for (let { name, callback } of slash_commands["sadie"]) {

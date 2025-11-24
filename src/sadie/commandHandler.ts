@@ -14,5 +14,8 @@ export function testCommands(msg: Message) {
         else if (testWord(args, 'kick')) kicking(msg);
         else if (testWord(args, 'like.?', 'love.?')) tsundere(msg);
         else greet(msg);
+        return false;
+    } else {
+        return true;
     }
 }

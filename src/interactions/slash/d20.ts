@@ -36,11 +36,37 @@ d20.on("ready", async () => {
 });
 d20.on("interactionCreate", async (interaction) => {
     let startTime = Date.now();
-    if (!interaction.isCommand()) return;
+    if (!interaction.isApplicationCommand()) return;
     if (ignore_channels.includes(interaction.channelId)) {
-        reply(interaction, "Try another channel", true);
+        interaction.reply({
+            content: "Try another channel",
+            ephemeral: true,
+        });
         return;
     }
+
+    let shouldStop = false;
+    for (let { name, callback } of application_commands["d20"]) {
+        // console.log(interaction.commandName, name);
+        if (name == interaction.commandName) {
+            callback(interaction, startTime);
+            shouldStop = true;
+            return;
+        }
+    }
+    if (shouldStop) return;
+    if (!interaction.isCommand()) return;
+
+    for (let { name, callback } of slash_commands["d20"]) {
+        console.log(name == interaction.commandName, interaction.commandName, name);
+        if (name == interaction.commandName) {
+            callback(interaction, startTime);
+            console.debug('ran')
+            shouldStop = true;
+            return;
+        }
+    }
+    if (shouldStop) return;
 
     if (interaction.commandName == "test") {
         console.log(interaction.commandName);
@@ -57,8 +83,8 @@ d20.on("interactionCreate", async (interaction) => {
         return;
     }
 
-    if (testing && interaction.channelId != testChannelId) return;
-    else if (!testing && interaction.channelId == testChannelId) return;
+    // if (testing && interaction.channelId != testChannelId) return;
+    // else if (!testing && interaction.channelId == testChannelId) return;
 
     switch (interaction.commandName) {
         // case "mute":
@@ -114,7 +140,7 @@ d20.on("interactionCreate", async (interaction) => {
 
         //     if (!reason || !(typeof reason == "string") || !interaction.guildId || !interaction.channel) {
         //         reply(interaction, "Something went wrong", true);
-        //         return;
+        //         return; has not been implemented
         //     }
         //     warn(player, interaction.guildId, reason, interaction);
         //     break;
@@ -200,34 +226,30 @@ d20.on("interactionCreate", async (interaction) => {
             break;
         }
         default:
-            for (let { name, callback } of slash_commands["d20"]) {
-                // console.log(interaction.commandName, name);
-                if (name == interaction.commandName) {
-                    callback(interaction, startTime);
-                    return;
-                }
-            }
             interaction.reply({ ephemeral: true, content: "The command /" + interaction.commandName + " has not been implemented" });
             break;
     }
 });
 
-d20.on("interactionCreate", async (interaction) => {
-    let startTime = Date.now();
-    if (!interaction.isApplicationCommand()) return;
-    if (ignore_channels.includes(interaction.channelId)) {
-        interaction.reply({
-            content: "Try another channel",
-            ephemeral: true,
-        });
-        return;
-    }
-    for (let { name, callback } of application_commands["d20"]) {
-        // console.log(interaction.commandName, name);
-        if (name == interaction.commandName) {
-            callback(interaction, startTime);
-            return;
-        }
-    }
-    interaction.reply({ ephemeral: true, content: "The command " + interaction.commandName + " has not been implemented" });
-});
+// d20.on("interactionCreate", async (interaction) => {
+//     let startTime = Date.now();
+//     if (!interaction.isApplicationCommand()) return;
+//     console.debug('interaction.type', interaction.type);
+//     if (interaction.type == "MESSAGE_COMPONENT") return;
+//     console.debug('Received application command interaction');
+//     if (ignore_channels.includes(interaction.channelId)) {
+//         interaction.reply({
+//             content: "Try another channel",
+//             ephemeral: true,
+//         });
+//         return;
+//     }
+//     for (let { name, callback } of application_commands["d20"]) {
+//         // console.log(interaction.commandName, name);
+//         if (name == interaction.commandName) {
+//             callback(interaction, startTime);
+//             return;
+//         }
+//     }
+//     // interaction.reply({ ephemeral: true, content: "The command " + interaction.commandName + " has not been implemented" });
+// });

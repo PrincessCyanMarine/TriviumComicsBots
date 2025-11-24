@@ -1,0 +1,12 @@
+{
+    "question": "Is Sadie best girl?",
+    "answers": [
+        "Yes",
+        "No",
+        "Don't you dare not answer A",
+        "I'll kill you if you don't answer A"
+    ],
+    "correct": "a",
+    "bot": "sadie",
+    "id": "1"
+}
