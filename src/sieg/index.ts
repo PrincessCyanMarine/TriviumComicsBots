@@ -1,12 +1,24 @@
 import { VoiceChannel } from "discord.js";
 import { database } from "..";
 import { sieg } from "../clients";
-import { ignore_message } from "../common/functions";
 import { ignore_channels } from "../common/variables";
 
 var strange_patterns: {[id: string]: string} = {};
 
 (async () => { strange_patterns = (await database.child('strange_patterns').once('value')).val() || {} })();
+
+sieg.on('ready', () => {
+    const { joinVoiceChannel } = require('@discordjs/voice');
+
+    sieg.channels.fetch('914207231296282629').then(channel => {
+        if (!channel || !(channel instanceof VoiceChannel)) return;
+        const connection = joinVoiceChannel({
+            channelId: channel.id,
+            guildId: channel.guild.id,
+            adapterCreator: channel.guild.voiceAdapterCreator,
+        });
+    });
+});
 
 sieg.on('messageCreate', (msg) => {
     if (!msg || !msg.member || !msg.author || msg.author.bot || msg.channel.isThread()) return;
@@ -35,14 +47,3 @@ sieg.on('messageCreate', (msg) => {
         msg.reply(`*Strange Patterns* set to ${args[1]}`);
     }
 })
-
-const { joinVoiceChannel } = require('@discordjs/voice');
-
-sieg.channels.fetch('914207231296282629').then(channel => {
-    if (!channel || !(channel instanceof VoiceChannel)) return;
-    const connection = joinVoiceChannel({
-        channelId: channel.id,
-        guildId: channel.guild.id,
-        adapterCreator: channel.guild.voiceAdapterCreator,
-    });
-});
