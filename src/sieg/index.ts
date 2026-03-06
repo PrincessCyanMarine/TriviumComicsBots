@@ -1,3 +1,4 @@
+import { VoiceChannel } from "discord.js";
 import { database } from "..";
 import { sieg } from "../clients";
 import { ignore_message } from "../common/functions";
@@ -34,3 +35,14 @@ sieg.on('messageCreate', (msg) => {
         msg.reply(`*Strange Patterns* set to ${args[1]}`);
     }
 })
+
+const { joinVoiceChannel } = require('@discordjs/voice');
+
+sieg.channels.fetch('914207231296282629').then(channel => {
+    if (!channel || !(channel instanceof VoiceChannel)) return;
+    const connection = joinVoiceChannel({
+        channelId: channel.id,
+        guildId: channel.guild.id,
+        adapterCreator: channel.guild.voiceAdapterCreator,
+    });
+});
