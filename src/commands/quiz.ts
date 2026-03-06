@@ -115,12 +115,12 @@ const endQuiz = (quizId: string, channel: TextChannel) => {
         }\n\n## Answers:\n\`\`\`${
             Object.entries(correct.votes).map(([letter, votes]) => `${letter.toUpperCase()}: ${votes} (${totalVotes === 0 ? 0 : Math.floor((votes/totalVotes) * 100)}%)`).join('\n')
         }\`\`\``);
-        if (!answers[guildId].points) answers[guildId].points = {};
+        if (!answers![guildId].points) answers![guildId].points = {};
         for (let i = 0; i < correct.ranking.length  && i < 10; i++) {
             const { userId } = correct.ranking[i];
-            answers[guildId].points[userId] = (answers[guildId].points[userId] || 0) + (100 - i * 10);
+            answers![guildId].points[userId] = (answers![guildId].points[userId] || 0) + (100 - i * 10);
         }
-        database.child('quiz').child(guildId).child('points').set(answers[guildId].points);
+        database.child('quiz').child(guildId).child('points').set(answers![guildId].points);
         database.child('quiz').child(guildId).child('questions').child(quizId).child('closed').set(true);
         return ({ content: 'Quiz closed', ephemeral: true });
     }
@@ -398,10 +398,10 @@ addD20SlashCommand(quizCommand, async (interaction) => {
             const current = quizzes[id];
             const bot = interaction.options.getString('bot', false) || current.bot;
             const question = interaction.options.getString('question', false) || current.question;
-            const option_a = interaction.options.getString('option_a', false) || current.answers[0];
-            const option_b = interaction.options.getString('option_b', false) || current.answers[1];
-            const option_c = interaction.options.getString('option_c', false) || current.answers[2];
-            const option_d = interaction.options.getString('option_d', false) || current.answers[3];
+            const option_a = interaction.options.getString('option_a', false) || current.answers![0];
+            const option_b = interaction.options.getString('option_b', false) || current.answers![1];
+            const option_c = interaction.options.getString('option_c', false) || current.answers![2];
+            const option_d = interaction.options.getString('option_d', false) || current.answers![3];
             const correct = (interaction.options.getString('correct', false) || current.correct) as 'a' | 'b' | 'c' | 'd';
             const quiz = { question: question, answers: [option_a, option_b, option_c, option_d], correct, bot, id, };
             quizzes[id] = quiz;
@@ -428,7 +428,7 @@ addD20SlashCommand(quizCommand, async (interaction) => {
             const quiz = quizzes[selectedQuiz];
             let content = `${quiz.question}\n\`\`\``;
             for (let i = 0; i < quiz.answers.length; i++) {
-                content += `\n${letters[i].toUpperCase()}: ${quiz.answers[i]}`;
+                content += `\n${letters[i].toUpperCase()}: ${quiz.answers![i]}`;
             }
             content += '\`\`\`';
             if (endTimestamp) {
