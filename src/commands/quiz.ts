@@ -119,7 +119,7 @@ const endQuiz = (quizId: string, channel: TextChannel) => {
         for (let i = 0; i < correct.ranking.length  && i < 10; i++) {
             const { userId } = correct.ranking[i];
             if (!answers![guildId].points) answers![guildId].points = {};
-            answers![guildId]!.points[userId] = (answers![guildId]?.points?.[userId] || 0) + (100 - i * 10);
+            answers![guildId]!.points![userId] = (answers![guildId]?.points?.[userId] || 0) + (100 - i * 10);
         }
         database.child('quiz').child(guildId).child('points').set(answers![guildId].points);
         database.child('quiz').child(guildId).child('questions').child(quizId).child('closed').set(true);
